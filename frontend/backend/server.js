@@ -50,6 +50,7 @@ app.use(
       "http://localhost:5173",
 
       "http://localhost:3000",
+      "https://mega-control-salamanca-frontend.onrender.com",
 
       process.env.FRONTEND_URL,
 
