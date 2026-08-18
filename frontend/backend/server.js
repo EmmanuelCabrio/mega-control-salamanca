@@ -127,6 +127,11 @@ function autenticarToken(
 
     }
 
+    console.log("🔎 LOGIN VALIDADO:", resultado.correcto);
+console.log("🔎 SUPERVISOR:", supervisor);
+console.log("🔎 JWT_SECRET EXISTE:", !!JWT_SECRET);
+console.log("🔎 JWT_SECRET LONGITUD:", JWT_SECRET?.length);
+
 
     const token =
       encabezado.substring(7);
