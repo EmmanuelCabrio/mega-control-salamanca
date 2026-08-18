@@ -1,6 +1,7 @@
 const XLSX = require("xlsx");
 const path = require("path");
-
+const fs = require("fs");
+const os = require("os");
 
 // ==================================================
 // UBICACIÓN DEL EXCEL
@@ -11,6 +12,11 @@ const RUTA_EXCEL = path.join(
   "../data/SEGUIMIENTO 2.0.xlsx"
 );
 
+
+const RUTA_EXCEL_SUPABASE = path.join(
+  os.tmpdir(),
+  "SEGUIMIENTO 2.0.xlsx"
+);
 
 // ==================================================
 // CACHE DE DATOS
@@ -72,6 +78,149 @@ function esValorInvalido(valor) {
 
 }
 
+// ==================================================
+// DESCARGAR EXCEL DESDE SUPABASE
+// ==================================================
+
+async function descargarExcelDesdeSupabase() {
+
+  const supabaseUrl =
+    process.env.SUPABASE_URL;
+
+  const supabaseSecretKey =
+    process.env.SUPABASE_SECRET_KEY;
+
+
+  // ================================================
+  // SI NO HAY SUPABASE
+  // ================================================
+
+  if (
+    !supabaseUrl ||
+    !supabaseSecretKey
+  ) {
+
+    console.log(
+      "💻 SUPABASE no configurado."
+    );
+
+    console.log(
+      "📂 Se utilizará el Excel local."
+    );
+
+    return;
+
+  }
+
+
+  console.log(
+    "☁️ Descargando Excel desde Supabase..."
+  );
+
+
+  // ================================================
+  // DATOS DEL BUCKET Y ARCHIVO
+  // ================================================
+
+  const bucket =
+    encodeURIComponent(
+      "Nombre: mega-data"
+    );
+
+  const archivo =
+    encodeURIComponent(
+      "SEGUIMIENTO 2.0.xlsx"
+    );
+
+
+  // ================================================
+  // DESCARGAR ARCHIVO PRIVADO
+  // ================================================
+
+  const url =
+    `${supabaseUrl}/storage/v1/object/authenticated/${bucket}/${archivo}`;
+
+
+  console.log(
+    "📥 Descargando archivo privado..."
+  );
+
+
+  const respuestaArchivo =
+    await fetch(
+      url,
+      {
+        method: "GET",
+
+        headers: {
+
+          apikey:
+            supabaseSecretKey,
+
+          Authorization:
+            `Bearer ${supabaseSecretKey}`,
+
+        },
+
+      }
+    );
+
+
+  // ================================================
+  // VALIDAR RESPUESTA
+  // ================================================
+
+  if (!respuestaArchivo.ok) {
+
+    const mensaje =
+      await respuestaArchivo.text();
+
+    throw new Error(
+      `No se pudo descargar el Excel: HTTP ${respuestaArchivo.status} ${mensaje}`
+    );
+
+  }
+
+
+  // ================================================
+  // CONVERTIR A BUFFER
+  // ================================================
+
+  const buffer =
+    Buffer.from(
+      await respuestaArchivo.arrayBuffer()
+    );
+
+
+  // ================================================
+  // GUARDAR ARCHIVO TEMPORAL
+  // ================================================
+
+  fs.writeFileSync(
+    RUTA_EXCEL_SUPABASE,
+    buffer
+  );
+
+
+  console.log(
+    "✅ Excel descargado desde Supabase"
+  );
+
+
+  console.log(
+    `📊 Tamaño: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
+  );
+
+
+  console.log(
+    "📂 Archivo temporal:",
+    RUTA_EXCEL_SUPABASE
+  );
+
+}
+
+
+
 
 // ==================================================
 // CARGAR EXCEL
@@ -90,10 +239,20 @@ function cargarExcel() {
     );
 
 
-    const workbook =
-      XLSX.readFile(
-        RUTA_EXCEL
-      );
+    const rutaExcelActual =
+  (
+    process.env.SUPABASE_URL &&
+    process.env.SUPABASE_SECRET_KEY &&
+    fs.existsSync(RUTA_EXCEL_SUPABASE)
+  )
+    ? RUTA_EXCEL_SUPABASE
+    : RUTA_EXCEL;
+
+
+const workbook =
+  XLSX.readFile(
+    rutaExcelActual
+  );
 
 
     return workbook;
@@ -2641,5 +2800,7 @@ module.exports = {
   validarUsuario,
 
   leerExcel,
+
+  descargarExcelDesdeSupabase,
 
 };

@@ -8,6 +8,7 @@ dotenv.config();
 const {
   validarUsuario,
   leerExcel,
+  descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
 // CONFIGURACIÓN
@@ -967,38 +968,73 @@ app.get(
 
 
 // ==================================================
-// SERVIDOR
+// INICIAR SERVIDOR
 // ==================================================
 
-app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
+async function iniciarServidor() {
+
+  try {
 
     console.log(
-      "=========================================="
+      "☁️ Preparando datos desde Supabase..."
     );
 
-    console.log(
-      "🚀 BACKEND SEGUIMIENTO 2.0"
-    );
+    await descargarExcelDesdeSupabase();
 
     console.log(
-      `🌐 Puerto: ${PORT}`
+      "✅ Excel listo para utilizar"
     );
 
-    console.log(
-      "🔐 Autenticación JWT ACTIVADA"
+
+    app.listen(
+      PORT,
+      "0.0.0.0",
+      () => {
+
+        console.log(
+          "=========================================="
+        );
+
+        console.log(
+          "🚀 BACKEND SEGUIMIENTO 2.0"
+        );
+
+        console.log(
+          `🌐 Puerto: ${PORT}`
+        );
+
+        console.log(
+          "🔐 Autenticación JWT ACTIVADA"
+        );
+
+        console.log(
+          "🛡️ APIs protegidas"
+        );
+
+        console.log(
+          "☁️ Excel sincronizado desde Supabase"
+        );
+
+        console.log(
+          "=========================================="
+        );
+
+      }
     );
 
-    console.log(
-      "🛡️ APIs protegidas"
+  } catch (error) {
+
+    console.error(
+      "❌ ERROR AL INICIAR EL BACKEND:"
     );
 
-    console.log(
-      "=========================================="
-    );
+    console.error(error);
+
+    process.exit(1);
 
   }
-);
 
+}
+
+
+iniciarServidor();
