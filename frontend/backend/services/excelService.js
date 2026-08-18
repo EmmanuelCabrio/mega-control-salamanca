@@ -28,7 +28,7 @@ const RUTA_EXCEL_SUPABASE = path.join(
 
 let datosCacheados = null;
 let workbookCacheado = null;
-
+let usuariosCacheados = null;
 
 // ==================================================
 // NOMBRE DE HOJA
@@ -297,14 +297,64 @@ function cargarExcel() {
 }
 
 
+
+function cargarExcelUsuarios() {
+
+  try {
+
+    const workbook =
+      XLSX.readFile(
+        (
+          process.env.SUPABASE_URL &&
+          process.env.SUPABASE_SECRET_KEY &&
+          fs.existsSync(RUTA_EXCEL_SUPABASE)
+        )
+          ? RUTA_EXCEL_SUPABASE
+          : RUTA_EXCEL,
+        {
+          dense: true,
+          sheetRows: 100,
+          cellHTML: false,
+          cellFormula: false,
+          cellStyles: false,
+          cellNF: false,
+        }
+      );
+
+    return workbook;
+
+  } catch (error) {
+
+    console.error(
+      "❌ Error al abrir USERS:"
+    );
+
+    console.error(
+      error.message
+    );
+
+    throw error;
+
+  }
+
+}
+
+
 // ==================================================
 // LEER USERS
 // ==================================================
 
 function obtenerUsuarios() {
 
+  if (usuariosCacheados) {
+
+    return usuariosCacheados;
+
+  }
+
+
   const workbook =
-    cargarExcel();
+    cargarExcelUsuarios();
 
 
   const nombreHoja =
@@ -437,12 +487,14 @@ function obtenerUsuarios() {
   }
 
 
-  console.log(
-    `👥 Usuarios encontrados: ${usuarios.length}`
-  );
+ console.log(
+  `👥 Usuarios encontrados: ${usuarios.length}`
+);
 
+usuariosCacheados =
+  usuarios;
 
-  return usuarios;
+return usuariosCacheados;
 
 }
 
