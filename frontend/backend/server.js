@@ -50,7 +50,9 @@ app.use(
 
       "http://localhost:3000",
 
-    ],
+      process.env.FRONTEND_URL,
+
+    ].filter(Boolean),
 
     methods: [
       "GET",
@@ -850,42 +852,6 @@ app.get(
 
 
 // ==================================================
-// SERVIDOR
-// ==================================================
-
-app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
-
-    console.log(
-      "=========================================="
-    );
-
-    console.log(
-      "🚀 BACKEND SEGUIMIENTO 2.0"
-    );
-
-    console.log(
-      `🌐 Puerto: ${PORT}`
-    );
-
-    console.log(
-      "🔐 Autenticación JWT ACTIVADA"
-    );
-
-    console.log(
-      "🛡️ APIs protegidas"
-    );
-
-    console.log(
-      "=========================================="
-    );
-
-  }
-);
-
-// ==================================================
 // 🏆 RANKING COMPLETO CL SALAMANCA
 // ==================================================
 
@@ -997,3 +963,42 @@ app.get(
 
   }
 );
+
+
+
+// ==================================================
+// SERVIDOR
+// ==================================================
+
+app.listen(
+  PORT,
+  "0.0.0.0",
+  () => {
+
+    console.log(
+      "=========================================="
+    );
+
+    console.log(
+      "🚀 BACKEND SEGUIMIENTO 2.0"
+    );
+
+    console.log(
+      `🌐 Puerto: ${PORT}`
+    );
+
+    console.log(
+      "🔐 Autenticación JWT ACTIVADA"
+    );
+
+    console.log(
+      "🛡️ APIs protegidas"
+    );
+
+    console.log(
+      "=========================================="
+    );
+
+  }
+);
+
