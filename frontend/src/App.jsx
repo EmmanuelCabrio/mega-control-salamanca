@@ -21,7 +21,9 @@ import {
   fetchProtegido
 } from "./services/authService";
 
-
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3001";
 
 
 function App() {
@@ -125,7 +127,7 @@ async function cargarDatos() {
 
     const respuestaRanking =
       await fetchProtegido(
-        "http://localhost:3001/api/ranking-supervisores"
+        `${API_URL}/api/ranking-supervisores`
       );
 if (
   !respuestaRanking.ok
@@ -175,7 +177,7 @@ console.log(
 
 const respuestaTop3CL =
   await fetchProtegido(
-    "http://localhost:3001/api/ranking-cl"
+    `${API_URL}/api/ranking-cl`
   );
 
 console.log(
@@ -232,7 +234,7 @@ console.log(
 
    const respuestaRegistros =
   await fetchProtegido(
-    "http://localhost:3001/api/registros"
+    `${API_URL}/api/registros`
   );
 
 
@@ -253,7 +255,7 @@ console.log(
 
 const respuestaRankingCL =
   await fetchProtegido(
-    "http://localhost:3001/api/ranking-cl-completo"
+    `${API_URL}/api/ranking-cl-completo`
   );
 
 
@@ -360,7 +362,7 @@ console.log(
 
 const respuestaPlanTrabajo =
   await fetchProtegido(
-    "http://localhost:3001/api/plan-trabajo"
+    `${API_URL}/api/plan-trabajo`
   );
 
 
@@ -427,7 +429,7 @@ console.log(
 
 const respuestaPenetracion =
   await fetchProtegido(
-    "http://localhost:3001/api/penetracion"
+    `${API_URL}/api/penetracion`
   );
 
 
