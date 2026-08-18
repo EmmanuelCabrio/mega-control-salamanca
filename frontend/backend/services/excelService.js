@@ -257,10 +257,17 @@ function cargarExcel() {
     );
 
 
-    workbookCacheado =
-      XLSX.readFile(
-        rutaExcelActual
-      );
+   workbookCacheado =
+  XLSX.readFile(
+    rutaExcelActual,
+    {
+      dense: true,
+      cellHTML: false,
+      cellFormula: false,
+      cellStyles: false,
+      cellNF: false,
+    }
+  );
 
 
     console.log(
