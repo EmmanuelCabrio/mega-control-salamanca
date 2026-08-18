@@ -27,7 +27,7 @@ const RUTA_EXCEL_SUPABASE = path.join(
 // se reinicia el backend.
 
 let datosCacheados = null;
-
+let workbookCacheado = null;
 
 
 // ==================================================
@@ -222,40 +222,54 @@ async function descargarExcelDesdeSupabase() {
 
 
 
-// ==================================================
-// CARGAR EXCEL
-// ==================================================
-
 function cargarExcel() {
 
   try {
+
+    // ================================================
+    // USAR CACHE SI EL EXCEL YA FUE CARGADO
+    // ================================================
+
+    if (workbookCacheado) {
+
+      return workbookCacheado;
+
+    }
+
 
     console.log(
       "📂 Cargando Excel:"
     );
 
+
+    const rutaExcelActual =
+      (
+        process.env.SUPABASE_URL &&
+        process.env.SUPABASE_SECRET_KEY &&
+        fs.existsSync(RUTA_EXCEL_SUPABASE)
+      )
+        ? RUTA_EXCEL_SUPABASE
+        : RUTA_EXCEL;
+
+
     console.log(
-      RUTA_EXCEL
+      rutaExcelActual
     );
 
 
-    const rutaExcelActual =
-  (
-    process.env.SUPABASE_URL &&
-    process.env.SUPABASE_SECRET_KEY &&
-    fs.existsSync(RUTA_EXCEL_SUPABASE)
-  )
-    ? RUTA_EXCEL_SUPABASE
-    : RUTA_EXCEL;
+    workbookCacheado =
+      XLSX.readFile(
+        rutaExcelActual
+      );
 
 
-const workbook =
-  XLSX.readFile(
-    rutaExcelActual
-  );
+    console.log(
+      "⚡ Excel cargado en memoria"
+    );
 
 
-    return workbook;
+    return workbookCacheado;
+
 
   } catch (error) {
 
@@ -263,9 +277,11 @@ const workbook =
       "❌ Error al abrir el Excel:"
     );
 
+
     console.error(
       error.message
     );
+
 
     throw error;
 
