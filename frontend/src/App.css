@@ -1,0 +1,3683 @@
+/* =========================================================
+   RESET / BASE
+========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 30px;
+}
+
+
+.card {
+  width: 100%;
+  max-width: 1400px;
+
+  margin: 0 auto;
+
+  background: white;
+
+  border-radius: 25px;
+
+  padding: 40px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TÍTULOS / BIENVENIDA
+========================================================= */
+
+.titulo-principal {
+  text-align: center;
+}
+
+
+.subtitulo {
+  text-align: center;
+  color: #2563eb;
+  margin-top: 50px;
+  margin-bottom: 35px;
+}
+
+
+.linea {
+  width: 100%;
+  height: 1px;
+  background: #d6d6d6;
+  margin-bottom: 35px;
+}
+
+
+.bienvenida {
+  text-align: center;
+  font-size: 46px;
+  margin: 0;
+  color: #16213e;
+}
+
+
+.descripcion {
+  text-align: center;
+  font-size: 22px;
+  color: #000000;
+  margin-top: 25px;
+  margin-bottom: 45px;
+}
+
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.botones {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 45px;
+}
+
+
+.boton {
+  border: none;
+  border-radius: 15px;
+  padding: 18px 35px;
+  font-size: 22px;
+  color: white;
+  background: #2563eb;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+
+.boton:hover {
+  transform: translateY(-3px);
+}
+
+
+.ranking {
+  background: #10b981;
+}
+
+
+.boton-regresar {
+  margin-top: 30px;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 10px;
+  background: #16213e;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+
+.boton-regresar:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+
+.boton-regresar:active {
+  transform: scale(0.96);
+}
+
+
+/* =========================================================
+   KPI / RESUMEN
+========================================================= */
+
+.sales-summary {
+  background: #f8fafc;
+  border-radius: 18px;
+  padding: 25px;
+  text-align: center;
+  border: 2px solid #dbe2e5;
+}
+
+
+.sales-summary h2 {
+  margin: 0;
+  color: #000000;
+}
+
+
+.sales-summary + .sales-summary {
+  margin-top: 20px;
+}
+
+
+.sales-summary h1 {
+  font-size: 70px;
+  color: #2563eb;
+  margin: 20px 0;
+}
+
+
+.sales-summary p {
+  font-size: 22px;
+  color: #16a34a;
+  margin: 0;
+}
+
+
+/* =========================================================
+   GRID PRINCIPAL
+========================================================= */
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-top: 25px;
+  align-items: start;
+}
+
+
+/* =========================================================
+   FOCOS ROJOS
+========================================================= */
+
+.focus-alerts {
+  background: #f8fafc;
+  border: 2px solid #dbe2e5;
+  border-radius: 18px;
+  padding: 25px;
+  align-self: start;
+}
+
+
+.focus-alerts h2 {
+  margin-top: 0;
+  color: rgb(255, 0, 0);
+  font-size: 36px;
+}
+
+
+.focus-alerts h3 {
+  color: #2563eb;
+}
+
+
+.focus-alerts hr {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid #dbe2e5;
+}
+
+
+.alerta {
+  padding: 18px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+.alerta strong {
+  color: #242420;
+  font-size: 20px;
+}
+
+
+.alerta p {
+  margin: 5px 0 0;
+  color: #ff0101;
+  font-size: 18px;
+}
+
+
+.alerta .detalle-alerta {
+  margin: 5px 0;
+  color: #555;
+  font-size: 16px;
+}
+
+
+.alerta button {
+  margin-top: 10px;
+  display: block;
+}
+
+
+.boton-detalle {
+  margin-top: 10px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #385eb0;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+
+.boton-detalle:hover {
+  background: red;
+  transform: translateY(-2px);
+}
+
+
+.boton-detalle:active {
+  background: red;
+  transform: scale(0.95);
+}
+
+
+/* =========================================================
+   CUADRO DE HONOR
+========================================================= */
+
+.honor-board {
+  background: #f8fafc;
+  border: 2px solid #dbe2e5;
+  border-radius: 18px;
+  padding: 25px;
+  align-self: start;
+}
+
+
+.honor-tittle {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+
+.honor-card {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+
+.honor-info {
+  flex: 1;
+}
+
+
+.honor-nombre {
+  display: block;
+  font-size: 16px;
+}
+
+
+.honor-productividad {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+
+/* =========================================================
+   MEDALLAS
+========================================================= */
+
+.honor-medalla {
+  font-size: 28px;
+  width: 40px;
+  text-align: center;
+}
+
+
+.lugar-1 {
+  padding: 20px 14px;
+}
+
+
+.lugar-2 {
+  padding: 16px 14px;
+}
+
+
+.lugar-3 {
+  padding: 12px 14px;
+}
+
+
+.lugar-1 .honor-medalla {
+  font-size: 34px;
+}
+
+
+.lugar-2 .honor-medalla {
+  font-size: 30px;
+}
+
+
+.lugar-3 .honor-medalla {
+  font-size: 26px;
+}
+
+
+/* =========================================================
+   RANKINGS DEL DASHBOARD
+========================================================= */
+
+.rankings-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  align-self: start;
+
+  /* Columna derecha */
+  grid-column: 2;
+  grid-row: 1;
+}
+
+
+/* Las tarjetas ocupan sólo el espacio necesario */
+
+.rankings-dashboard .honor-board {
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+}
+
+
+/* Títulos de rankings */
+
+.rankings-dashboard .honor-tittle {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+}
+
+
+/* Tarjetas individuales */
+
+.rankings-dashboard .honor-card {
+  padding: 4px 6px;
+  margin-bottom: 2px;
+  gap: 6px;
+}
+
+
+/* Medallas */
+
+.rankings-dashboard .honor-medalla {
+  font-size: 20px;
+  width: 28px;
+}
+
+
+/* Nombre */
+
+.rankings-dashboard .honor-nombre {
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+
+/* Productividad */
+
+.rankings-dashboard .honor-productividad {
+  margin: 2px 0 0;
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   NIVELES DE PRODUCTIVIDAD
+========================================================= */
+
+.nivel-verde-fuerte {
+  background: #c3fad6;
+}
+
+
+.nivel-verde {
+  background: #dcfce7;
+}
+
+
+.nivel-amarillo {
+  background: #fef9c3;
+}
+
+
+.nivel-naranja {
+  background: #ffedd5;
+}
+
+
+.nivel-rojo {
+  background: #fee2e2;
+}
+
+
+.nivel-rojo-fuerte {
+  background: #fecaca;
+}
+
+
+/* =========================================================
+   TABLA DEL EQUIPO
+========================================================= */
+
+.equipo-completo {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+
+.team-table {
+  background: #f8fafc;
+  border: 2px solid #dbe2e5;
+  border-radius: 18px;
+  padding: 25px;
+
+  /* Sin scroll interno */
+  max-height: none;
+  overflow: visible;
+}
+
+
+.team-table h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 30px;
+}
+
+
+.team-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+
+/* Encabezado azul */
+
+.team-table th {
+  text-align: center;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  font-size: 18px;
+}
+
+
+.team-table td {
+  padding: 12px;
+  border-bottom: 1px solid #dbe2e5;
+  font-size: 17px;
+}
+
+
+.team-table tbody tr:hover {
+  background: #eaf0ff;
+}
+
+
+/* =========================================================
+   RANKING CLUSTER
+========================================================= */
+
+.ranking-cluster {
+  width: 100%;
+}
+
+
+.ranking-cluster h2 {
+  text-align: center;
+  font-size: 28px;
+  margin: 0 auto 25px auto;
+  color: white;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   TABLA RANKING CLUSTER
+========================================================= */
+
+.tabla-ranking {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  font-size: 18px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+
+/* Encabezado azul */
+
+.tabla-ranking th {
+  background: #2563eb !important;
+  color: white;
+  padding: 15px 12px;
+  text-align: center;
+
+  /* Conservado para el ranking */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+
+.tabla-ranking td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #dbe2e5;
+}
+
+
+.tabla-ranking tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  padding: 20px;
+}
+
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 25px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+
+.login-logo {
+  font-size: 42px;
+  font-weight: bold;
+  color: #2563eb;
+  margin-bottom: 10px;
+}
+
+
+.login-card h1 {
+  margin: 0;
+  color: #16213e;
+}
+
+
+.login-subtitulo {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+
+.login-card form {
+  text-align: left;
+}
+
+
+.login-card label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 7px;
+  font-weight: bold;
+  color: #16213e;
+}
+
+
+.login-card input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #dbe2e5;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+}
+
+
+.login-card input:focus {
+  border-color: #2563eb;
+}
+
+
+.login-button {
+  width: 100%;
+  margin-top: 25px;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+
+.login-button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+
+.login-error {
+  color: red;
+  font-size: 14px;
+  margin-top: 15px;
+}
+
+
+/* =========================================================
+   RESPONSIVE — CELULAR
+========================================================= */
+
+@media (max-width: 700px) {
+
+  /* ================================================
+     CONTENEDOR
+  ================================================ */
+
+  .app {
+    padding: 15px;
+  }
+
+
+  .card {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+
+  /* ================================================
+     TÍTULOS
+  ================================================ */
+
+  .titulo-principal {
+    font-size: 30px;
+  }
+
+
+  .bienvenida {
+    font-size: 30px;
+  }
+
+
+  .descripcion {
+    font-size: 18px;
+    margin-bottom: 30px;
+  }
+
+
+  /* ================================================
+     BOTONES
+  ================================================ */
+
+  .botones {
+    gap: 10px;
+  }
+
+
+  .boton {
+    font-size: 15px;
+    padding: 10px 20px;
+  }
+
+
+  /* ================================================
+     KPI
+  ================================================ */
+
+  .sales-summary h1 {
+    font-size: 30px;
+  }
+
+
+  .sales-summary h2 {
+    font-size: 20px;
+  }
+
+
+  .sales-summary p {
+    font-size: 16px;
+  }
+
+
+  /* ================================================
+     GRID
+  ================================================ */
+
+  .performance-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+
+  /* ================================================
+     FOCOS
+  ================================================ */
+
+  .focus-alerts {
+    padding: 20px;
+  }
+
+
+  .focus-alerts h2 {
+    font-size: 26px;
+  }
+
+
+  .alerta strong {
+    font-size: 18px;
+  }
+
+
+  .boton-detalle {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+
+  /* ================================================
+     RANKINGS
+  ================================================ */
+
+  .rankings-dashboard {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+  }
+
+
+  .rankings-dashboard .honor-board {
+    padding: 12px 15px;
+  }
+
+
+  .rankings-dashboard .honor-tittle {
+    font-size: 19px;
+    margin-bottom: 8px;
+  }
+
+
+  .rankings-dashboard .honor-card {
+    padding: 4px 6px;
+    margin-bottom: 2px;
+  }
+
+
+  .rankings-dashboard .honor-medalla {
+    font-size: 19px;
+    width: 26px;
+  }
+
+
+  .rankings-dashboard .honor-nombre {
+    font-size: 13px;
+  }
+
+
+  .rankings-dashboard .honor-productividad {
+    font-size: 11px;
+  }
+
+
+  /* ================================================
+     TABLA EQUIPO
+     SIN SCROLL INTERNO
+  ================================================ */
+
+  .team-table {
+    max-height: none;
+    overflow: visible;
+    padding: 15px;
+  }
+
+
+  .team-table h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+
+  .team-table th,
+  .team-table td {
+    padding: 10px 8px;
+    font-size: 15px;
+  }
+
+
+  .team-table td:first-child {
+    white-space: nowrap;
+  }
+
+
+  /* ================================================
+     RANKING CLUSTER
+  ================================================ */
+
+  .ranking-cluster {
+    width: 100%;
+  }
+
+
+  .ranking-cluster h2 {
+    text-align: center;
+    font-size: 28px;
+    margin: 0 auto 25px auto;
+    color: white;
+    white-space: nowrap;
+  }
+
+
+  .tabla-ranking {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    font-size: 18px;
+  }
+
+
+  .tabla-ranking td {
+    padding: 11px 12px;
+  }
+
+
+  .tabla-ranking th:nth-child(1),
+  .tabla-ranking td:nth-child(1) {
+    width: 18%;
+  }
+
+
+  .tabla-ranking th:nth-child(2),
+  .tabla-ranking td:nth-child(2) {
+    width: 57%;
+    white-space: nowrap;
+  }
+
+
+  .tabla-ranking th:nth-child(3),
+  .tabla-ranking td:nth-child(3) {
+    width: 25%;
+  }
+
+
+  /* ================================================
+     LOGIN
+  ================================================ */
+
+  .login-card {
+    padding: 30px 20px;
+  }
+
+
+  .login-logo {
+    font-size: 36px;
+  }
+
+
+  .login-card h1 {
+    font-size: 26px;
+  }
+
+}
+/* =========================================================
+   PANTALLA DE CARGA
+========================================================= */
+
+.loading-container {
+  min-height: 100vh;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  background: #000000;
+
+  padding: 20px;
+}
+
+
+.loading-card {
+  width: 100%;
+
+  max-width: 460px;
+
+  background: white;
+
+  border-radius: 25px;
+
+  padding: 45px 30px;
+
+  text-align: center;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.loading-logo {
+  font-size: 46px;
+
+  font-weight: bold;
+
+  color: #2563eb;
+
+  margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   CÍRCULO
+========================================================= */
+
+.loading-spinner {
+  width: 90px;
+
+  height: 90px;
+
+  margin: 0 auto 30px;
+
+  border-radius: 50%;
+
+  border: 7px solid #e5e7eb;
+
+  border-top-color: #2563eb;
+
+  animation:
+    loadingSpin 1s linear infinite;
+}
+
+
+.loading-spinner div {
+  width: 100%;
+
+  height: 100%;
+
+  border-radius: 50%;
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.loading-card h1 {
+  margin: 0;
+
+  color: #16213e;
+
+  font-size: 28px;
+}
+
+
+/* =========================================================
+   FRASE MOTIVACIONAL
+========================================================= */
+
+.loading-frase {
+  min-height: 52px;
+
+  margin: 25px 0 15px;
+
+  font-size: 18px;
+
+  color: #2563eb;
+
+  font-weight: bold;
+
+  line-height: 1.4;
+
+  animation:
+    fraseEntrada 0.5s ease;
+}
+
+
+/* =========================================================
+   ESTADO
+========================================================= */
+
+.loading-status {
+  display: block;
+
+  color: #777;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   ANIMACIÓN DEL CÍRCULO
+========================================================= */
+
+@keyframes loadingSpin {
+
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   ANIMACIÓN DE LAS FRASES
+========================================================= */
+
+@keyframes fraseEntrada {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+/* =========================================================
+   PLAN DE TRABAJO
+========================================================= */
+
+.plan-trabajo {
+
+  width: 100%;
+
+  max-width: 1000px;
+
+  margin: 0 auto;
+
+  padding: 20px;
+
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.plan-header {
+
+  text-align: center;
+
+  margin-bottom: 25px;
+
+}
+
+
+.plan-header h1 {
+
+  margin-bottom: 8px;
+
+  font-size: 30px;
+
+}
+
+
+.plan-header p {
+
+  margin: 0;
+
+  color: #666;
+
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.plan-resumen {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 15px;
+
+  margin-bottom: 25px;
+
+}
+
+
+.plan-resumen > div {
+
+  background: white;
+
+  border-radius: 15px;
+
+  padding: 18px;
+
+  text-align: center;
+
+  box-shadow:
+    0 5px 18px
+    rgba(0, 0, 0, 0.08);
+
+}
+
+
+.plan-resumen strong {
+
+  display: block;
+
+  font-size: 27px;
+
+  color: #2563eb;
+
+}
+
+
+.plan-resumen span {
+
+  display: block;
+
+  margin-top: 5px;
+
+  color: #777;
+
+  font-size: 13px;
+
+}
+
+
+/* =========================================================
+   LISTA DE COLONIAS
+========================================================= */
+
+.colonias-lista {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+
+}
+
+
+/* =========================================================
+   CARD COLONIA
+========================================================= */
+
+.colonia-card {
+
+  background: white;
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 5px 20px
+    rgba(0, 0, 0, 0.08);
+
+}
+
+
+.colonia-header {
+
+  margin-bottom: 18px;
+
+}
+
+
+.colonia-header h2 {
+
+  margin: 0;
+
+  font-size: 20px;
+
+}
+
+
+/* =========================================================
+   DATOS
+========================================================= */
+
+.colonia-datos {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 10px;
+
+}
+
+
+.dato-colonia {
+
+  background: #f5f7fa;
+
+  border-radius: 12px;
+
+  padding: 12px;
+
+  text-align: center;
+
+}
+
+
+.dato-colonia span {
+
+  display: block;
+
+  font-size: 12px;
+
+  color: #777;
+
+  margin-bottom: 5px;
+
+}
+
+
+.dato-colonia strong {
+
+  font-size: 19px;
+
+  color: #16213e;
+
+}
+
+
+.dato-colonia .por-vender {
+
+  color: #e53935;
+
+}
+
+
+/* =========================================================
+   SIN COLONIAS
+========================================================= */
+
+.sin-colonias {
+
+  background: white;
+
+  border-radius: 15px;
+
+  padding: 30px;
+
+  text-align: center;
+
+  color: #777;
+
+}
+
+
+/* =========================================================
+   BOTÓN REGRESAR
+========================================================= */
+
+.plan-trabajo .boton-regresar {
+
+  display: block;
+
+  margin: 25px auto 0;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .plan-trabajo {
+
+    padding: 10px;
+
+  }
+
+
+  .plan-header h1 {
+
+    font-size: 25px;
+
+  }
+
+
+  .plan-resumen {
+
+    grid-template-columns:
+      repeat(3, 1fr);
+
+    gap: 8px;
+
+  }
+
+
+  .plan-resumen > div {
+
+    padding: 12px 6px;
+
+  }
+
+
+  .plan-resumen strong {
+
+    font-size: 21px;
+
+  }
+
+
+  .plan-resumen span {
+
+    font-size: 11px;
+
+  }
+
+
+  .colonia-card {
+
+    padding: 15px;
+
+  }
+
+
+  .colonia-header h2 {
+
+    font-size: 17px;
+
+  }
+
+
+  .colonia-datos {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+  }
+
+}
+
+
+
+
+/* =========================================================
+   LOADING — CELULAR
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .loading-card {
+
+    padding: 35px 22px;
+
+    border-radius: 20px;
+
+  }
+
+
+  .loading-logo {
+
+    font-size: 38px;
+
+  }
+
+
+  .loading-spinner {
+
+    width: 75px;
+
+    height: 75px;
+
+  }
+
+
+  .loading-card h1 {
+
+    font-size: 24px;
+
+  }
+
+
+  .loading-frase {
+
+    font-size: 16px;
+
+  }
+
+}
+
+/* =========================================================
+   📊 PENETRACIÓN POR COLONIA
+========================================================= */
+
+.penetracion-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 35px;
+  background: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.20);
+  color: #16213e;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.penetracion-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.penetracion-icono {
+  font-size: 45px;
+  margin-bottom: 5px;
+}
+
+.penetracion-header h1 {
+  margin: 0;
+  font-size: 32px;
+  color: #16213e;
+}
+
+.penetracion-header p {
+  margin: 10px 0 0;
+  color: #666666;
+  font-size: 17px;
+}
+
+
+/* =========================================================
+   SELECTORES
+========================================================= */
+
+.penetracion-selectores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.penetracion-selector {
+  background: #f8fafc;
+  border: 2px solid #dbe2e5;
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.penetracion-selector label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #16213e;
+  font-size: 16px;
+}
+
+.penetracion-selector select {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #16213e;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none;
+}
+
+.penetracion-selector select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.penetracion-selector select:disabled {
+  background: #e5e7eb;
+  color: #888888;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   ESTADO VACÍO
+========================================================= */
+
+.penetracion-vacio {
+  background: #f8fafc;
+  border: 2px dashed #dbe2e5;
+  border-radius: 18px;
+  padding: 45px 25px;
+  text-align: center;
+}
+
+.penetracion-vacio-icono {
+  font-size: 50px;
+  margin-bottom: 10px;
+}
+
+.penetracion-vacio h2 {
+  margin: 5px 0;
+  color: #16213e;
+}
+
+.penetracion-vacio p {
+  margin: 8px 0 0;
+  color: #777777;
+}
+
+
+/* =========================================================
+   TARJETA DE RESULTADOS
+========================================================= */
+
+.penetracion-card {
+  background: #f8fafc;
+  border: 2px solid #dbe2e5;
+  border-radius: 20px;
+  padding: 25px;
+}
+
+
+/* =========================================================
+   COLONIA
+========================================================= */
+
+.penetracion-colonia {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #dbe2e5;
+}
+
+.penetracion-colonia span {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: #777777;
+  margin-bottom: 5px;
+}
+
+.penetracion-colonia h2 {
+  margin: 0;
+  font-size: 30px;
+  color: #16213e;
+}
+
+.penetracion-colonia small {
+  display: block;
+  margin-top: 8px;
+  color: #2563eb;
+  font-weight: bold;
+}
+
+
+/* =========================================================
+   NSE
+========================================================= */
+
+.penetracion-nse {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  padding: 15px 20px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #dbe2e5;
+}
+
+.penetracion-nse span {
+  color: #555555;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.penetracion-nse strong {
+  font-size: 24px;
+  color: #2563eb;
+}
+
+
+/* =========================================================
+   INDICADORES
+========================================================= */
+
+.penetracion-indicadores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.penetracion-indicador {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 18px 12px;
+  text-align: center;
+  border: 1px solid #dbe2e5;
+}
+
+.penetracion-indicador span {
+  display: block;
+  font-size: 13px;
+  color: #666666;
+  margin-bottom: 8px;
+}
+
+.penetracion-indicador strong {
+  display: block;
+  font-size: 26px;
+  color: #16213e;
+}
+
+
+/* =========================================================
+   PENETRACIÓN DESTACADA
+========================================================= */
+
+.penetracion-indicador.principal {
+  background: #eff6ff;
+  border: 2px solid #2563eb;
+}
+
+.penetracion-indicador.principal span {
+  color: #2563eb;
+  font-weight: bold;
+}
+
+.penetracion-indicador.principal strong {
+  color: #2563eb;
+  font-size: 30px;
+}
+
+
+/* =========================================================
+   POR VENDER
+========================================================= */
+
+.penetracion-indicador:last-child strong {
+  color: #dc2626;
+}
+
+
+/* =========================================================
+   BOTÓN
+========================================================= */
+
+.penetracion-container .boton-regresar {
+  display: block;
+  margin: 25px auto 0;
+}
+/* =========================================================
+   📈 AVANCE SEMANAL
+========================================================= */
+
+.avance-semanal-container {
+
+  width: 100%;
+  max-width: 1100px;
+
+  margin: 0 auto;
+
+  padding: 30px;
+
+  background: #ffffff;
+
+  border-radius: 25px;
+
+  box-shadow:
+    0 20px 50px
+    rgba(0, 0, 0, 0.20);
+
+  color: #16213e;
+
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.avance-semanal-header {
+
+  text-align: center;
+
+  margin-bottom: 25px;
+
+}
+
+
+.avance-semanal-icono {
+
+  font-size: 45px;
+
+  margin-bottom: 5px;
+
+}
+
+
+.avance-semanal-header h1 {
+
+  margin: 0;
+
+  font-size: 32px;
+
+  color: #16213e;
+
+}
+
+
+.avance-semanal-header p {
+
+  margin: 8px 0;
+
+  color: #666;
+
+  font-size: 16px;
+
+}
+
+
+.avance-semanal-supervisor {
+
+  display: inline-block;
+
+  margin-top: 8px;
+
+  padding: 10px 18px;
+
+  background: #eff6ff;
+
+  border-radius: 12px;
+
+  color: #2563eb;
+
+  font-weight: bold;
+
+}
+
+
+/* =========================================================
+   RESUMEN DEL EQUIPO
+========================================================= */
+
+.avance-semanal-resumen {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, 1fr);
+
+  gap: 12px;
+
+  margin-bottom: 30px;
+
+}
+
+
+.avance-resumen-card {
+
+  background: #f8fafc;
+
+  border: 1px solid #dbe2e5;
+
+  border-radius: 15px;
+
+  padding: 16px 8px;
+
+  text-align: center;
+
+}
+
+
+.avance-resumen-card span {
+
+  display: block;
+
+  font-size: 13px;
+
+  color: #666;
+
+  margin-bottom: 8px;
+
+}
+
+
+.avance-resumen-card strong {
+
+  display: block;
+
+  font-size: 26px;
+
+  color: #16213e;
+
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.avance-semanal-tabla-container {
+
+  background: #f8fafc;
+
+  border: 1px solid #dbe2e5;
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+}
+
+
+.avance-semanal-tabla-container h2 {
+
+  margin-top: 0;
+
+  margin-bottom: 18px;
+
+  color: #16213e;
+
+  font-size: 21px;
+
+}
+
+
+
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.avance-semanal-tabla {
+
+  width: 100%;
+
+  min-width: 850px;
+
+  border-collapse: collapse;
+
+  background: #ffffff;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+}
+
+
+.avance-semanal-tabla th {
+
+  padding: 13px 10px;
+
+  background: #16213e;
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  text-align: center;
+
+  white-space: nowrap;
+
+}
+
+
+.avance-semanal-tabla th:first-child {
+
+  text-align: left;
+
+}
+
+
+.avance-semanal-tabla td {
+
+  padding: 13px 10px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  text-align: center;
+
+  color: #16213e;
+
+  font-size: 14px;
+
+}
+
+
+.avance-semanal-tabla td:first-child {
+
+  text-align: left;
+
+  min-width: 240px;
+
+}
+
+
+.avance-semanal-tabla tbody tr:hover {
+
+  background: #eff6ff;
+
+}
+
+
+/* =========================================================
+   PRODUCTIVIDAD
+========================================================= */
+
+.avance-semanal-tabla td:nth-child(2) {
+
+  font-weight: bold;
+
+}
+
+
+/* =========================================================
+   ESTADO VACÍO
+========================================================= */
+
+.avance-semanal-vacio {
+
+  text-align: center;
+
+  padding: 40px 20px;
+
+  background: #ffffff;
+
+  border: 2px dashed #dbe2e5;
+
+  border-radius: 15px;
+
+}
+
+
+.avance-semanal-vacio div {
+
+  font-size: 45px;
+
+}
+
+
+.avance-semanal-vacio h3 {
+
+  color: #16213e;
+
+  margin: 10px 0 5px;
+
+}
+
+
+.avance-semanal-vacio p {
+
+  color: #777;
+
+}
+
+
+/* =========================================================
+   BOTÓN REGRESAR
+========================================================= */
+
+.avance-semanal-container .boton-regresar {
+
+  display: block;
+
+  margin: 25px auto 0;
+
+}
+
+/* Nombre del supervisor */
+
+.nombre-supervisor {
+  margin: 5px 0 0;
+
+  font-size: 35px;
+
+  line-height: 1.15;
+
+  font-weight: 800;
+
+  color: #16213e;
+
+  text-transform: uppercase;
+
+  text-align: center;
+}
+
+
+/* Descripción */
+
+.descripcion {
+  margin-top: 12px;
+
+  font-size: 17px;
+
+  color: #666;
+}
+
+
+/* ==================================================
+   RANKING INICIAL — COMPACTO
+================================================== */
+
+.ranking-overlay {
+  position: fixed;
+  inset: 0;
+  background: #050b18;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 15px;
+
+  z-index: 9999;
+
+  overflow: hidden;
+}
+
+
+.ranking-inicial {
+
+  width: 100%;
+  max-width: 650px;
+
+  max-height: calc(100vh - 30px);
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border-radius: 24px;
+
+  padding: 25px 30px 22px;
+
+  text-align: center;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35);
+
+  border-top: 6px solid #2864e6;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow: hidden;
+}
+
+
+/* ICONO */
+
+.ranking-icono {
+
+  font-size: 45px;
+
+  line-height: 1;
+
+  margin-bottom: 5px;
+}
+
+
+/* TÍTULO */
+
+.ranking-inicial h1 {
+
+  margin: 0;
+
+  color: #14213d;
+
+  font-size: 28px;
+
+  line-height: 1.1;
+
+  font-weight: 900;
+}
+
+
+/* NOMBRE */
+
+.ranking-nombre {
+
+  margin: 8px 0 15px;
+
+  color: #2864e6;
+
+  font-size: 18px;
+
+  line-height: 1.15;
+
+  font-weight: 800;
+}
+
+
+/* POSICIÓN */
+
+.ranking-posicion {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  margin: 5px 0 12px;
+}
+
+
+.ranking-posicion span {
+
+  color: #68758a;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+}
+
+
+.ranking-posicion strong {
+
+  color: #14213d;
+
+  font-size: 58px;
+
+  line-height: 0.95;
+
+  font-weight: 900;
+}
+
+
+.ranking-posicion small {
+
+  color: #8b96a8;
+
+  font-size: 25px;
+}
+
+
+/* PRODUCTIVIDAD */
+
+.ranking-productividad {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+
+  padding: 10px 25px;
+
+  background: #f1f5fb;
+
+  border-radius: 14px;
+
+  color: #68758a;
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+
+.ranking-productividad strong {
+
+  color: #2864e6;
+
+  font-size: 25px;
+}
+
+
+/* MENSAJE PRINCIPAL */
+
+.ranking-inicial h2 {
+
+  margin: 14px 0 5px;
+
+  color: #14213d;
+
+  font-size: 23px;
+
+  line-height: 1.05;
+
+  font-weight: 900;
+}
+
+
+/* MENSAJE */
+
+.ranking-mensaje {
+
+  max-width: 520px;
+
+  margin: 0 auto 15px;
+
+  color: #68758a;
+
+  font-size: 14px;
+
+  line-height: 1.3;
+}
+
+
+/* BOTÓN */
+
+.ranking-continuar {
+
+  width: 100%;
+
+  max-width: 360px;
+
+  border: none;
+
+  border-radius: 13px;
+
+  padding: 13px 20px;
+
+  background: #2864e6;
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  box-shadow:
+    0 7px 18px rgba(40, 100, 230, 0.25);
+}
+
+
+.ranking-continuar:hover {
+
+  transform: translateY(-2px);
+
+}
+
+
+/* ==================================================
+   PANTALLAS BAJAS
+================================================== */
+
+@media (max-height: 750px) {
+
+  .ranking-inicial {
+
+    padding: 18px 25px 16px;
+
+    border-radius: 20px;
+  }
+
+
+  .ranking-icono {
+
+    font-size: 35px;
+
+  }
+
+
+  .ranking-inicial h1 {
+
+    font-size: 24px;
+
+  }
+
+
+  .ranking-nombre {
+
+    margin: 5px 0 10px;
+
+    font-size: 16px;
+
+  }
+
+
+  .ranking-posicion strong {
+
+    font-size: 50px;
+
+  }
+
+
+  .ranking-productividad {
+
+    padding: 7px 20px;
+
+  }
+
+
+  .ranking-productividad strong {
+
+    font-size: 22px;
+
+  }
+
+
+  .ranking-inicial h2 {
+
+    margin: 10px 0 4px;
+
+    font-size: 20px;
+
+  }
+
+
+  .ranking-mensaje {
+
+    margin-bottom: 10px;
+
+    font-size: 13px;
+
+  }
+
+
+  .ranking-continuar {
+
+    padding: 11px 18px;
+
+    font-size: 14px;
+
+  }
+
+}
+
+
+/* =========================================================
+   📱 RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+  .avance-semanal-container {
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+  }
+
+
+  .avance-semanal-header h1 {
+
+    font-size: 26px;
+
+  }
+
+
+  .avance-semanal-resumen {
+
+    grid-template-columns:
+      repeat(3, 1fr);
+
+    gap: 10px;
+
+  }
+
+
+  .avance-resumen-card {
+
+    padding: 14px 6px;
+
+  }
+
+
+  .avance-resumen-card strong {
+
+    font-size: 22px;
+
+  }
+
+}
+
+
+
+/* =========================================================
+   📱 CELULAR
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .penetracion-container {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .penetracion-header h1 {
+    font-size: 26px;
+  }
+
+  .penetracion-header p {
+    font-size: 15px;
+  }
+
+  .penetracion-selectores {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .penetracion-selector {
+    padding: 16px;
+  }
+
+  .penetracion-card {
+    padding: 18px;
+  }
+
+  .penetracion-colonia h2 {
+    font-size: 24px;
+  }
+
+  .penetracion-indicadores {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .penetracion-indicador {
+    padding: 15px 8px;
+  }
+
+  .penetracion-indicador strong {
+    font-size: 22px;
+  }
+
+  .penetracion-indicador.principal strong {
+    font-size: 25px;
+  }
+
+
+  .avance-semanal-container {
+
+    padding: 15px;
+
+  }
+
+
+  .avance-semanal-resumen {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+  }
+
+
+  .avance-semanal-header h1 {
+
+    font-size: 23px;
+
+  }
+
+
+  .avance-semanal-header p {
+
+    font-size: 14px;
+
+  }
+
+
+  .avance-semanal-supervisor {
+
+    font-size: 13px;
+
+    max-width: 100%;
+
+  }
+
+    .bienvenida {
+    font-size: 30px;
+  }
+
+  .nombre-supervisor {
+    font-size: 30px;
+  }
+
+  .descripcion {
+    font-size: 15px;
+  }
+
+}
+
+/* ==================================================
+   🏆 RANKING DE SUPERVISORES — PREMIUM
+================================================== */
+
+.ranking-supervisores {
+
+  grid-column: 1 / -1;
+
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+
+  margin-top: 35px;
+  padding: 32px 36px 36px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f8faff 100%
+    );
+
+  border-radius: 24px;
+
+  border: 1px solid #dce4f0;
+
+  box-shadow:
+    0 12px 35px rgba(20, 33, 61, 0.10);
+
+}
+
+
+/* ==================================================
+   TÍTULO
+================================================== */
+
+.ranking-supervisores h2 {
+
+  margin: 0;
+
+  color: #14213d;
+
+  font-size: 30px;
+
+  font-weight: 900;
+
+  letter-spacing: -0.5px;
+
+}
+
+
+.ranking-subtitulo {
+
+  margin: 6px 0 25px;
+
+  color: #68758a;
+
+  font-size: 16px;
+
+  font-weight: 500;
+
+}
+
+
+/* ==================================================
+   TABLA
+================================================== */
+
+.ranking-supervisores table {
+
+  width: 100%;
+
+  border-collapse: separate;
+
+  border-spacing: 0;
+
+  table-layout: fixed;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+
+}
+
+
+/* ==================================================
+   COLUMNAS
+================================================== */
+
+.ranking-supervisores th:nth-child(1),
+.ranking-supervisores td:nth-child(1) {
+
+  width: 12%;
+
+  text-align: center;
+
+}
+
+
+.ranking-supervisores th:nth-child(2),
+.ranking-supervisores td:nth-child(2) {
+
+  width: 68%;
+
+  text-align: left;
+
+}
+
+
+.ranking-supervisores th:nth-child(3),
+.ranking-supervisores td:nth-child(3) {
+
+  width: 20%;
+
+  text-align: center;
+
+}
+
+
+/* ==================================================
+   ENCABEZADO
+================================================== */
+
+.ranking-supervisores thead th {
+
+  padding: 18px 22px;
+
+  background: #14213d;
+
+  color: #ffffff;
+
+  font-size: 16px;
+
+  font-weight: 900;
+
+  letter-spacing: .3px;
+
+}
+
+
+.ranking-supervisores thead th:first-child {
+
+  border-radius: 14px 0 0 0;
+
+}
+
+
+.ranking-supervisores thead th:last-child {
+
+  border-radius: 0 14px 0 0;
+
+}
+
+
+/* ==================================================
+   FILAS
+================================================== */
+
+.ranking-supervisores tbody tr {
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease;
+
+}
+
+
+.ranking-supervisores tbody tr:hover {
+
+  transform: scale(1.005);
+
+  box-shadow:
+    0 5px 15px rgba(20, 33, 61, .08);
+
+}
+
+
+/* ==================================================
+   CELDAS
+================================================== */
+
+.ranking-supervisores tbody td {
+
+  padding: 18px 22px;
+
+  border-bottom:
+    1px solid #e6ebf2;
+
+  color: #14213d;
+
+  font-size: 18px;
+
+  vertical-align: middle;
+
+}
+
+
+/* ==================================================
+   PUESTO
+================================================== */
+
+.ranking-supervisores tbody td:nth-child(1) {
+
+  font-size: 24px;
+
+  font-weight: 900;
+
+}
+
+
+/* ==================================================
+   SUPERVISOR
+================================================== */
+
+.ranking-supervisores tbody td:nth-child(2) {
+
+  font-size: 18px;
+
+  font-weight: 800;
+
+}
+
+
+/* ==================================================
+   PRODUCTIVIDAD
+================================================== */
+
+.ranking-supervisores tbody td:nth-child(3) {
+
+  font-size: 24px;
+
+  font-weight: 900;
+
+  color: #2864e6;
+
+}
+
+
+/* ==================================================
+   🥇 PRIMER LUGAR
+================================================== */
+
+.ranking-supervisores tbody tr:nth-child(1) {
+
+  background:
+    linear-gradient(
+      90deg,
+      #fff8d9,
+      #ffffff
+    );
+
+}
+
+
+/* ==================================================
+   🥈 SEGUNDO LUGAR
+================================================== */
+
+.ranking-supervisores tbody tr:nth-child(2) {
+
+  background:
+    linear-gradient(
+      90deg,
+      #f1f4f8,
+      #ffffff
+    );
+
+}
+
+
+/* ==================================================
+   🥉 TERCER LUGAR
+================================================== */
+
+.ranking-supervisores tbody tr:nth-child(3) {
+
+  background:
+    linear-gradient(
+      90deg,
+      #fff0e3,
+      #ffffff
+    );
+
+}
+
+
+/* ==================================================
+   🔵 SUPERVISOR ACTUAL
+================================================== */
+
+.ranking-supervisores tbody tr.supervisor-actual {
+
+  background:
+    linear-gradient(
+      90deg,
+      #e7f0ff,
+      #f8fbff
+    );
+
+  box-shadow:
+    inset 6px 0 0 #2864e6;
+
+}
+
+
+.ranking-supervisores tbody tr.supervisor-actual td {
+
+  font-weight: 900;
+
+}
+
+
+/* ==================================================
+   👉 TÚ ESTÁS AQUÍ
+================================================== */
+
+.tu-posicion {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  margin-left: 14px;
+
+  padding: 6px 13px;
+
+  border-radius: 20px;
+
+  background: #2864e6;
+
+  color: white;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  letter-spacing: .3px;
+
+  box-shadow:
+    0 4px 10px rgba(40, 100, 230, .25);
+
+}
+
+/* ==================================================
+   ÚLTIMA FILA
+================================================== */
+
+.ranking-supervisores tbody tr:last-child td {
+
+  border-bottom: none;
+
+}
+
+
+/* ==================================================
+   MÓVIL
+================================================== */
+
+@media (max-width: 700px) {
+
+  .ranking-supervisores {
+
+    padding: 18px;
+
+  }
+
+
+  .ranking-supervisores h2 {
+
+    font-size: 23px;
+
+  }
+
+
+  .ranking-supervisores table {
+
+    table-layout: auto;
+
+  }
+
+
+  .ranking-supervisores th:nth-child(1),
+  .ranking-supervisores td:nth-child(1) {
+
+    width: 70px;
+
+  }
+
+
+  .ranking-supervisores th:nth-child(2),
+  .ranking-supervisores td:nth-child(2) {
+
+    width: auto;
+
+  }
+
+
+  .ranking-supervisores th:nth-child(3),
+  .ranking-supervisores td:nth-child(3) {
+
+    width: 120px;
+
+  }
+
+
+  .ranking-supervisores tbody td {
+
+    padding: 13px 10px;
+
+    font-size: 14px;
+
+  }
+
+
+  .ranking-supervisores tbody td:nth-child(1) {
+
+    font-size: 20px;
+
+  }
+
+
+  .ranking-supervisores tbody td:nth-child(3) {
+
+    font-size: 17px;
+
+  }
+
+
+  .tu-posicion {
+
+    display: block;
+
+    width: fit-content;
+
+    margin: 5px 0 0;
+
+  }
+
+}
+
+
+
+/* ==================================================
+   🏆 RECONOCIMIENTO TOP 3 CL SALAMANCA
+================================================== */
+
+.cl-recognition {
+
+  width: 100%;
+  max-width: 850px;
+
+  min-height: 100vh;
+
+  padding: 15px 30px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  text-align: center;
+
+  color: white;
+
+}
+
+
+/* ==================================================
+   TROFEO
+================================================== */
+
+.cl-recognition-trofeo {
+
+  font-size: 48px;
+
+  margin-bottom: 0;
+
+  filter:
+    drop-shadow(
+      0 0 20px rgba(255, 204, 50, .55)
+    );
+
+}
+
+
+/* ==================================================
+   TÍTULO
+================================================== */
+
+.cl-recognition h1 {
+
+  margin: 0;
+
+  font-size: 50px;
+
+  line-height: .85;
+
+  font-weight: 1000;
+
+  letter-spacing: 3px;
+
+  color: #ffd84d;
+
+}
+
+
+.cl-recognition h2 {
+
+  margin: 3px 0 7px;
+
+  font-size: 27px;
+
+  font-weight: 900;
+
+  letter-spacing: 2px;
+
+  color: white;
+
+}
+
+
+.cl-recognition-linea {
+
+  width: 150px;
+
+  height: 3px;
+
+  margin: 7px auto 10px;
+
+  background: #ffd84d;
+
+  border-radius: 10px;
+
+}
+
+
+.cl-recognition h3 {
+
+  margin: 0 0 14px;
+
+  font-size: 17px;
+
+  line-height: 1.1;
+
+  font-weight: 900;
+
+  color: #ffffff;
+
+}
+
+
+/* ==================================================
+   PODIO
+================================================== */
+
+.cl-recognition-ranking {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+}
+
+
+/* ==================================================
+   TARJETA GENERAL
+================================================== */
+
+.cl-podio {
+
+  display: flex;
+
+  align-items: center;
+
+  width: 100%;
+
+  min-height: 65px;
+
+  padding: 7px 20px;
+
+  box-sizing: border-box;
+
+  border-radius: 16px;
+
+  border: 1px solid rgba(
+    255,
+    255,
+    255,
+    .2
+  );
+
+  box-shadow:
+    0 8px 25px rgba(
+      0,
+      0,
+      0,
+      .25
+    );
+
+}
+
+
+/* ==================================================
+   🥇 PRIMER LUGAR
+================================================== */
+
+.cl-podio-1 {
+
+  min-height: 82px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffd84d,
+      #c88a08
+    );
+
+  color: #171717;
+
+  border:
+    2px solid #ffe88a;
+
+  box-shadow:
+    0 0 30px rgba(
+      255,
+      216,
+      77,
+      .35
+    );
+
+}
+
+
+/* ==================================================
+   🥈 SEGUNDO LUGAR
+================================================== */
+
+.cl-podio-2 {
+
+  min-height: 68px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dfe4ea,
+      #8993a0
+    );
+
+  color: #172033;
+
+}
+
+
+/* ==================================================
+   🥉 TERCER LUGAR
+================================================== */
+
+.cl-podio-3 {
+
+  min-height: 68px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #d89a62,
+      #94552c
+    );
+
+  color: white;
+
+}
+
+
+/* ==================================================
+   MEDALLAS
+================================================== */
+
+.cl-podio-medalla {
+
+  width: 62px;
+
+  flex-shrink: 0;
+
+  font-size: 38px;
+
+}
+
+
+/* ==================================================
+   INFORMACIÓN
+================================================== */
+
+.cl-podio-info {
+
+  flex: 1;
+
+  text-align: left;
+
+}
+
+
+/* 🥇 MÁS PROTAGONISMO */
+
+.cl-podio-1
+.cl-podio-info strong {
+
+  font-size: 21px;
+
+}
+
+
+/* 🥈 Y 🥉 UN POCO MÁS COMPACTOS */
+
+.cl-podio-2
+.cl-podio-info strong,
+
+.cl-podio-3
+.cl-podio-info strong {
+
+  font-size: 17px;
+
+}
+
+
+.cl-podio-info strong {
+
+  display: block;
+
+  font-weight: 1000;
+
+  line-height: 1.05;
+
+}
+
+
+.cl-podio-info span {
+
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  opacity: .75;
+
+}
+
+
+.cl-podio-info b {
+
+  display: block;
+
+  font-size: 20px;
+
+  font-weight: 1000;
+
+}
+
+
+/* ==================================================
+   PRODUCTIVIDAD #1
+================================================== */
+
+.cl-podio-1
+.cl-podio-info b {
+
+  font-size: 23px;
+
+}
+
+
+/* ==================================================
+   FRASE
+================================================== */
+
+.cl-recognition-frase {
+
+  margin-top: 12px;
+
+}
+
+
+.cl-recognition-frase strong {
+
+  display: block;
+
+  font-size: 16px;
+
+  line-height: 1.1;
+
+}
+
+
+.cl-recognition-frase p {
+
+  margin-top: 5px;
+
+  font-size: 15px;
+
+  line-height: 1.1;
+
+  font-weight: 900;
+
+  color: #ffd84d;
+
+}
+
+
+/* ==================================================
+   BOTÓN
+================================================== */
+
+.cl-recognition-continuar {
+
+  width: 100%;
+
+  max-width: 420px;
+
+  margin: 10px auto 0;
+
+  padding: 11px 25px;
+
+  border: none;
+
+  border-radius: 50px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2864e6,
+      #4385ff
+    );
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: 1000;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 25px rgba(
+      40,
+      100,
+      230,
+      .35
+    );
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+
+}
+
+
+.cl-recognition-continuar:hover {
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(
+      40,
+      100,
+      230,
+      .5
+    );
+
+}
+
+/* ==================================================
+   🎯 CENTRADO HORIZONTAL TOP 3
+================================================== */
+
+.cl-recognition {
+
+  margin-left: auto;
+  margin-right: auto;
+
+  align-items: center;
+
+}
+
+
+.cl-recognition-ranking {
+
+  width: 100%;
+
+  align-items: center;
+
+}
+
+
+.cl-podio {
+
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+
+.cl-recognition-frase {
+
+  width: 100%;
+
+  text-align: center;
+
+}
+
+
+.cl-recognition-continuar {
+
+  display: block;
+
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+
+/* ==================================================
+   📱 CELULAR
+================================================== */
+
+@media (max-width: 700px) {
+
+  .cl-recognition {
+
+    padding:
+      25px 15px;
+
+  }
+
+
+  .cl-recognition-trofeo {
+
+    font-size: 50px;
+
+  }
+
+
+  .cl-recognition h1 {
+
+    font-size: 46px;
+
+  }
+
+
+  .cl-recognition h2 {
+
+    font-size: 25px;
+
+  }
+
+
+  .cl-recognition h3 {
+
+    font-size: 18px;
+
+  }
+
+
+  .cl-podio {
+
+    min-height: 85px;
+
+    padding:
+      12px 15px;
+
+  }
+
+
+  .cl-podio-1 {
+
+    min-height: 105px;
+
+  }
+
+
+  .cl-podio-medalla {
+
+    width: 60px;
+
+    font-size: 38px;
+
+  }
+
+
+  .cl-podio-info strong {
+
+    font-size: 16px;
+
+  }
+
+
+  .cl-podio-info b {
+
+    font-size: 22px;
+
+  }
+
+
+  .cl-recognition-frase strong {
+
+    font-size: 18px;
+
+  }
+
+
+  .cl-recognition-frase p {
+
+    font-size: 17px;
+
+  }
+
+}
+
+
+/* =========================================================
+   VALIDACIÓN DE ACCESO — LOGIN
+========================================================= */
+
+.login-validando {
+  width: 100%;
+
+  text-align: center;
+
+  padding: 25px 0 10px;
+}
+
+
+/* =========================================================
+   TÍTULO DE VALIDACIÓN
+========================================================= */
+
+.login-validando h2 {
+  margin: 0;
+
+  color: #16213e;
+
+  font-size: 28px;
+
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   CÍRCULO DE VALIDACIÓN
+   Reutiliza .loading-spinner
+========================================================= */
+
+.login-validando .loading-spinner {
+  margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   FRASE
+========================================================= */
+
+.login-validando .loading-frase {
+  margin: 20px 0 12px;
+
+  min-height: 52px;
+
+  font-size: 17px;
+
+  color: #2563eb;
+
+  font-weight: bold;
+
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   ESTADO
+========================================================= */
+
+.login-validando .loading-status {
+  display: block;
+
+  color: #777;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
