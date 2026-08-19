@@ -127,11 +127,6 @@ function autenticarToken(
 
     }
 
-    console.log("🔎 LOGIN VALIDADO:", resultado.correcto);
-console.log("🔎 SUPERVISOR:", supervisor);
-console.log("🔎 JWT_SECRET EXISTE:", !!JWT_SECRET);
-console.log("🔎 JWT_SECRET LONGITUD:", JWT_SECRET?.length);
-
 
     const token =
       encabezado.substring(7);
@@ -174,7 +169,17 @@ console.log("🔎 JWT_SECRET LONGITUD:", JWT_SECRET?.length);
 
   } catch (error) {
 
-    return res.status(401).json({
+  console.error(
+    "❌ ERROR AUTENTICAR TOKEN:",
+    error.name
+  );
+
+  console.error(
+    "❌ MENSAJE JWT:",
+    error.message
+  );
+
+  return res.status(401).json({
 
       correcto: false,
 
