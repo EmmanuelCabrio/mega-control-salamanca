@@ -169,15 +169,6 @@ function autenticarToken(
 
   } catch (error) {
 
-  console.error(
-    "❌ ERROR AUTENTICAR TOKEN:",
-    error.name
-  );
-
-  console.error(
-    "❌ MENSAJE JWT:",
-    error.message
-  );
 
   return res.status(401).json({
 
