@@ -2,6 +2,7 @@ const XLSX = require("xlsx");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const crypto = require("crypto");
 
 // ==================================================
 // UBICACIÓN DEL EXCEL
@@ -191,6 +192,15 @@ async function descargarExcelDesdeSupabase() {
       await respuestaArchivo.arrayBuffer()
     );
 
+  const hashExcel =
+  crypto
+    .createHash("sha256")
+    .update(buffer)
+    .digest("hex");
+
+console.log(
+  `🔐 SHA-256 Excel: ${hashExcel}`
+);
 
   // ================================================
   // GUARDAR ARCHIVO TEMPORAL
