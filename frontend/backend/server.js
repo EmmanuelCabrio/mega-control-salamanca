@@ -210,7 +210,7 @@ app.get(
 
 app.post(
   "/auth/login",
-  (req, res) => {
+  async (req, res) => {
 
     try {
 
@@ -236,7 +236,7 @@ app.post(
 
       }
 
-
+      
       const resultado =
         validarUsuario(
           usuario,
@@ -254,7 +254,7 @@ app.post(
 
       }
 
-
+     await leerExcel();
       const supervisor =
         normalizarSupervisor(
           resultado.supervisor
