@@ -2334,7 +2334,6 @@ async function leerExcel() {
 
   }
 
-
   try {
 
     const workbook =
