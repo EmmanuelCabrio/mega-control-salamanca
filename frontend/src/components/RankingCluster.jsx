@@ -13,8 +13,13 @@ function RankingCluster({
   // ORDENAR RANKING 
   // ================================================== 
  
-  const listaCompleta =
-  [...registros];
+const listaCompleta =
+  registros.filter(
+    (promotor) =>
+      promotor?.nombre &&
+      String(promotor.nombre).trim() !== "" &&
+      String(promotor.nombre).trim() !== "0"
+  );
  
   // ================================================== 
   // TOP 3 SI ES COMPACTO 
