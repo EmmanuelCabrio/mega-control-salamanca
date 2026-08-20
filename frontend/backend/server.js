@@ -981,10 +981,16 @@ async function iniciarServidor() {
     );
 
     await descargarExcelDesdeSupabase();
-
+    
     console.log(
-      "✅ Excel listo para utilizar"
-    );
+  "⚙️ Procesando datos del Excel..."
+);
+
+await leerExcel();
+
+console.log(
+  "✅ Datos procesados y listos"
+);
 
 
     app.listen(
