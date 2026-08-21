@@ -4019,3 +4019,200 @@ body {
   }
 
 }
+
+/* ==================================================
+   CHECKLIST DE SEGUIMIENTO
+================================================== */
+
+.seguimiento-container {
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+
+/* ==================================================
+   BOTÓN INICIAR SEGUIMIENTO
+================================================== */
+
+.boton-checklist {
+  display: block;
+  width: 100%;
+  padding: 11px 16px;
+  margin-top: 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* ==================================================
+   CONTENEDOR CHECKLIST
+================================================== */
+
+.checklist-foco {
+  margin-top: 14px;
+  padding: 18px;
+
+  background: #f8fafc;
+
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+}
+
+
+/* ==================================================
+   TÍTULO
+================================================== */
+
+.checklist-foco h3 {
+  margin: 0 0 8px 0;
+
+  font-size: 18px;
+  font-weight: 800;
+
+  color: #172554;
+}
+
+
+/* ==================================================
+   TEXTO INTRODUCTORIO
+================================================== */
+
+.checklist-intro {
+  margin: 0 0 15px 0;
+
+  font-size: 13px;
+  line-height: 1.5;
+
+  color: #64748b;
+}
+
+
+/* ==================================================
+   CADA PUNTO DEL CHECKLIST
+================================================== */
+
+.checklist-item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  width: 100%;
+
+  margin-bottom: 11px;
+
+  padding: 11px 12px;
+
+  box-sizing: border-box;
+
+  background: white;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+
+/* ==================================================
+   CHECKBOX
+================================================== */
+
+.checklist-item input[type="checkbox"] {
+  flex-shrink: 0;
+
+  width: 18px;
+  height: 18px;
+
+  margin-top: 2px;
+
+  cursor: pointer;
+}
+
+
+/* ==================================================
+   TEXTO DEL CHECKLIST
+================================================== */
+
+.checklist-item span {
+  display: block;
+
+  flex: 1;
+
+  font-size: 14px;
+
+  line-height: 1.4;
+
+  color: #1e293b;
+}
+
+
+/* ==================================================
+   PROGRESO
+================================================== */
+
+.checklist-progreso {
+  margin-top: 15px;
+
+  text-align: center;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #475569;
+}
+
+
+/* ==================================================
+   BOTÓN CONTINUAR
+================================================== */
+
+.boton-continuar-compromiso {
+  display: block;
+
+  width: 100%;
+
+  margin-top: 14px;
+
+  padding: 12px 16px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #16a34a;
+
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+/* ==================================================
+   BOTÓN DESHABILITADO
+================================================== */
+
+.boton-continuar-compromiso:disabled {
+  background: #cbd5e1;
+
+  color: #64748b;
+
+  cursor: not-allowed;
+}
