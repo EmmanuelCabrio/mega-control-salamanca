@@ -66,87 +66,123 @@ function FocosRojosIniciales({
 
     <div className="focos-rojos-iniciales">
 
-
-      {/* ============================================
-          TÍTULO
-      ============================================ */}
-
-      <h1>
-        🔴 Focos Rojos
-      </h1>
+      <div className="focos-rojos-iniciales-card">
 
 
-      <p>
-        Estos son los 2 focos prioritarios
-        que requieren tu atención hoy.
-      </p>
+        {/* ==========================================
+            ICONO
+        ========================================== */}
 
+        <div className="focos-rojos-iniciales-icono">
 
-      {/* ============================================
-          LISTA
-      ============================================ */}
-
-      {lista.length > 0 ? (
-
-        <div className="focos-rojos-iniciales-lista">
-
-          {lista.map(
-            (
-              promotor
-              
-            ) => (
-
-              <div
-                key={
-                  promotor.nombre
-                }
-
-                className="foco-rojo-inicial"
-              >
-
-                <span>
-                  🔴
-                </span>
-
-                <strong>
-                  {promotor.nombre}
-                </strong>
-
-              </div>
-
-            )
-          )}
+          🔴
 
         </div>
 
-      ) : (
 
-        <p>
-          🟢 ¡Excelente!
-          No tienes focos rojos hoy.
+        {/* ==========================================
+            TÍTULO
+        ========================================== */}
+
+        <h1>
+
+          Focos Rojos
+
+        </h1>
+
+
+        {/* ==========================================
+            MENSAJE
+        ========================================== */}
+
+        <p className="focos-rojos-iniciales-subtitulo">
+
+          Estos son los 2 focos que requieren
+          tu atención hoy.
+
         </p>
 
-      )}
+
+        {/* ==========================================
+            LISTA
+        ========================================== */}
+
+        {lista.length > 0 ? (
+
+          <div className="focos-rojos-iniciales-lista">
+
+            {lista.map(
+              (promotor) => (
+
+                <div
+                  key={
+                    promotor.nombre
+                  }
+
+                  className="foco-rojo-inicial"
+                >
+
+                  <span className="foco-rojo-inicial-icono">
+
+                    🔴
+
+                  </span>
 
 
-      {/* ============================================
-          CONTINUAR
-      ============================================ */}
+                  <strong>
 
-      <button
+                    {promotor.nombre}
 
-        type="button"
+                  </strong>
 
-        onClick={
-          onContinuar
-        }
+                </div>
 
-      >
+              )
+            )}
 
-        Continuar →
+          </div>
 
-      </button>
+        ) : (
 
+          <div className="focos-rojos-iniciales-vacio">
+
+            🟢
+
+            <strong>
+              ¡Excelente!
+            </strong>
+
+            <span>
+              No tienes focos rojos hoy.
+            </span>
+
+          </div>
+
+        )}
+
+
+        {/* ==========================================
+            CONTINUAR
+        ========================================== */}
+
+        <button
+
+          type="button"
+
+          className="focos-rojos-iniciales-boton"
+
+          onClick={
+            onContinuar
+          }
+
+        >
+
+          Continuar →
+
+        </button>
+
+
+      </div>
 
     </div>
 
