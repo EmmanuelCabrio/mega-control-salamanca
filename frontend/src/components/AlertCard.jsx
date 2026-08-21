@@ -31,6 +31,36 @@ function AlertCard({
 
 
   // ==================================================
+  // CHECKLIST
+  // ==================================================
+
+  const [
+    checklist,
+    setChecklist
+  ] = useState({
+
+    causaIdentificada: false,
+
+    actividadRevisada: false,
+
+    retroalimentacionRealizada: false,
+
+    accionDefinida: false
+
+  });
+
+
+  // ==================================================
+  // MOSTRAR CHECKLIST
+  // ==================================================
+
+  const [
+    mostrarChecklist,
+    setMostrarChecklist
+  ] = useState(false);
+
+
+  // ==================================================
   // SELECCIONAR MOTIVO DE AUSENCIA
   // ==================================================
 
@@ -79,6 +109,43 @@ function AlertCard({
 
 
   // ==================================================
+  // ACTUALIZAR CHECKLIST
+  // ==================================================
+
+  function cambiarChecklist(
+    campo
+  ) {
+
+    setChecklist(
+      (actual) => ({
+
+        ...actual,
+
+        [campo]:
+          !actual[campo]
+
+      })
+    );
+
+  }
+
+
+  // ==================================================
+  // VALIDAR CHECKLIST
+  // ==================================================
+
+  const checklistCompleto =
+
+    checklist.causaIdentificada &&
+
+    checklist.actividadRevisada &&
+
+    checklist.retroalimentacionRealizada &&
+
+    checklist.accionDefinida;
+
+
+  // ==================================================
   // RENDER
   // ==================================================
 
@@ -92,7 +159,9 @@ function AlertCard({
       ============================================ */}
 
       <strong>
+
         🔴 {promotor.nombre}
+
       </strong>
 
 
@@ -181,7 +250,7 @@ function AlertCard({
             <strong>
 
               {Number(
-                promotor.productividad
+                promotor.productividad ?? 0
               ).toFixed(2)}
 
             </strong>
@@ -201,7 +270,7 @@ function AlertCard({
 
             <strong>
 
-              {promotor.diasSinVenta}
+              {promotor.diasSinVenta ?? 0}
 
             </strong>
 
@@ -220,7 +289,7 @@ function AlertCard({
 
             <strong>
 
-              {promotor.recuperaciones}
+              {promotor.recuperaciones ?? 0}
 
             </strong>
 
@@ -247,6 +316,7 @@ function AlertCard({
                 <ul>
 
                   {promotor.detalles.map(
+
                     (
                       detalle,
                       index
@@ -261,6 +331,7 @@ function AlertCard({
                       </li>
 
                     )
+
                   )}
 
                 </ul>
@@ -271,7 +342,256 @@ function AlertCard({
 
 
           {/* ========================================
-              MARCAR AUSENCIA
+              CHECKLIST
+          ======================================== */}
+
+          <div className="seguimiento-container">
+
+
+            <button
+
+              type="button"
+
+              className="boton-checklist"
+
+              onClick={() =>
+                setMostrarChecklist(
+                  !mostrarChecklist
+                )
+              }
+
+            >
+
+              {mostrarChecklist
+
+                ? "🔼 Ocultar checklist"
+
+                : "☑️ Iniciar seguimiento"
+
+              }
+
+            </button>
+
+
+            {/* ======================================
+                CHECKLIST
+            ====================================== */}
+
+            {mostrarChecklist && (
+
+              <div className="checklist-foco">
+
+
+                <h3>
+
+                  ☑️ Checklist de intervención
+
+                </h3>
+
+
+                <p className="checklist-intro">
+
+                  Antes de definir el compromiso,
+                  asegúrate de haber revisado
+                  estos puntos.
+
+                </p>
+
+
+                {/* ==================================
+                    PUNTO 1
+                ================================== */}
+
+                <label className="checklist-item">
+
+                  <input
+
+                    type="checkbox"
+
+                    checked={
+                      checklist.causaIdentificada
+                    }
+
+                    onChange={() =>
+                      cambiarChecklist(
+                        "causaIdentificada"
+                      )
+                    }
+
+                  />
+
+                  <span>
+
+                    🔎 Identifiqué la causa
+                    principal del foco rojo.
+
+                  </span>
+
+                </label>
+
+
+                {/* ==================================
+                    PUNTO 2
+                ================================== */}
+
+                <label className="checklist-item">
+
+                  <input
+
+                    type="checkbox"
+
+                    checked={
+                      checklist.actividadRevisada
+                    }
+
+                    onChange={() =>
+                      cambiarChecklist(
+                        "actividadRevisada"
+                      )
+                    }
+
+                  />
+
+                  <span>
+
+                    📋 Revisé su actividad
+                    y desempeño.
+
+                  </span>
+
+                </label>
+
+
+                {/* ==================================
+                    PUNTO 3
+                ================================== */}
+
+                <label className="checklist-item">
+
+                  <input
+
+                    type="checkbox"
+
+                    checked={
+                      checklist.retroalimentacionRealizada
+                    }
+
+                    onChange={() =>
+                      cambiarChecklist(
+                        "retroalimentacionRealizada"
+                      )
+                    }
+
+                  />
+
+                  <span>
+
+                    🗣️ Realicé una
+                    retroalimentación directa.
+
+                  </span>
+
+                </label>
+
+
+                {/* ==================================
+                    PUNTO 4
+                ================================== */}
+
+                <label className="checklist-item">
+
+                  <input
+
+                    type="checkbox"
+
+                    checked={
+                      checklist.accionDefinida
+                    }
+
+                    onChange={() =>
+                      cambiarChecklist(
+                        "accionDefinida"
+                      )
+                    }
+
+                  />
+
+                  <span>
+
+                    🎯 Identifiqué el área
+                    específica que debe mejorar.
+
+                  </span>
+
+                </label>
+
+
+                {/* ==================================
+                    AVANCE DEL CHECKLIST
+                ================================== */}
+
+                <div className="checklist-progreso">
+
+                  {Object.values(
+                    checklist
+                  ).filter(Boolean).length}
+
+                  {" / "}
+
+                  {Object.keys(
+                    checklist
+                  ).length}
+
+                  {" "}completados
+
+                </div>
+
+
+                {/* ==================================
+                    CONTINUAR
+                ================================== */}
+
+                <button
+
+                  type="button"
+
+                  className="boton-continuar-compromiso"
+
+                  disabled={
+                    !checklistCompleto
+                  }
+
+                  onClick={() => {
+
+                    console.log(
+                      "Checklist completado para:",
+                      promotor.nombre
+                    );
+
+                  }}
+
+                >
+
+                  {checklistCompleto
+
+                    ? "🎯 Continuar con compromiso →"
+
+                    : "🔒 Completa el checklist"
+
+                  }
+
+                </button>
+
+
+              </div>
+
+            )}
+
+          </div>
+
+
+          {/* ========================================
+              AUSENCIA
           ======================================== */}
 
           {!ausencia && (
@@ -295,10 +615,6 @@ function AlertCard({
 
               </button>
 
-
-              {/* ==================================
-                  OPCIONES DE AUSENCIA
-              ================================== */}
 
               {mostrarAusencia && (
 
