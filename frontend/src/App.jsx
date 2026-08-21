@@ -20,6 +20,7 @@ import CLRecognition from "./components/CLRecognition";
 import {
   fetchProtegido
 } from "./services/authService";
+import FocosRojosIniciales from "./components/FocosRojosIniciales";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -80,6 +81,15 @@ const [
   setMostrarReconocimientoCL
 ] = useState(false);
 
+ // ==================================================
+//  FOCOS ROJOS INICIALES
+// ================================================== 
+
+
+  const [
+  mostrarFocosRojosIniciales,
+  setMostrarFocosRojosIniciales
+] = useState(false);
 
   // ==================================================
   // PENETRACIÓN
@@ -643,13 +653,37 @@ if (mostrarReconocimientoCL) {
         top3Ranking
       }
 
+     onContinuar={() => {
+
+  setMostrarReconocimientoCL(false);
+
+  setMostrarFocosRojosIniciales(true);
+
+}}
+    />
+
+  );
+
+}
+
+
+if (mostrarFocosRojosIniciales) {
+
+  return (
+
+    <FocosRojosIniciales
+
+      registros={
+        registros
+      }
+
+      supervisorSeleccionado={
+        supervisorSeleccionado
+      }
+
       onContinuar={() => {
 
-        console.log(
-          "🔥 SALIENDO DEL TOP 3 CL"
-        );
-
-        setMostrarReconocimientoCL(false);
+        setMostrarFocosRojosIniciales(false);
 
         setVista("supervisor");
 
@@ -660,6 +694,13 @@ if (mostrarReconocimientoCL) {
   );
 
 }
+
+
+ // ==================================================
+  // EMPIEZA EL DASHBOARD
+  // ==================================================
+
+  
 
 
   // ==================================================
