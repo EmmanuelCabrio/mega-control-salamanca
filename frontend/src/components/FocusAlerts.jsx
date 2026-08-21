@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import AlertCard from "./AlertCard";
 
 import {
@@ -15,7 +16,9 @@ function FocusAlerts({
 
   ausencias = {},
 
-  setAusencias
+  setAusencias,
+
+  onFocosCalculados
 
 }) {
 
@@ -74,6 +77,32 @@ function FocusAlerts({
     ordenarPorPrioridad(
       [...focosDisponibles]
     ).slice(0, 2);
+
+
+
+    // ==================================================
+  // ENVIAR LOS 2 FOCOS A LA PANTALLA PRINCIPAL
+  // ==================================================
+
+  useEffect(() => {
+
+    if (
+      typeof onFocosCalculados ===
+      "function"
+    ) {
+
+      onFocosCalculados(
+        lista
+      );
+
+    }
+
+  }, [
+    registros,
+    supervisorSeleccionado,
+    ausencias,
+    onFocosCalculados
+  ]);
 
 
   // ==================================================
