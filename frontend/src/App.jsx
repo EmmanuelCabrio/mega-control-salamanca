@@ -1035,10 +1035,6 @@ if (mostrarReconocimientoCL) {
               setAusencias
             }
 
-              onFocosCalculados={
-               setFocosRojosHoy
-           }
-
           />
 
 
@@ -1073,70 +1069,6 @@ if (mostrarReconocimientoCL) {
               titulo="🏆 Ranking CL Salamanca"
 
             />
-
-
-          </div>
-
-
-                    {/* ========================================
-              🔴 FOCOS ROJOS DE HOY
-          ======================================== */}
-
-          {focosRojosHoy.length > 0 && (
-
-            <div className="focos-hoy-card">
-
-              <h2>
-                🔴 Estos son tus focos rojos para hoy
-              </h2>
-
-              <p>
-                🎯 Enfócate en ellos durante tu jornada.
-              </p>
-
-              <div className="focos-hoy-list">
-
-                {focosRojosHoy.map(
-                  (promotor) => (
-
-                    <div
-                      key={
-                        promotor.nombre
-                      }
-                      className="foco-hoy-item"
-                    >
-
-                      <div>
-
-                        <strong>
-                          {promotor.nombre}
-                        </strong>
-
-                        <span>
-                          Productividad:{" "}
-                          {Number(
-                            promotor.productividad ?? 0
-                          ).toFixed(2)}
-                        </span>
-
-                      </div>
-
-                      <button
-                        type="button"
-                      >
-                        VER FOCO ROJO →
-                      </button>
-
-                    </div>
-
-                  )
-                )}
-
-              </div>
-
-            </div>
-
-          )}
 
 
           {/* ========================================
