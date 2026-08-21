@@ -1069,6 +1069,8 @@ if (mostrarReconocimientoCL) {
               titulo="🏆 Ranking CL Salamanca"
 
             />
+            
+            </div>
 
 
           {/* ========================================
