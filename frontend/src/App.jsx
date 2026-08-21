@@ -97,6 +97,12 @@ const [
   const [ausencias, setAusencias] =
     useState({});
 
+
+  const [
+  focosRojosHoy,
+  setFocosRojosHoy
+] = useState([]);
+
   // ==================================================
   // LOGIN
   // ==================================================
@@ -1032,6 +1038,10 @@ if (mostrarReconocimientoCL) {
             setAusencias={
               setAusencias
             }
+
+              onFocosCalculados={
+               setFocosRojosHoy
+           }
 
           />
 
