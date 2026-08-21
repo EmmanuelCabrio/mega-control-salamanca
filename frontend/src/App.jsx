@@ -98,10 +98,6 @@ const [
     useState({});
 
 
-  const [
-  focosRojosHoy,
-  setFocosRojosHoy
-] = useState([]);
 
   // ==================================================
   // LOGIN
