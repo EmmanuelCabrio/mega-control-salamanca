@@ -30,6 +30,10 @@ function ChecklistFocoRojo({
 
   const [checks, setChecks] = useState({});
 
+  // Texto adicional capturado por el supervisor
+  const [otraArea, setOtraArea] = useState("");
+  const [accionCorrectiva, setAccionCorrectiva] = useState("");
+
 
   // =========================================================
   // FUNCIÓN PARA MARCAR / DESMARCAR
@@ -286,6 +290,222 @@ const principalArea =
 
 
   // =========================================================
+  // 📄 GENERAR Y DESCARGAR EVIDENCIA HTML
+  // =========================================================
+  //
+  // Tomamos exactamente lo que el supervisor tiene en pantalla:
+  // - casillas marcadas / desmarcadas
+  // - gráfica y diagnóstico
+  // - otra área
+  // - acción correctiva
+  // - datos automáticos del foco rojo
+  //
+  // No usamos WhatsApp ni servidor. El archivo queda en Descargas.
+  // =========================================================
+
+  const exportarHTML = () => {
+
+    const origen =
+      document.getElementById("checklist-foco-rojo");
+
+    if (!origen) {
+      alert("No se pudo generar la evidencia. Intenta nuevamente.");
+      return;
+    }
+
+    const copia = origen.cloneNode(true);
+
+    // -------------------------------------------------------
+    // Eliminar botones de navegación/exportación de la copia
+    // -------------------------------------------------------
+
+    const footer =
+      copia.querySelector('[data-export-footer="true"]');
+
+    if (footer) {
+      footer.remove();
+    }
+
+    // -------------------------------------------------------
+    // Convertir checkboxes a evidencia visual fija
+    // -------------------------------------------------------
+
+    const checksOriginales =
+      origen.querySelectorAll('input[type="checkbox"]');
+
+    const checksCopia =
+      copia.querySelectorAll('input[type="checkbox"]');
+
+    checksCopia.forEach((checkbox, index) => {
+
+      const original =
+        checksOriginales[index];
+
+      const span =
+        document.createElement("span");
+
+      const cumplio =
+        !!original?.checked;
+
+      span.textContent =
+        cumplio ? "☑" : "☐";
+
+      span.style.display = "inline-block";
+      span.style.width = "20px";
+      span.style.fontSize = "18px";
+      span.style.fontWeight = "900";
+      span.style.color =
+        cumplio ? "#176b38" : "#9d1717";
+      span.style.flexShrink = "0";
+
+      checkbox.replaceWith(span);
+    });
+
+    // -------------------------------------------------------
+    // Convertir campo "Otra" a texto fijo
+    // -------------------------------------------------------
+
+    const inputOriginal =
+      origen.querySelector('input[type="text"]');
+
+    const inputCopia =
+      copia.querySelector('input[type="text"]');
+
+    if (inputCopia) {
+
+      const texto =
+        inputOriginal?.value ||
+        otraArea ||
+        "";
+
+      const bloque =
+        document.createElement("div");
+
+      bloque.textContent =
+        texto || "No especificado.";
+
+      bloque.style.padding = "12px";
+      bloque.style.border = "1px solid #d5dce5";
+      bloque.style.borderRadius = "10px";
+      bloque.style.fontSize = "14px";
+      bloque.style.background = "#fff";
+
+      inputCopia.replaceWith(bloque);
+    }
+
+    // -------------------------------------------------------
+    // Convertir acción correctiva a texto fijo
+    // -------------------------------------------------------
+
+    const textareaOriginal =
+      origen.querySelector("textarea");
+
+    const textareaCopia =
+      copia.querySelector("textarea");
+
+    if (textareaCopia) {
+
+      const texto =
+        textareaOriginal?.value ||
+        accionCorrectiva ||
+        "No se registró acción correctiva.";
+
+      const bloque =
+        document.createElement("div");
+
+      bloque.textContent = texto;
+
+      bloque.style.whiteSpace = "pre-wrap";
+      bloque.style.width = "100%";
+      bloque.style.minHeight = "130px";
+      bloque.style.boxSizing = "border-box";
+      bloque.style.border = "1px solid #d5dce5";
+      bloque.style.borderRadius = "10px";
+      bloque.style.padding = "12px";
+      bloque.style.fontFamily =
+        "Arial, Helvetica, sans-serif";
+      bloque.style.fontSize = "14px";
+      bloque.style.background = "#fff";
+
+      textareaCopia.replaceWith(bloque);
+    }
+
+    // -------------------------------------------------------
+    // HTML independiente, listo para guardar/abrir/imprimir
+    // -------------------------------------------------------
+
+    const estilos = `
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 30px 20px;
+        background: #f4f6f9;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #17202a;
+      }
+      .check-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        padding: 10px;
+        border-radius: 9px;
+        background: #f7f9fb;
+        font-size: 14px;
+        line-height: 1.35;
+      }
+      @media print {
+        body { background: #fff; padding: 0; }
+        section, header { break-inside: avoid; }
+      }
+    `;
+
+    const documento = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Foco Rojo - ${vendedor}</title>
+<style>${estilos}</style>
+</head>
+<body>
+${copia.outerHTML}
+</body>
+</html>`;
+
+    const blob =
+      new Blob(
+        [documento],
+        { type: "text/html;charset=utf-8" }
+      );
+
+    const url =
+      URL.createObjectURL(blob);
+
+    const enlace =
+      document.createElement("a");
+
+    const nombreLimpio =
+      vendedor
+        .replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g, "_")
+        .replace(/_+/g, "_");
+
+    enlace.href = url;
+    enlace.download =
+      `Checklist_Foco_Rojo_${nombreLimpio}_${fecha.replace(/\//g, "-")}.html`;
+
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+
+    URL.revokeObjectURL(url);
+
+    alert(
+      "✅ Evidencia descargada correctamente.\n\nYa puedes encontrarla en la carpeta Descargas y compartirla por WhatsApp."
+    );
+  };
+
+
+  // =========================================================
   // COMPONENTE VISUAL PARA CADA CASILLA
   // =========================================================
 
@@ -530,7 +750,10 @@ const principalArea =
 
     <div style={styles.page}>
 
-      <div style={styles.container}>
+      <div
+        id="checklist-foco-rojo"
+        style={styles.container}
+      >
 
 
         {/* =================================================
@@ -1771,6 +1994,8 @@ const principalArea =
 
     <input
       type="text"
+      value={otraArea}
+      onChange={(e) => setOtraArea(e.target.value)}
       placeholder="Especifica otra área de oportunidad..."
       style={{
         width: "100%",
@@ -1812,6 +2037,8 @@ const principalArea =
 
 
           <textarea
+            value={accionCorrectiva}
+            onChange={(e) => setAccionCorrectiva(e.target.value)}
             style={styles.textArea}
             placeholder="Escribe aquí la acción correctiva..."
           />
@@ -1823,7 +2050,10 @@ const principalArea =
             BOTONES
         ================================================= */}
 
-        <div style={styles.footer}>
+        <div
+          data-export-footer="true"
+          style={styles.footer}
+        >
 
           <button
             type="button"
@@ -1837,13 +2067,9 @@ const principalArea =
           <button
             type="button"
             style={styles.exportButton}
-            onClick={() =>
-              alert(
-                "La exportación de evidencia la construiremos en el siguiente paso."
-              )
-            }
+            onClick={exportarHTML}
           >
-            📄 Exportar evidencia
+            📄 Descargar evidencia HTML
           </button>
 
         </div>
