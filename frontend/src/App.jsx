@@ -115,60 +115,12 @@ const [
   // LOGIN
   // ==================================================
 
-  // ==================================================
-  // 🔐 SESIÓN PERSISTENTE
-  // ==================================================
+  const [logueado, setLogueado] =
+    useState(false);
+
 
   const [supervisorSeleccionado, setSupervisorSeleccionado] =
-    useState(() => {
-      try {
-
-        const sesionGuardada =
-          localStorage.getItem("mega_sesion");
-
-        if (!sesionGuardada) {
-          return "";
-        }
-
-        return JSON.parse(
-          sesionGuardada
-        );
-
-      } catch (error) {
-
-        console.error(
-          "❌ No se pudo recuperar la sesión:",
-          error
-        );
-
-        localStorage.removeItem(
-          "mega_sesion"
-        );
-
-        return "";
-
-      }
-    });
-
-
-  const [logueado, setLogueado] =
-    useState(() => {
-
-      try {
-
-        return Boolean(
-          localStorage.getItem(
-            "mega_sesion"
-          )
-        );
-
-      } catch (error) {
-
-        return false;
-
-      }
-
-    });
+    useState("");
 
 
 // ==================================================
@@ -605,29 +557,6 @@ function manejarLogin(
   );
 
 
-  // ==========================================
-  // 💾 GUARDAR SESIÓN
-  // ==========================================
-
-  try {
-
-    localStorage.setItem(
-      "mega_sesion",
-      JSON.stringify(
-        supervisor
-      )
-    );
-
-  } catch (error) {
-
-    console.error(
-      "❌ No se pudo guardar la sesión:",
-      error
-    );
-
-  }
-
-
   setLogueado(
     true
   );
@@ -641,69 +570,16 @@ function manejarLogin(
 
 
   // ==========================================
-  // MOSTRAR RANKING AL ENTRAR
+  // 🏆 MOSTRAR TOP 3 CL AL ENTRAR
   // ==========================================
 
-  setMostrarRankingInicial(
+  setMostrarReconocimientoCL(
     true
   );
 
 }
 
  
-
-  // ==================================================
-  // 🚪 CERRAR SESIÓN
-  // ==================================================
-
-  function cerrarSesion() {
-
-    localStorage.removeItem(
-      "mega_sesion"
-    );
-
-
-    setLogueado(
-      false
-    );
-
-
-    setSupervisorSeleccionado(
-      ""
-    );
-
-
-    setPromotorEnSeguimiento(
-      null
-    );
-
-
-    setMostrarRankingInicial(
-      false
-    );
-
-
-    setMostrarReconocimientoCL(
-      false
-    );
-
-
-    setMostrarFocosRojosIniciales(
-      false
-    );
-
-
-    setVista(
-      "supervisor"
-    );
-
-
-    setAusencias(
-      {}
-    );
-
-  }
-
 
   // ==================================================
   // MOSTRAR LOGIN
@@ -756,9 +632,9 @@ onContinuar={() => {
     false
   );
 
-  setMostrarReconocimientoCL(
+  setMostrarFocosRojosIniciales(
     true
-);
+  );
 
 }}
 
@@ -793,7 +669,7 @@ if (mostrarReconocimientoCL) {
 
   setMostrarReconocimientoCL(false);
 
-  setMostrarFocosRojosIniciales(true);
+  setMostrarRankingInicial(true);
 
 }}
     />
@@ -1098,37 +974,6 @@ if (
         {/* ==========================================
             ENCABEZADO
         ========================================== */}
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            marginBottom: "10px"
-          }}
-        >
-
-          <button
-            type="button"
-            onClick={
-              cerrarSesion
-            }
-            style={{
-              border: "none",
-              borderRadius: "10px",
-              padding: "8px 14px",
-              background: "#b91c1c",
-              color: "#fff",
-              fontWeight: "700",
-              cursor: "pointer",
-              boxShadow:
-                "0 3px 10px rgba(0,0,0,0.12)"
-            }}
-          >
-            🚪 Cerrar sesión
-          </button>
-
-        </div>
 
         <Header />
 
