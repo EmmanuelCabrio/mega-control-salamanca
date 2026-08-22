@@ -21,6 +21,8 @@ import {
   fetchProtegido
 } from "./services/authService";
 import FocosRojosIniciales from "./components/FocosRojosIniciales";
+import ChecklistFocoRojo
+  from "./components/ChecklistFocoRojo";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -120,6 +122,16 @@ const [
   const [supervisorSeleccionado, setSupervisorSeleccionado] =
     useState("");
 
+
+// ==================================================
+// 🔴 VENDEDOR EN SEGUIMIENTO
+// ==================================================
+
+const [
+  promotorEnSeguimiento,
+  setPromotorEnSeguimiento
+] = useState(null);
+  
 
 // ==================================================
 // CARGAR DATOS
@@ -910,6 +922,45 @@ if (mostrarFocosRojosIniciales) {
 
 
   // ==================================================
+// 🔴 VISTA CHECKLIST FOCO ROJO
+// ==================================================
+
+if (
+  vista === "checklistFocoRojo"
+) {
+
+  return (
+
+    <ChecklistFocoRojo
+
+      promotor={
+        promotorEnSeguimiento
+      }
+
+      supervisor={
+        supervisorSeleccionado
+      }
+
+      onRegresar={() => {
+
+        setPromotorEnSeguimiento(
+          null
+        );
+
+        setVista(
+          "supervisor"
+        );
+
+      }}
+
+    />
+
+  );
+
+}
+
+
+  // ==================================================
   // DASHBOARD
   // ==================================================
 
@@ -1075,6 +1126,18 @@ if (mostrarFocosRojosIniciales) {
             setAusencias={
               setAusencias
             }
+
+            onIniciarSeguimiento={(promotor) => {
+
+  setPromotorEnSeguimiento(
+    promotor
+  );
+
+  setVista(
+    "checklistFocoRojo"
+  );
+
+}}
 
           />
 
