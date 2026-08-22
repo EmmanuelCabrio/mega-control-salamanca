@@ -2,15 +2,11 @@ import { useState } from "react";
 
 
 function AlertCard({
-
   promotor,
-
   ausencia,
-
   onAusencia,
-
-  onQuitarAusencia
-
+  onQuitarAusencia,
+  onIniciarSeguimiento
 }) {
 
 
@@ -354,9 +350,9 @@ function AlertCard({
 
               className="boton-checklist"
 
-              onClick={() =>
-                setMostrarChecklist(
-                  !mostrarChecklist
+            onClick={() =>
+                 onIniciarSeguimiento(
+                  promotor
                 )
               }
 
