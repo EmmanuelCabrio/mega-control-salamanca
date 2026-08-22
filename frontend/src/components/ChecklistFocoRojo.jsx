@@ -33,6 +33,7 @@ function ChecklistFocoRojo({
   // Texto adicional capturado por el supervisor
   const [otraArea, setOtraArea] = useState("");
   const [accionCorrectiva, setAccionCorrectiva] = useState("");
+const [evidenciaDescargada, setEvidenciaDescargada] = useState(false);
 
 
   // =========================================================
@@ -495,6 +496,8 @@ ${copia.outerHTML}
 
     document.body.appendChild(enlace);
     enlace.click();
+
+  setEvidenciaDescargada(true);
     enlace.remove();
 
     URL.revokeObjectURL(url);
@@ -2056,12 +2059,27 @@ ${copia.outerHTML}
         >
 
           <button
-            type="button"
-            onClick={onRegresar}
-            style={styles.backButton}
-          >
-            ↩️ Regresar al Dashboard
-          </button>
+    type="button"
+    onClick={() => {
+      if (!evidenciaDescargada) {
+        alert(
+          "Primero debes descargar la evidencia HTML del checklist antes de regresar al Dashboard."
+        );
+        return;
+      }
+
+      onRegresar();
+    }}
+    style={{
+      ...styles.backButton,
+      opacity: evidenciaDescargada ? 1 : 0.55,
+      cursor: evidenciaDescargada ? "pointer" : "not-allowed"
+    }}
+  >
+    {evidenciaDescargada
+      ? "↩️ Regresar al Dashboard"
+      : "🔒 Descarga la evidencia para continuar"}
+  </button>
 
 
           <button
@@ -2069,7 +2087,7 @@ ${copia.outerHTML}
             style={styles.exportButton}
             onClick={exportarHTML}
           >
-            📄 Descargar evidencia HTML
+            📄 Descargar CheckList
           </button>
 
         </div>
