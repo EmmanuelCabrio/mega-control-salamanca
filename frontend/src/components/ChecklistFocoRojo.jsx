@@ -45,6 +45,246 @@ function ChecklistFocoRojo({
   };
 
 
+
+  // =========================================================
+// 📊 MOTOR DEL DIAGNÓSTICO
+// =========================================================
+//
+// El supervisor solamente marca lo que el vendedor SÍ hizo.
+// Lo que no está marcado se considera oportunidad.
+//
+// IMPORTANTE:
+// Algunos puntos son grupos de selección.
+// Ejemplo:
+// Rompimiento del hielo:
+// - Cumplido natural
+// - Disculpa
+// - Observación
+// - Humor
+// - Pregunta inesperada
+//
+// En esos casos NO contamos las opciones no elegidas
+// como errores. Si eligió una técnica, cumplió.
+// =========================================================
+
+
+const diagnosticoAreas = {
+
+  "Imagen / presentación": [
+    "imagen-aseado",
+    "imagen-peinado",
+    "imagen-uniforme",
+    "imagen-gafete",
+    "presentacion-vendedor",
+    "presentacion-empresa"
+  ],
+
+  "Preparación": [
+    "preparacion-analiza",
+    "preparacion-acometida",
+    "preparacion-dimme"
+  ],
+
+  "Rompimiento del hielo": [
+    {
+      tipo: "grupo",
+      ids: [
+        "hielo-cumplido",
+        "hielo-disculpa",
+        "hielo-observacion",
+        "hielo-humor",
+        "hielo-pregunta",
+        "hielo-otra"
+      ]
+    }
+  ],
+
+  "Generación de confianza": [
+    "confianza"
+  ],
+
+  "Sondeo": [
+    "sondeo-costo",
+    "sondeo-compania",
+    "sondeo-megas",
+    "sondeo-canales",
+    "sondeo-telefonia",
+    "sondeo-apps",
+    "sondeo-simetria",
+    "sondeo-tecnologia",
+    "sondeo-servicio"
+  ],
+
+  "Presentación": [
+    "presentacion-sondeo",
+    "presentacion-beneficios",
+    "presentacion-necesidad"
+  ],
+
+  "Argumentación de beneficios": [
+    "beneficios-caracteristicas",
+    "beneficios-claro",
+    "beneficios-precio"
+  ],
+
+  "Manejo de objeciones": [
+    "objecion-acepta",
+    "objecion-profundiza",
+    "objecion-responde",
+    "objecion-cierra"
+  ],
+
+  "Cierre": [
+    "cierre-necesidad",
+    "cierre-reconoce",
+    "cierre-conecta",
+    "cierre-sis",
+    "cierre-solucion",
+    "cierre-senales",
+    {
+      tipo: "grupo",
+      ids: [
+        "cierre-eleccion",
+        "cierre-resumen",
+        "cierre-accion",
+        "cierre-otra"
+      ]
+    },
+    "silencio"
+  ],
+
+  "Venta adicional": [
+    {
+      tipo: "grupo",
+      ids: [
+        "adicional-movil",
+        "adicional-netflix",
+        "adicional-disney",
+        "adicional-max",
+        "adicional-streaming"
+      ]
+    }
+  ],
+
+  "Explicación de condiciones": [
+    "condiciones-paquete",
+    "condiciones-mensualidad",
+    "condiciones-instalacion",
+    "condiciones-plazo",
+    "condiciones-activacion",
+    "condiciones-pago",
+    "condiciones-corte"
+  ],
+
+  "Seguimiento": [
+    "prospecto-dimme",
+    "prospecto-info",
+    "prospecto-seguimiento"
+  ],
+
+  "Registro": [
+    "registro-ventas",
+    "registro-coincide"
+  ],
+
+  "Referidos": [
+    "referidos"
+  ],
+
+  "Despedida": [
+    "despedida-amable",
+    "despedida-impresion"
+  ]
+
+};
+
+
+// =========================================================
+// 🔎 CALCULAR ÁREAS DE OPORTUNIDAD
+// =========================================================
+
+const resultadosDiagnostico = Object.entries(
+  diagnosticoAreas
+).map(([area, criterios]) => {
+
+  let oportunidades = 0;
+  let evaluaciones = 0;
+
+
+  criterios.forEach((criterio) => {
+
+    // ---------------------------------------------
+    // GRUPO DE OPCIONES
+    // ---------------------------------------------
+
+    if (
+      typeof criterio === "object" &&
+      criterio.tipo === "grupo"
+    ) {
+
+      evaluaciones += 1;
+
+      const cumplioGrupo =
+        criterio.ids.some(
+          (id) => checks[id]
+        );
+
+      if (!cumplioGrupo) {
+        oportunidades += 1;
+      }
+
+      return;
+    }
+
+
+    // ---------------------------------------------
+    // CRITERIO INDIVIDUAL
+    // ---------------------------------------------
+
+    evaluaciones += 1;
+
+    if (!checks[criterio]) {
+      oportunidades += 1;
+    }
+
+  });
+
+
+  return {
+    area,
+    oportunidades,
+    evaluaciones
+  };
+
+});
+
+
+// =========================================================
+// 📊 ORDENAR DE MAYOR A MENOR DOLOR
+// =========================================================
+
+const rankingDiagnostico =
+  resultadosDiagnostico
+    .filter(
+      (item) =>
+        item.oportunidades > 0
+    )
+    .sort(
+      (a, b) =>
+        b.oportunidades -
+        a.oportunidades
+    );
+
+
+// =========================================================
+// 🔴 MAYOR ÁREA DE OPORTUNIDAD
+// =========================================================
+
+const principalArea =
+  rankingDiagnostico[0]?.area ||
+  "Sin áreas de oportunidad detectadas";
+
+
   // =========================================================
   // COMPONENTE VISUAL PARA CADA CASILLA
   // =========================================================
@@ -1299,118 +1539,253 @@ function ChecklistFocoRojo({
         </section>
 
 
-        {/* =================================================
-            DIAGNÓSTICO
-        ================================================= */}
+       {/* =================================================
+    DIAGNÓSTICO DEL SUPERVISOR
+================================================= */}
 
-        <section style={styles.section}>
+<section style={styles.section}>
 
-          <div style={styles.sectionHeader}>
+  <div style={styles.sectionHeader}>
+
+    <div
+      style={{
+        ...styles.number,
+        background: "#d71920"
+      }}
+    >
+      🔴
+    </div>
+
+    <h2 style={styles.sectionTitle}>
+      DIAGNÓSTICO DEL SUPERVISOR
+    </h2>
+
+  </div>
+
+
+  <div style={styles.question}>
+    ¿Dónde se encuentra principalmente el área de oportunidad?
+  </div>
+
+
+  {/* =================================================
+      PRINCIPAL ÁREA DE DOLOR
+  ================================================= */}
+
+  <div
+    style={{
+      background: "#fff4f4",
+      border: "1px solid #f3c2c2",
+      borderRadius: "12px",
+      padding: "18px",
+      marginBottom: "20px"
+    }}
+  >
+
+    <div
+      style={{
+        fontSize: "12px",
+        fontWeight: "800",
+        color: "#d71920",
+        textTransform: "uppercase",
+        marginBottom: "6px"
+      }}
+    >
+      🔥 Principal área de oportunidad
+    </div>
+
+
+    <div
+      style={{
+        fontSize: "22px",
+        fontWeight: "900",
+        color: "#17202a"
+      }}
+    >
+      {principalArea}
+    </div>
+
+
+    {rankingDiagnostico.length > 0 && (
+
+      <div
+        style={{
+          fontSize: "13px",
+          color: "#59636e",
+          marginTop: "5px"
+        }}
+      >
+        El área con mayor cantidad de oportunidades
+        detectadas durante la observación.
+      </div>
+
+    )}
+
+  </div>
+
+
+  {/* =================================================
+      GRÁFICA DE DOLOR
+  ================================================= */}
+
+  {rankingDiagnostico.length === 0 ? (
+
+    <div
+      style={{
+        padding: "20px",
+        textAlign: "center",
+        background: "#f1faf4",
+        borderRadius: "12px",
+        color: "#19733a",
+        fontWeight: "700"
+      }}
+    >
+      🟢 No se detectaron áreas de oportunidad.
+    </div>
+
+  ) : (
+
+    <div>
+
+      {rankingDiagnostico.map(
+        (item) => {
+
+          const maxOportunidades =
+            rankingDiagnostico[0]
+              .oportunidades;
+
+          const ancho =
+            maxOportunidades > 0
+              ? (
+                  item.oportunidades /
+                  maxOportunidades
+                ) * 100
+              : 0;
+
+
+          return (
 
             <div
+              key={item.area}
               style={{
-                ...styles.number,
-                background: "#d71920"
+                marginBottom: "16px"
               }}
             >
-              🔴
+
+              {/* ---------------------------------------
+                  NOMBRE + CANTIDAD
+              --------------------------------------- */}
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent:
+                    "space-between",
+                  alignItems: "center",
+                  marginBottom: "6px"
+                }}
+              >
+
+                <span
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "700"
+                  }}
+                >
+                  {item.area}
+                </span>
+
+
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: "900",
+                    color: "#d71920"
+                  }}
+                >
+                  {item.oportunidades}
+                  {" "}
+                  {item.oportunidades === 1
+                    ? "oportunidad"
+                    : "oportunidades"}
+                </span>
+
+              </div>
+
+
+              {/* ---------------------------------------
+                  BARRA
+              --------------------------------------- */}
+
+              <div
+                style={{
+                  width: "100%",
+                  height: "13px",
+                  background: "#edf0f3",
+                  borderRadius: "20px",
+                  overflow: "hidden"
+                }}
+              >
+
+                <div
+                  style={{
+                    width: `${ancho}%`,
+                    height: "100%",
+                    background:
+                      "#d71920",
+                    borderRadius:
+                      "20px",
+                    transition:
+                      "width .3s ease"
+                  }}
+                />
+
+              </div>
+
             </div>
 
-            <h2 style={styles.sectionTitle}>
-              DIAGNÓSTICO DEL SUPERVISOR
-            </h2>
+          );
 
-          </div>
+        }
+      )}
 
+    </div>
 
-          <div style={styles.question}>
-            ¿Dónde se encuentra principalmente el área de oportunidad?
-          </div>
+  )}
 
 
-          <div style={styles.checksGrid}>
+  {/* =================================================
+      OTRA ÁREA
+  ================================================= */}
 
-            <Check id="diag-imagen">
-              Imagen / presentación
-            </Check>
+  <div
+    style={{
+      marginTop: "22px"
+    }}
+  >
 
-            <Check id="diag-preparacion">
-              Preparación
-            </Check>
-
-            <Check id="diag-hielo">
-              Rompimiento del hielo
-            </Check>
-
-            <Check id="diag-confianza">
-              Generación de confianza
-            </Check>
-
-            <Check id="diag-sondeo">
-              Sondeo
-            </Check>
-
-            <Check id="diag-presentacion">
-              Presentación
-            </Check>
-
-            <Check id="diag-beneficios">
-              Argumentación de beneficios
-            </Check>
-
-            <Check id="diag-objeciones">
-              Manejo de objeciones
-            </Check>
-
-            <Check id="diag-cierre">
-              Cierre
-            </Check>
-
-            <Check id="diag-adicional">
-              Venta adicional
-            </Check>
-
-            <Check id="diag-condiciones">
-              Explicación de condiciones
-            </Check>
-
-            <Check id="diag-seguimiento">
-              Seguimiento
-            </Check>
-
-            <Check id="diag-registro">
-              Registro
-            </Check>
-
-          </div>
+    <div style={styles.question}>
+      Otra:
+    </div>
 
 
-          <div
-            style={{
-              ...styles.question,
-              marginTop: "20px"
-            }}
-          >
-            Otra:
-          </div>
+    <input
+      type="text"
+      placeholder="Especifica otra área de oportunidad..."
+      style={{
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "12px",
+        border:
+          "1px solid #d5dce5",
+        borderRadius: "10px",
+        fontSize: "14px"
+      }}
+    />
 
+  </div>
 
-          <input
-            type="text"
-            placeholder="Especifica otra área de oportunidad..."
-            style={{
-              width: "100%",
-              boxSizing: "border-box",
-              padding: "12px",
-              border:
-                "1px solid #d5dce5",
-              borderRadius: "10px",
-              fontSize: "14px"
-            }}
-          />
-
-        </section>
-
+</section>
 
         {/* =================================================
             ACCIÓN CORRECTIVA
