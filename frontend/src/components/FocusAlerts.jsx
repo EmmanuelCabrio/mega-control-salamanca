@@ -8,16 +8,11 @@ import {
 
 
 function FocusAlerts({
-
   registros = [],
-
   supervisorSeleccionado = "",
-
   ausencias = {},
-
   setAusencias,
-
-
+  onIniciarSeguimiento
 }) {
 
 
@@ -277,6 +272,10 @@ function FocusAlerts({
               onQuitarAusencia={
                 quitarAusencia
               }
+
+              onIniciarSeguimiento={
+  onIniciarSeguimiento
+}
 
             />
 
