@@ -9,53 +9,131 @@ function FocosRojosIniciales({
 
   registros = [],
 
-  supervisorSeleccionado = "",
-
   onContinuar
 
 }) {
 
 
   // ==================================================
-  // EQUIPO DEL SUPERVISOR
+  // OBTENER SUPERVISORES ÚNICOS
   // ==================================================
 
-  const equipo =
-    registros.filter(
-      (promotor) =>
-        promotor.supervisor ===
-        supervisorSeleccionado
-    );
+  const supervisores = [
+    ...new Set(
 
+      registros
 
-  // ==================================================
-  // CALCULAR PRIORIDADES
-  // ==================================================
+        .map(
+          (promotor) =>
+            String(
+              promotor.supervisor ?? ""
+            ).trim()
+        )
 
-  const equipoConPrioridades =
-    calcularPrioridades(
-      equipo
-    );
+        .filter(
+          (supervisor) =>
+            supervisor &&
+            supervisor !== "0"
+        )
 
-
-  // ==================================================
-  // OBTENER FOCOS ROJOS
-  // ==================================================
-
-  const focosRojos =
-    filtrarFocosRojos(
-      equipoConPrioridades
-    );
+    )
+  ];
 
 
   // ==================================================
-  // ORDENAR Y TOMAR EL PRIMERO
+  // OBTENER 1 FOCO ROJO POR SUPERVISOR
   // ==================================================
 
-  const lista =
-    ordenarPorPrioridad(
-      [...focosRojos]
-    ).slice(0, 1);
+  const focosPorSupervisor =
+    supervisores
+
+      .map(
+        (supervisor) => {
+
+          // ==========================================
+          // EQUIPO DEL SUPERVISOR
+          // ==========================================
+
+          const equipo =
+            registros.filter(
+              (promotor) =>
+
+                String(
+                  promotor.supervisor ?? ""
+                ).trim() ===
+                supervisor &&
+
+                String(
+                  promotor.nombre ?? ""
+                ).trim() !== "" &&
+
+                String(
+                  promotor.nombre ?? ""
+                ).trim() !== "0"
+
+            );
+
+
+          // ==========================================
+          // CALCULAR PRIORIDADES
+          // ==========================================
+
+          const equipoConPrioridades =
+            calcularPrioridades(
+              equipo
+            );
+
+
+          // ==========================================
+          // OBTENER FOCOS ROJOS
+          // ==========================================
+
+          const focosRojos =
+            filtrarFocosRojos(
+              equipoConPrioridades
+            );
+
+
+          // ==========================================
+          // ORDENAR POR PRIORIDAD
+          // Y TOMAR EL MÁS CRÍTICO
+          // ==========================================
+
+          const focoMasCritico =
+            ordenarPorPrioridad(
+              [...focosRojos]
+            )[0];
+
+
+          // ==========================================
+          // SI NO TIENE FOCO → NO MOSTRAR
+          // ==========================================
+
+          if (!focoMasCritico) {
+
+            return null;
+
+          }
+
+
+          // ==========================================
+          // DEVOLVER FOCO + SUPERVISOR
+          // ==========================================
+
+          return {
+
+            ...focoMasCritico,
+
+            supervisor
+
+          };
+
+        }
+      )
+
+      .filter(
+        Boolean
+      );
 
 
   // ==================================================
@@ -97,8 +175,8 @@ function FocosRojosIniciales({
 
         <p className="focos-rojos-iniciales-subtitulo">
 
-          Estos son los 2 focos que requieren
-          tu atención hoy.
+          Estos son los focos rojos de tus
+          supervisores para hoy.
 
         </p>
 
@@ -107,20 +185,29 @@ function FocosRojosIniciales({
             LISTA
         ========================================== */}
 
-        {lista.length > 0 ? (
+        {focosPorSupervisor.length > 0 ? (
 
           <div className="focos-rojos-iniciales-lista">
 
-            {lista.map(
-              (promotor) => (
+            {focosPorSupervisor.map(
+
+              (promotor, index) => (
 
                 <div
+
                   key={
-                    promotor.nombre
+
+                    `${promotor.supervisor}-${promotor.nombre}-${index}`
+
                   }
 
                   className="foco-rojo-inicial"
                 >
+
+
+                  {/* ==================================
+                      ICONO
+                  ================================== */}
 
                   <span className="foco-rojo-inicial-icono">
 
@@ -129,31 +216,78 @@ function FocosRojosIniciales({
                   </span>
 
 
-                  <strong>
+                  <div>
 
-                    {promotor.nombre}
 
-                  </strong>
+                    {/* ==============================
+                        NOMBRE DEL SUPERVISOR
+                    ============================== */}
+
+                    <strong>
+
+                      {promotor.supervisor}
+
+                    </strong>
+
+
+                    {/* ==============================
+                        PROMOTOR
+                    ============================== */}
+
+                    <div>
+
+                      {promotor.nombre}
+
+                    </div>
+
+
+                    {/* ==============================
+                        MOTIVO
+                    ============================== */}
+
+                    {promotor.motivo && (
+
+                      <small>
+
+                        {promotor.motivo}
+
+                      </small>
+
+                    )}
+
+                  </div>
+
 
                 </div>
 
               )
+
             )}
 
           </div>
 
         ) : (
 
+
+          // ============================================
+          // SIN FOCOS
+          // ============================================
+
           <div className="focos-rojos-iniciales-vacio">
 
             🟢
 
             <strong>
+
               ¡Excelente!
+
             </strong>
 
             <span>
-              No tienes focos rojos hoy.
+
+              Ninguno de tus supervisores tiene
+              focos rojos hoy.
+
             </span>
 
           </div>
