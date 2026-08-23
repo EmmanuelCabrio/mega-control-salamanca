@@ -418,6 +418,7 @@ function obtenerUsuarios() {
   const COLUMNA_PASSWORD = 3;
   const COLUMNA_ESTADO = 4;
   const COLUMNA_SUPERVISOR = 5;
+  const COLUMNA_ROL = 6;
 
 
   for (
@@ -469,6 +470,13 @@ function obtenerUsuarios() {
         ] ?? ""
       ).trim();
 
+    const rol =
+  String(
+    fila[
+      COLUMNA_ROL
+    ] ?? ""
+  ).trim();
+
 
     if (
       !usuario ||
@@ -491,6 +499,8 @@ function obtenerUsuarios() {
       estado,
 
       supervisor,
+
+      rol,
 
     });
 
@@ -605,6 +615,9 @@ function validarUsuario(
 
     empleado:
       encontrado.empleado,
+
+    rol:
+  encontrado.rol,
 
   };
 
