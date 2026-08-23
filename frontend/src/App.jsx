@@ -620,7 +620,7 @@ function manejarLogin(
     resultadoLogin.rol;
 
 
-  if (
+ if (
   rol === "DIRECCIÓN"
 ) {
 
@@ -629,6 +629,18 @@ function manejarLogin(
   );
 
   setAusencias({});
+
+  setMostrarRankingInicial(
+    false
+  );
+
+  setMostrarFocosRojosIniciales(
+    false
+  );
+
+  setMostrarRankingSupervisoresIntermedio(
+    false
+  );
 
   setMostrarReconocimientoCL(
     true
