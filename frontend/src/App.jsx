@@ -830,7 +830,10 @@ onContinuar={() => {
 // 🏆 RECONOCIMIENTO TOP 3 CL SALAMANCA
 // ==================================================
 
-if (mostrarReconocimientoCL) {
+if (
+  mostrarReconocimientoCL &&
+  top3Ranking.length > 0
+) {
 
   console.log(
     "🔥 MOSTRANDO TOP 3 CL:",
@@ -845,13 +848,14 @@ if (mostrarReconocimientoCL) {
         top3Ranking
       }
 
-     onContinuar={() => {
+      onContinuar={() => {
 
-  setMostrarReconocimientoCL(false);
+        setMostrarReconocimientoCL(false);
 
-  setMostrarRankingSupervisoresIntermedio(true);
+        setMostrarRankingSupervisoresIntermedio(true);
 
-}}
+      }}
+
     />
 
   );
