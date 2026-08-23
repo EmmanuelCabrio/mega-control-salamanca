@@ -33,7 +33,6 @@ function FocosRojosIniciales({
 
   // ==================================================
   // FILTRAR REGISTROS VÁLIDOS
-  // Evitamos nombres / supervisores "0"
   // ==================================================
 
   const registrosValidos =
@@ -69,7 +68,7 @@ function FocosRojosIniciales({
 
 
   // ==================================================
-  // OBTENER FOCOS ROJOS
+  // LISTA FINAL DE FOCOS
   // ==================================================
 
   let lista = [];
@@ -88,16 +87,26 @@ function FocosRojosIniciales({
 
     const equipo =
       registrosValidos.filter(
-        (promotor) =>
+        (promotor) => {
 
-          String(
-            promotor.supervisor ?? ""
-          ).trim() ===
+          const supervisor =
+            String(
+              promotor.supervisor ?? ""
+            ).trim();
 
-          String(
-            supervisorSeleccionado ?? ""
-          ).trim()
 
+          const supervisorActual =
+            String(
+              supervisorSeleccionado ?? ""
+            ).trim();
+
+
+          return (
+            supervisor ===
+            supervisorActual
+          );
+
+        }
       );
 
 
@@ -122,14 +131,18 @@ function FocosRojosIniciales({
 
 
     // ================================================
-    // ORDENAR Y TOMAR EL MÁS CRÍTICO
+    // ORDENAR POR PRIORIDAD
+    // Y TOMAR SOLO EL MÁS CRÍTICO
     // ================================================
 
     lista =
       ordenarPorPrioridad(
         [...focosRojos]
       )
-      .slice(0, 1);
+      .slice(
+        0,
+        1
+      );
 
   }
 
@@ -161,11 +174,13 @@ function FocosRojosIniciales({
           )
 
           .filter(
-            (supervisor) =>
+            (supervisor) => (
 
               supervisor !== "" &&
 
               supervisor !== "0"
+
+            )
 
           )
 
@@ -175,7 +190,7 @@ function FocosRojosIniciales({
 
 
     // ================================================
-    // OBTENER 1 FOCO POR SUPERVISOR
+    // OBTENER 1 FOCO ROJO POR SUPERVISOR
     // ================================================
 
     lista =
@@ -192,13 +207,14 @@ function FocosRojosIniciales({
 
             const equipo =
               registrosValidos.filter(
-                (promotor) =>
+                (promotor) => (
 
                   String(
                     promotor.supervisor ?? ""
                   ).trim() ===
                   supervisor
 
+                )
               );
 
 
@@ -223,7 +239,8 @@ function FocosRojosIniciales({
 
 
             // ========================================
-            // TOMAR EL MÁS CRÍTICO
+            // ORDENAR
+            // Y TOMAR EL MÁS CRÍTICO
             // ========================================
 
             const focoMasCritico =
@@ -234,6 +251,7 @@ function FocosRojosIniciales({
 
             // ========================================
             // SI NO HAY FOCO
+            // NO MOSTRAR AL SUPERVISOR
             // ========================================
 
             if (
@@ -302,7 +320,7 @@ function FocosRojosIniciales({
 
 
         {/* ==========================================
-            MENSAJE
+            SUBTÍTULO
         ========================================== */}
 
         <p className="focos-rojos-iniciales-subtitulo">
@@ -311,7 +329,7 @@ function FocosRojosIniciales({
 
             ? "Estos son los focos rojos de tus supervisores para hoy."
 
-            : "Estos son los focos que requieren tu atención hoy."
+            : "Este es el foco rojo que requiere tu atención hoy."
 
           }
 
@@ -411,9 +429,9 @@ function FocosRojosIniciales({
         ) : (
 
 
-          // ============================================
+          // ==========================================
           // SIN FOCOS
-          // ============================================
+          // ==========================================
 
           <div className="focos-rojos-iniciales-vacio">
 
@@ -424,6 +442,7 @@ function FocosRojosIniciales({
               ¡Excelente!
 
             </strong>
+
 
             <span>
 
