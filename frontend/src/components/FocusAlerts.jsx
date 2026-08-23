@@ -63,13 +63,13 @@ function FocusAlerts({
 
   // ==================================================
   // ORDENAR POR PRIORIDAD
-  // Y MOSTRAR SOLAMENTE LOS 2 PRIMEROS
+  // Y MOSTRAR SOLAMENTE EL PRIMERO
   // ==================================================
 
   const lista =
     ordenarPorPrioridad(
       [...focosDisponibles]
-    ).slice(0, 2);
+    ).slice(0, 1);
 
 
   // ==================================================
