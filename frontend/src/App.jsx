@@ -56,7 +56,7 @@ function App() {
 
 
 
-    // ==================================================
+// ==================================================
 // RANKING DE SUPERVISORES
 // ==================================================
 
@@ -621,20 +621,22 @@ function manejarLogin(
 
 
   if (
-    rol === "DIRECCIÓN"
-  ) {
+  rol === "DIRECCIÓN"
+) {
 
-    setLogueado(
-      true
-    );
+  setLogueado(
+    true
+  );
 
-    setVista(
-      "direccion"
-    );
+  setAusencias({});
 
-    return;
+  setMostrarReconocimientoCL(
+    true
+  );
 
-  }
+  return;
+
+}
 
 
   setSupervisorSeleccionado(
