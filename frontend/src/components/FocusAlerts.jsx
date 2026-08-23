@@ -177,7 +177,7 @@ function FocusAlerts({
 
       <p className="subtitulo-focos">
 
-        🎯 2 focos prioritarios para hoy
+        🎯 1 foco prioritario para hoy, sino está pasa al que sigue:
 
       </p>
 
