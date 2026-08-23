@@ -23,18 +23,38 @@ function RankingSupervisores({
         String(item.supervisor).trim() !== "0"
     );
 
+// ==================================================
+// NORMALIZAR NOMBRE DE SUPERVISOR
+// ==================================================
+
+function normalizarNombre(
+  nombre
+) {
+
+  return String(
+    nombre ?? ""
+  )
+    .trim()
+    .toUpperCase();
+
+}
+
+  
 
   // ==================================================
   // BUSCAR SUPERVISOR ACTUAL
   // ==================================================
 
   const supervisorActual =
-    ranking.find(
-      (item) =>
-        item.supervisor ===
+  ranking.find(
+    (item) =>
+      normalizarNombre(
+        item.supervisor
+      ) ===
+      normalizarNombre(
         supervisorSeleccionado
-    );
-
+      )
+  );
 
   const posicion =
     supervisorActual?.posicion ??
@@ -310,13 +330,13 @@ function RankingSupervisores({
               supervisor
             ) => {
 
-           const esActual =
-                   String(
-                    supervisor.supervisor ?? ""
-                     ).trim().toUpperCase() ===
-                    String(
-                   supervisorSeleccionado ?? ""
-                    ).trim().toUpperCase();
+                 const esActual =
+              normalizarNombre(
+                  supervisor.supervisor
+                       ) ===
+                  normalizarNombre(
+                      supervisorSeleccionado
+                    );
 
 
               return (
