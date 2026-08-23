@@ -605,18 +605,23 @@ useEffect(() => {
   cargarDatos();
 
 }, [logueado]);
-  // ==================================================
+// ==================================================
 // LOGIN
 // ==================================================
 
 function manejarLogin(
-  supervisor
+  resultadoLogin
 ) {
+
+  const supervisor =
+    resultadoLogin.supervisor;
+
+  const rol =
+    resultadoLogin.rol;
 
   setSupervisorSeleccionado(
     supervisor
   );
-
 
   // ==========================================
   // 💾 GUARDAR SESIÓN
