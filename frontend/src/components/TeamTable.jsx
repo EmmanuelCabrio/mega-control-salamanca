@@ -10,16 +10,21 @@ function TeamTable({
 }) {
 
   // ==================================================
-  // EQUIPO DEL SUPERVISOR
-  // ==================================================
+// EQUIPO DEL SUPERVISOR
+// ==================================================
 
-  const equipo =
-    registros.filter(
-      (promotor) =>
-        promotor.supervisor ===
-        supervisorSeleccionado
-    );
+const equipo =
+  registros.filter(
+    (promotor) =>
+      promotor.supervisor ===
+        supervisorSeleccionado &&
 
+      promotor.nombre &&
+
+      String(
+        promotor.nombre
+      ).trim() !== "0"
+  );
 
   // ==================================================
   // ORDENAR POR PRODUCTIVIDAD
