@@ -310,9 +310,13 @@ function RankingSupervisores({
               supervisor
             ) => {
 
-              const esActual =
-                supervisor.supervisor ===
-                supervisorSeleccionado;
+           const esActual =
+                   String(
+                    supervisor.supervisor ?? ""
+                     ).trim().toUpperCase() ===
+                    String(
+                   supervisorSeleccionado ?? ""
+                    ).trim().toUpperCase();
 
 
               return (
