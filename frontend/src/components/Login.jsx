@@ -194,7 +194,7 @@ function Login({ onLogin }) {
       // ==============================================
 
       onLogin(
-        resultado.supervisor
+        resultado
       );
 
 
