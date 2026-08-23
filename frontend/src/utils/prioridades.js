@@ -350,3 +350,46 @@ export function obtenerNivelProductividad(
   return "nivel-rojo-fuerte";
 
 }
+
+
+// ==================================================
+// OBTENER FOCO MÁS CRÍTICO POR SUPERVISOR
+// ==================================================
+
+export function obtenerFocoCriticoSupervisor(
+  registros,
+  supervisor
+) {
+
+  const equipo =
+    registros.filter(
+      (promotor) =>
+        promotor.supervisor ===
+        supervisor
+    );
+
+
+  const equipoConPrioridades =
+    calcularPrioridades(
+      equipo
+    );
+
+
+  const focosRojos =
+    filtrarFocosRojos(
+      equipoConPrioridades
+    );
+
+
+  const lista =
+    ordenarPorPrioridad(
+      [...focosRojos]
+    );
+
+
+  return (
+    lista[0] ||
+    null
+  );
+
+}
