@@ -11,6 +11,19 @@ function RankingSupervisores({
 }) {
 
 
+
+    // ==================================================
+  // 🧹 LIMPIAR RANKING
+  // ==================================================
+
+  const rankingLimpio =
+    ranking.filter(
+      (item) =>
+        item.supervisor &&
+        String(item.supervisor).trim() !== "0"
+    );
+
+
   // ==================================================
   // BUSCAR SUPERVISOR ACTUAL
   // ==================================================
@@ -36,7 +49,7 @@ function RankingSupervisores({
 
 
   const total =
-    ranking.length;
+    rankingLimpio.length;
 
 
   // ==================================================
@@ -291,7 +304,7 @@ function RankingSupervisores({
 
         <tbody>
 
-          {ranking.map(
+          {rankingLimpio.map(
 
             (
               supervisor
