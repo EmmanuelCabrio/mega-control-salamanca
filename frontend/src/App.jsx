@@ -922,8 +922,12 @@ if (mostrarRankingSupervisoresIntermedio) {
           <RankingSupervisores
 
             ranking={
-              rankingSupervisores
-            }
+               rankingSupervisores.filter(
+                 (item) =>
+                 item.supervisor &&
+                   String(item.supervisor).trim() !== "0"
+                )
+             }
 
             supervisorSeleccionado={
               supervisorSeleccionado
