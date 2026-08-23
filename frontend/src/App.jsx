@@ -57,7 +57,7 @@ function App() {
 
 
 // ==================================================
-// RANKING DE SUPERVISORES
+// RANKING INICIAL DE SUPERVISORES LUGAR DE TOTAL DE SUPERVISORES
 // ==================================================
 
 const [
@@ -922,15 +922,7 @@ if (mostrarRankingSupervisoresIntermedio) {
           <RankingSupervisores
 
             ranking={
-               rankingSupervisores.filter(
-                 (item) =>
-                 item.supervisor &&
-                   String(item.supervisor).trim() !== "0"
-                )
-             }
-
-            supervisorSeleccionado={
-              supervisorSeleccionado
+              rankingSupervisores
             }
 
           />
