@@ -302,6 +302,10 @@ app.post(
         empleado:
           resultado.empleado,
 
+        rol:
+            resultado.rol,
+
+
       });
 
     } catch (error) {
