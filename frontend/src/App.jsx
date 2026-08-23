@@ -619,9 +619,28 @@ function manejarLogin(
   const rol =
     resultadoLogin.rol;
 
+
+  if (
+    rol === "DIRECCIÓN"
+  ) {
+
+    setLogueado(
+      true
+    );
+
+    setVista(
+      "direccion"
+    );
+
+    return;
+
+  }
+
+
   setSupervisorSeleccionado(
     supervisor
   );
+ 
 
   // ==========================================
   // 💾 GUARDAR SESIÓN
@@ -1223,6 +1242,22 @@ if (
 
 }
 
+
+  // ==================================================
+// 👑 PANEL DE DIRECCIÓN
+// ==================================================
+
+if (
+  vista === "direccion"
+) {
+
+  return (
+
+    <PanelDireccion />
+
+  );
+
+}
 
   // ==================================================
   // DASHBOARD
