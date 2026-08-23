@@ -49,13 +49,13 @@ function FocosRojosIniciales({
 
 
   // ==================================================
-  // ORDENAR Y TOMAR LOS 2 PRIMEROS
+  // ORDENAR Y TOMAR EL PRIMERO
   // ==================================================
 
   const lista =
     ordenarPorPrioridad(
       [...focosRojos]
-    ).slice(0, 2);
+    ).slice(0, 1);
 
 
   // ==================================================
