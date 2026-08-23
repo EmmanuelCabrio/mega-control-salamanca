@@ -584,9 +584,6 @@ console.log(
 // ==================================================
 // 🔐 CARGAR DATOS DESPUÉS DEL LOGIN
 // ==================================================
-// ==================================================
-// 🔐 CARGAR DATOS DESPUÉS DEL LOGIN
-// ==================================================
 
 useEffect(() => {
 
@@ -601,6 +598,10 @@ useEffect(() => {
     "🚀🚀 INICIANDO CARGA DESPUÉS DEL LOGIN"
   );
 
+
+  console.log(
+  "🚀 DIRECCIÓN: voy a cargar datos"
+);
 
   cargarDatos();
 
