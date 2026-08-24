@@ -98,14 +98,6 @@ const [
 
 
 
-  console.log(
-  "🔴 FOCOS INICIALES:",
-  {
-    rolUsuario,
-    supervisorSeleccionado,
-    registros: registros.length
-  }
-);
 
  // ==================================================
 //  FOCOS ROJOS INICIALES
