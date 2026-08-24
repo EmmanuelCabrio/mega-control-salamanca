@@ -92,6 +92,22 @@ function normalizarSupervisor(
 
 }
 
+// ==================================================
+// NORMALIZAR ROL
+// ==================================================
+
+function normalizarRol(
+  rol
+) {
+
+  return String(
+    rol || ""
+  )
+    .trim()
+    .toUpperCase();
+
+}
+
 
 // ==================================================
 // AUTENTICACIÓN
@@ -139,20 +155,27 @@ function autenticarToken(
       );
 
 
-    if (
-      !datos.supervisor
-    ) {
+  const rol =
+  normalizarRol(
+    datos.rol
+  );
 
-      return res.status(401).json({
 
-        correcto: false,
+if (
+  !datos.supervisor &&
+  rol !== "DIRECCIÓN"
+) {
 
-        mensaje:
-          "Token inválido",
+  return res.status(401).json({
 
-      });
+    correcto: false,
 
-    }
+    mensaje:
+      "Token inválido",
+
+  });
+
+}
 
 
     req.supervisor =
@@ -163,6 +186,9 @@ function autenticarToken(
 
     req.usuario =
       datos.usuario || "";
+
+    req.rol =
+  rol;
 
 
     next();
@@ -265,30 +291,35 @@ app.post(
       // CREAR TOKEN
       // ==========================================
 
-      const token =
-        jwt.sign(
+    const token =
+  jwt.sign(
 
-          {
+    {
 
-            usuario:
-              String(usuario)
-                .trim()
-                .toUpperCase(),
+      usuario:
+        String(usuario)
+          .trim()
+          .toUpperCase(),
 
-            supervisor,
+      supervisor,
 
-          },
+      rol:
+        normalizarRol(
+          resultado.rol
+        ),
 
-          JWT_SECRET,
+    },
 
-          {
+    JWT_SECRET,
 
-            expiresIn:
-              "12h",
+    {
 
-          }
+      expiresIn:
+        "12h",
 
-        );
+    }
+
+  );
 
 
       return res.json({
@@ -540,13 +571,61 @@ app.get(
         await leerExcel();
 
 
+      // ==========================================
+      // ROL DEL USUARIO
+      // ==========================================
+
+      const rol =
+        normalizarRol(
+          req.rol
+        );
+
+
+      // ==========================================
+      // 👔 DIRECCIÓN
+      // ==========================================
+      // Dirección necesita TODOS los registros
+      // para poder detectar el foco más crítico
+      // de cada supervisor.
+      // ==========================================
+
+      if (
+        rol === "DIRECCIÓN"
+      ) {
+
+        const registros =
+          datos.registros || [];
+
+
+        console.log(
+          "👔 DIRECCIÓN - REGISTROS TOTALES:",
+          registros.length
+        );
+
+
+        return res.json({
+
+          correcto: true,
+
+          rol,
+
+          registros,
+
+        });
+
+      }
+
+
+      // ==========================================
+      // 👨‍💼 SUPERVISOR
+      // ==========================================
+      // Los supervisores solamente reciben
+      // los registros de su propio equipo.
+      // ==========================================
+
       const supervisor =
         req.supervisor;
 
-
-      // ==========================================
-      // SOLO EQUIPO DEL SUPERVISOR
-      // ==========================================
 
       const registros =
         (datos.registros || [])
@@ -556,14 +635,31 @@ app.get(
 
               normalizarSupervisor(
                 registro.supervisor
-              ) === supervisor
+              ) ===
+              supervisor
 
           );
+
+
+      console.log(
+        "👨‍💼 SUPERVISOR:",
+        supervisor
+      );
+
+
+      console.log(
+        "👥 REGISTROS DE SU EQUIPO:",
+        registros.length
+      );
 
 
       return res.json({
 
         correcto: true,
+
+        rol,
+
+        supervisor,
 
         registros,
 
@@ -575,7 +671,9 @@ app.get(
         "❌ Error en /api/registros:"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       return res.status(500).json({
