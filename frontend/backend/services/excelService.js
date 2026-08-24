@@ -1675,9 +1675,11 @@ function leerAvanceSemanal(hoja) {
 // LEER DÍAS HÁBILES DESDE PRODUCTIVIDAD
 // ==================================================
 //
-// H1 = DÍAS HÁBILES
+// H1 = DÍAS HÁBILES TOTALES
 // H2 = DÍAS TRANSCURRIDOS
 // H3 = DÍAS POR TRANSCURRIR
+//
+// H3 en Excel = H1 - H2
 //
 // ==================================================
 
@@ -1694,9 +1696,21 @@ function leerDiasHabiles(hojaProduccion) {
     );
 
   const diasHabilesRestantes =
-    Number(
-      hojaProduccion["H3"]?.v ?? 0
+    Math.max(
+      diasHabilesTotales -
+      diasHabilesTranscurridos,
+      0
     );
+
+
+  console.log(
+    "📅 DÍAS HÁBILES:",
+    {
+      totales: diasHabilesTotales,
+      transcurridos: diasHabilesTranscurridos,
+      restantes: diasHabilesRestantes
+    }
+  );
 
 
   return {
@@ -1710,7 +1724,6 @@ function leerDiasHabiles(hojaProduccion) {
   };
 
 }
-
 
 // ==================================================
 // LEER REGISTROS DE PRODUCTIVIDAD
