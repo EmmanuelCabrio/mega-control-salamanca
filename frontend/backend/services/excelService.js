@@ -1679,21 +1679,42 @@ function leerAvanceSemanal(hoja) {
 // H2 = DÍAS TRANSCURRIDOS
 // H3 = DÍAS POR TRANSCURRIR
 //
-// H3 en Excel = H1 - H2
-//
 // ==================================================
 
 function leerDiasHabiles(hojaProduccion) {
 
+  const datos =
+    XLSX.utils.sheet_to_json(
+      hojaProduccion,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  // ==================================================
+  // H1 = fila 1, columna H
+  // H2 = fila 2, columna H
+  // ==================================================
+
   const diasHabilesTotales =
     Number(
-      hojaProduccion["H1"]?.v ?? 0
+      datos[0]?.[7] ?? 0
     );
+
 
   const diasHabilesTranscurridos =
     Number(
-      hojaProduccion["H2"]?.v ?? 0
+      datos[1]?.[7] ?? 0
     );
+
+
+  // ==================================================
+  // DÍAS RESTANTES
+  //
+  // H3 = H1 - H2
+  // ==================================================
 
   const diasHabilesRestantes =
     Math.max(
@@ -1706,9 +1727,14 @@ function leerDiasHabiles(hojaProduccion) {
   console.log(
     "📅 DÍAS HÁBILES:",
     {
-      totales: diasHabilesTotales,
-      transcurridos: diasHabilesTranscurridos,
-      restantes: diasHabilesRestantes
+      totales:
+        diasHabilesTotales,
+
+      transcurridos:
+        diasHabilesTranscurridos,
+
+      restantes:
+        diasHabilesRestantes,
     }
   );
 
@@ -1724,7 +1750,6 @@ function leerDiasHabiles(hojaProduccion) {
   };
 
 }
-
 // ==================================================
 // LEER REGISTROS DE PRODUCTIVIDAD
 // ==================================================
