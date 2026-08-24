@@ -1032,17 +1032,29 @@ if (mostrarFocosRojosIniciales) {
     rolUsuario
   }
 
-  onContinuar={() => {
+ onContinuar={() => {
 
-    setMostrarFocosRojosIniciales(
-      false
-    );
+  setMostrarFocosRojosIniciales(
+    false
+  );
+
+  if (
+    rolUsuario === "DIRECCIÓN"
+  ) {
 
     setVista(
-      "supervisor"
+      "direccion"
     );
 
-  }}
+    return;
+
+  }
+
+  setVista(
+    "supervisor"
+  );
+
+}}
 
 />
 
@@ -1303,7 +1315,7 @@ if (
 }
 
 
-  // ==================================================
+// ==================================================
 // 👑 PANEL DE DIRECCIÓN
 // ==================================================
 
@@ -1313,7 +1325,25 @@ if (
 
   return (
 
-    <PanelDireccion />
+    <PanelDireccion
+
+      registros={
+        registros
+      }
+
+      rankingSupervisores={
+        rankingSupervisores
+      }
+
+      rankingCL={
+        rankingCL
+      }
+
+      onCerrarSesion={
+        cerrarSesion
+      }
+
+    />
 
   );
 
