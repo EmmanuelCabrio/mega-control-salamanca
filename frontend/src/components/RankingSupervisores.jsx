@@ -288,13 +288,13 @@ function normalizarNombre(
     <div className="ranking-supervisores">
 
       <h2>
-        🏆 Ranking de Supervisores CL Salamanca
+        🏆 Ranking Supervisores CL Salamanca
       </h2>
 
 
       <p className="ranking-subtitulo">
 
-        Sólo los mejores escriben la hisotoria 🔥
+        Sólo los MEJORES escriben la HISTORIA 🔥
         
       </p>
 
