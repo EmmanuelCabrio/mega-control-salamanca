@@ -19,16 +19,20 @@ function FocosRojosIniciales({
 
 
   // ==================================================
-  // IDENTIFICAR SI ES DIRECCIÓN
+  // NORMALIZAR ROL
   // ==================================================
 
-  const esDireccion =
+  const rolNormalizado =
     String(
       rolUsuario ?? ""
     )
       .trim()
-      .toUpperCase() ===
-    "DIRECCIÓN";
+      .toUpperCase()
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      );
 
 
   // ==================================================
@@ -68,7 +72,28 @@ function FocosRojosIniciales({
 
 
   // ==================================================
-  // LISTA FINAL DE FOCOS
+  // IDENTIFICAR DIRECCIÓN
+  //
+  // PRIMERA OPCIÓN:
+  // EL ROL DICE DIRECCIÓN
+  //
+  // SEGUNDA OPCIÓN:
+  // NO HAY SUPERVISOR SELECCIONADO
+  // PERO YA TENEMOS REGISTROS
+  // ==================================================
+
+  const esDireccion =
+    rolNormalizado === "DIRECCION" ||
+    (
+      String(
+        supervisorSeleccionado ?? ""
+      ).trim() === "" &&
+      registrosValidos.length > 0
+    );
+
+
+  // ==================================================
+  // LISTA FINAL
   // ==================================================
 
   let lista = [];
@@ -82,8 +107,14 @@ function FocosRojosIniciales({
 
 
     // ================================================
-    // EQUIPO DEL SUPERVISOR LOGUEADO
+    // EQUIPO DEL SUPERVISOR
     // ================================================
+
+    const supervisorActual =
+      String(
+        supervisorSeleccionado ?? ""
+      ).trim();
+
 
     const equipo =
       registrosValidos.filter(
@@ -92,12 +123,6 @@ function FocosRojosIniciales({
           const supervisor =
             String(
               promotor.supervisor ?? ""
-            ).trim();
-
-
-          const supervisorActual =
-            String(
-              supervisorSeleccionado ?? ""
             ).trim();
 
 
@@ -121,7 +146,7 @@ function FocosRojosIniciales({
 
 
     // ================================================
-    // OBTENER FOCOS ROJOS
+    // FOCOS ROJOS
     // ================================================
 
     const focosRojos =
@@ -131,15 +156,13 @@ function FocosRojosIniciales({
 
 
     // ================================================
-    // ORDENAR POR PRIORIDAD
-    // Y TOMAR SOLO EL MÁS CRÍTICO
+    // MÁS CRÍTICO
     // ================================================
 
     lista =
       ordenarPorPrioridad(
         [...focosRojos]
-      )
-      .slice(
+      ).slice(
         0,
         1
       );
@@ -163,7 +186,6 @@ function FocosRojosIniciales({
       ...new Set(
 
         registrosValidos
-
           .map(
             (promotor) =>
 
@@ -172,15 +194,11 @@ function FocosRojosIniciales({
               ).trim()
 
           )
-
           .filter(
-            (supervisor) => (
+            (supervisor) =>
 
               supervisor !== "" &&
-
               supervisor !== "0"
-
-            )
 
           )
 
@@ -190,11 +208,10 @@ function FocosRojosIniciales({
 
 
     // ================================================
-    // OBTENER 1 FOCO ROJO POR SUPERVISOR
+    // RECORRER CADA SUPERVISOR
     // ================================================
 
     lista =
-
       supervisores
 
         .map(
@@ -207,14 +224,13 @@ function FocosRojosIniciales({
 
             const equipo =
               registrosValidos.filter(
-                (promotor) => (
+                (promotor) =>
 
                   String(
                     promotor.supervisor ?? ""
                   ).trim() ===
                   supervisor
 
-                )
               );
 
 
@@ -239,19 +255,26 @@ function FocosRojosIniciales({
 
 
             // ========================================
-            // ORDENAR
-            // Y TOMAR EL MÁS CRÍTICO
+            // ORDENAR POR PRIORIDAD
+            // ========================================
+
+            const ordenados =
+              ordenarPorPrioridad(
+                [...focosRojos]
+              );
+
+
+            // ========================================
+            // TOMAR EL MÁS CRÍTICO
             // ========================================
 
             const focoMasCritico =
-              ordenarPorPrioridad(
-                [...focosRojos]
-              )[0];
+              ordenados[0];
 
 
             // ========================================
-            // SI NO HAY FOCO
-            // NO MOSTRAR AL SUPERVISOR
+            // SI NO TIENE FOCO
+            // NO MOSTRAR
             // ========================================
 
             if (
@@ -264,7 +287,7 @@ function FocosRojosIniciales({
 
 
             // ========================================
-            // DEVOLVER FOCO + SUPERVISOR
+            // DEVOLVER INFORMACIÓN
             // ========================================
 
             return {
@@ -278,10 +301,10 @@ function FocosRojosIniciales({
           }
 
         )
-
         .filter(
           Boolean
         );
+
 
   }
 
@@ -351,9 +374,7 @@ function FocosRojosIniciales({
                 <div
 
                   key={
-
                     `${promotor.supervisor}-${promotor.nombre}-${index}`
-
                   }
 
                   className="foco-rojo-inicial"
@@ -427,7 +448,6 @@ function FocosRojosIniciales({
           </div>
 
         ) : (
-
 
           // ==========================================
           // SIN FOCOS
