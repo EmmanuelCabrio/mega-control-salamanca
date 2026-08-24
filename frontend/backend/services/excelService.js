@@ -1671,72 +1671,45 @@ function leerAvanceSemanal(hoja) {
 }
 
 
-
 // ==================================================
-// CALCULAR DÍAS HÁBILES RESTANTES
+// LEER DÍAS HÁBILES DESDE PRODUCTIVIDAD
+// ==================================================
+//
+// H1 = DÍAS HÁBILES
+// H2 = DÍAS TRANSCURRIDOS
+// H3 = DÍAS POR TRANSCURRIR
+//
 // ==================================================
 
-function calcularDiasHabilesRestantes() {
+function leerDiasHabiles(hojaProduccion) {
 
-  const hoy =
-    new Date();
+  const diasHabilesTotales =
+    Number(
+      hojaProduccion["H1"]?.v ?? 0
+    );
 
-  const año =
-    hoy.getFullYear();
+  const diasHabilesTranscurridos =
+    Number(
+      hojaProduccion["H2"]?.v ?? 0
+    );
 
-  const mes =
-    hoy.getMonth();
-
-  const diaActual =
-    hoy.getDate();
-
-  const ultimoDia =
-    new Date(
-      año,
-      mes + 1,
-      0
-    ).getDate();
+  const diasHabilesRestantes =
+    Number(
+      hojaProduccion["H3"]?.v ?? 0
+    );
 
 
-  let diasHabiles =
-    0;
+  return {
 
+    diasHabilesTotales,
 
-  for (
-    let dia = diaActual + 1;
-    dia <= ultimoDia;
-    dia++
-  ) {
+    diasHabilesTranscurridos,
 
-    const fecha =
-      new Date(
-        año,
-        mes,
-        dia
-      );
+    diasHabilesRestantes,
 
-
-    const diaSemana =
-      fecha.getDay();
-
-
-    // Lunes a sábado
-
-    if (
-      diaSemana !== 0
-    ) {
-
-      diasHabiles++;
-
-    }
-
-  }
-
-
-  return diasHabiles;
+  };
 
 }
-
 
 
 // ==================================================
@@ -1746,7 +1719,8 @@ function calcularDiasHabilesRestantes() {
 function leerRegistros(
   hojaProduccion,
   hojaSinVenta,
-  hojaVentaVsPpto
+  hojaVentaVsPpto,
+  diasHabiles
 ) {
 
   const datos =
@@ -2025,8 +1999,8 @@ function leerRegistros(
     // DÍAS HÁBILES
     // ==========================================
 
-    const diasHabilesRestantes =
-      calcularDiasHabilesRestantes();
+   const diasHabilesRestantes =
+  diasHabiles.diasHabilesRestantes;
 
 
     // ==========================================
@@ -2383,11 +2357,18 @@ if (
 }
 
 
+const diasHabiles =
+  leerDiasHabiles(
+    hojaProduccion
+  );
+
+
 const registros =
   leerRegistros(
     hojaProduccion,
     hojaSinVenta,
-    hojaVentaVsPpto
+    hojaVentaVsPpto,
+    diasHabiles
   );
 
 // ==================================================
