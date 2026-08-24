@@ -443,6 +443,25 @@ console.log(
       datosRegistros.registros || []
     );
 
+  console.log(
+  "🔴 CANTIDAD TOTAL DE REGISTROS:",
+  datosRegistros.registros?.length || 0
+);
+
+console.log(
+  "🔴 SUPERVISORES EN REGISTROS:",
+  [
+    ...new Set(
+      (datosRegistros.registros || [])
+        .map(
+          (registro) =>
+            registro.supervisor
+        )
+        .filter(Boolean)
+    )
+  ]
+);
+
 
     console.log(
       "🔥 setRegistros EJECUTADO"
