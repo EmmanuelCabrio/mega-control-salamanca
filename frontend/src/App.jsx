@@ -183,6 +183,15 @@ const [
 
     });
 
+  // ==================================================
+// 👤 ROL DEL USUARIO LOGUEADO
+// ==================================================
+
+const [
+  rolUsuario,
+  setRolUsuario
+] = useState("");
+
 
 // ==================================================
 // 🔴 VENDEDOR EN SEGUIMIENTO
@@ -620,6 +629,10 @@ function manejarLogin(
   const rol =
     resultadoLogin.rol;
 
+  setRolUsuario(
+  rol
+);
+
 
  if (
   rol === "DIRECCIÓN"
@@ -981,25 +994,33 @@ if (mostrarFocosRojosIniciales) {
 
   return (
 
-    <FocosRojosIniciales
+   <FocosRojosIniciales
 
-      registros={
-        registros
-      }
+  registros={
+    registros
+  }
 
-      supervisorSeleccionado={
-        supervisorSeleccionado
-      }
+  supervisorSeleccionado={
+    supervisorSeleccionado
+  }
 
-      onContinuar={() => {
+  rolUsuario={
+    rolUsuario
+  }
 
-        setMostrarFocosRojosIniciales(false);
+  onContinuar={() => {
 
-        setVista("supervisor");
+    setMostrarFocosRojosIniciales(
+      false
+    );
 
-      }}
+    setVista(
+      "supervisor"
+    );
 
-    />
+  }}
+
+/>
 
   );
 
