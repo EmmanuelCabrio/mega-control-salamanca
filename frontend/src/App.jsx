@@ -96,6 +96,17 @@ const [
   setMostrarRankingSupervisoresIntermedio
 ] = useState(false);
 
+
+
+  console.log(
+  "🔴 FOCOS INICIALES:",
+  {
+    rolUsuario,
+    supervisorSeleccionado,
+    registros: registros.length
+  }
+);
+
  // ==================================================
 //  FOCOS ROJOS INICIALES
 // ================================================== 
@@ -736,6 +747,8 @@ function manejarLogin(
     setSupervisorSeleccionado(
       ""
     );
+
+    setRolUsuario("");
 
 
     setPromotorEnSeguimiento(
