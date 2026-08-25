@@ -173,8 +173,28 @@ export async function fetchProtegido(
     obtenerToken();
 
 
+  // ================================================
+  // CONSTRUIR URL
+  // ================================================
+
+  const urlFinal =
+    url.startsWith("http")
+      ? url
+      : `${API_URL}${url}`;
+
+
+  console.log(
+    "🌐 FETCH PROTEGIDO:",
+    urlFinal
+  );
+
+
+  // ================================================
+  // REALIZAR PETICIÓN
+  // ================================================
+
   return fetch(
-    `${API_URL}${url}`,
+    urlFinal,
     {
 
       ...opciones,
