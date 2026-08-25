@@ -1,5 +1,8 @@
 import React from "react";
 
+import VentaVsMesAnterior
+  from "./VentaVsMesAnterior";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -74,44 +77,32 @@ function PanelDireccion({
           CENTRO DE CONTROL COMERCIAL
       ================================================== */}
 
-      <section className="panel-direccion-proximamente">
+     <section className="panel-direccion-proximamente">
 
-        <div>
+  <div>
 
-          <span>
+    <span>
+      🚀
+    </span>
 
-            🚀
+    <div>
 
-          </span>
+      <h2>
+        Centro de control comercial
+      </h2>
 
+      <p>
+        Indicadores estratégicos de Dirección.
+      </p>
 
-          <div>
+    </div>
 
-            <h2>
+  </div>
 
-              Centro de control comercial
-
-            </h2>
-
-
-            <p>
-
-              Aquí construiremos los indicadores estratégicos de Dirección.
-
-            </p>
-
-          </div>
-
-        </div>
+</section>
 
 
-        <div className="panel-direccion-badge">
-
-          EN CONSTRUCCIÓN
-
-        </div>
-
-      </section>
+<VentaVsMesAnterior />
 
 
     </div>
