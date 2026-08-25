@@ -8,6 +8,7 @@ dotenv.config();
 const {
   validarUsuario,
   leerExcel,
+  leerVentaVsMesAnterior,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
@@ -1060,6 +1061,71 @@ app.get(
 
         mensaje:
           "No se pudo cargar el Ranking CL",
+
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// 📊 VENTA VS MES ANTERIOR
+// ==================================================
+
+app.get(
+  "/api/venta-vs-mes-anterior",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      console.log(
+        "📊 CONSULTANDO VENTA VS MES ANTERIOR..."
+      );
+
+
+      const datos =
+        leerVentaVsMesAnterior();
+
+
+      return res.json({
+
+        correcto: true,
+
+        registros:
+          datos.registros || [],
+
+        servicios:
+          datos.servicios || [],
+
+        canales:
+          datos.canales || [],
+
+        meses:
+          datos.meses || [],
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/venta-vs-mes-anterior:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar Venta vs Mes Anterior",
 
       });
 
