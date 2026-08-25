@@ -1,87 +1,124 @@
-{/* ==================================================
-    CONTENIDO
-================================================== */}
+import React from "react";
 
-<section className="panel-direccion-contenido">
 
-  {/* ==================================================
-      RANKING SUPERVISORES
-  ================================================== */}
+// ==================================================
+// 👑 DASHBOARD DE DIRECCIÓN
+// ==================================================
 
-  <div className="panel-direccion-card">
+function PanelDireccion({
+  onCerrarSesion,
+}) {
 
-    <div className="panel-direccion-card-header">
+  return (
 
-      <div>
+    <div className="panel-direccion">
 
-        <span>
-          🏆
-        </span>
+      {/* ==================================================
+          ENCABEZADO
+      ================================================== */}
 
-        <h2>
-          Ranking de Supervisores
-        </h2>
+      <header className="panel-direccion-header">
 
-      </div>
+        <div>
+
+          <div className="panel-direccion-etiqueta">
+
+            👑 DIRECCIÓN
+
+          </div>
+
+
+          <h1>
+
+            Dashboard Dirección
+
+          </h1>
+
+
+          <p>
+
+            Centro de control comercial · SEGUIMIENTO 2.0
+
+          </p>
+
+        </div>
+
+
+        {/* ==================================================
+            CERRAR SESIÓN
+        ================================================== */}
+
+        {onCerrarSesion && (
+
+          <button
+
+            type="button"
+
+            className="panel-direccion-logout"
+
+            onClick={onCerrarSesion}
+
+          >
+
+            🚪 Cerrar sesión
+
+          </button>
+
+        )}
+
+      </header>
+
+
+
+      {/* ==================================================
+          CENTRO DE CONTROL COMERCIAL
+      ================================================== */}
+
+      <section className="panel-direccion-proximamente">
+
+        <div>
+
+          <span>
+
+            🚀
+
+          </span>
+
+
+          <div>
+
+            <h2>
+
+              Centro de control comercial
+
+            </h2>
+
+
+            <p>
+
+              Aquí construiremos los indicadores estratégicos de Dirección.
+
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div className="panel-direccion-badge">
+
+          EN CONSTRUCCIÓN
+
+        </div>
+
+      </section>
+
 
     </div>
 
+  );
 
-    {rankingSupervisores.length > 0 ? (
+}
 
-      <div className="panel-direccion-ranking">
 
-        {rankingSupervisores
-          .slice(0, 5)
-          .map(
-            (supervisor, index) => (
-
-              <div
-                key={
-                  `${supervisor.supervisor}-${index}`
-                }
-                className="panel-direccion-ranking-item"
-              >
-
-                <span className="panel-direccion-posicion">
-                  {index + 1}
-                </span>
-
-                <div>
-
-                  <strong>
-                    {supervisor.supervisor}
-                  </strong>
-
-                  <small>
-
-                    Productividad:{" "}
-
-                    {Number(
-                      supervisor.productividad ?? 0
-                    ).toFixed(2)}
-
-                  </small>
-
-                </div>
-
-              </div>
-
-            )
-          )}
-
-      </div>
-
-    ) : (
-
-      <div className="panel-direccion-vacio">
-
-        No hay información disponible.
-
-      </div>
-
-    )}
-
-  </div>
-
-</section>
+export default PanelDireccion;
