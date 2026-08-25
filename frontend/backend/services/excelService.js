@@ -2331,20 +2331,6 @@ function leerRankingSupervisores(
 }
 
 
-// ==================================================
-// LEER EXCEL COMPLETO
-// ==================================================
-//
-// Por ahora conectamos:
-// ✅ USERS
-// ✅ BD PLAN DE TRABAJO
-//
-// Posteriormente agregaremos:
-// 📊 BD AVANCE SEMANAL
-// ==================================================
-
-async function leerExcel() {
-
   // ==================================================
 // 📊 VENTA VS MES ANTERIOR
 // ==================================================
@@ -2643,6 +2629,22 @@ function leerVentaVsMesAnterior() {
   }
 
 }
+
+
+
+// ==================================================
+// LEER EXCEL COMPLETO
+// ==================================================
+//
+// Por ahora conectamos:
+// ✅ USERS
+// ✅ BD PLAN DE TRABAJO
+//
+// Posteriormente agregaremos:
+// 📊 BD AVANCE SEMANAL
+// ==================================================
+
+async function leerExcel() {
 
   // ==================================================
   // USAR CACHE SI YA FUE CARGADO
