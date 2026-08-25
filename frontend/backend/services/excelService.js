@@ -2346,6 +2346,305 @@ function leerRankingSupervisores(
 async function leerExcel() {
 
   // ==================================================
+// 📊 VENTA VS MES ANTERIOR
+// ==================================================
+
+function leerVentaVsMesAnterior() {
+
+  try {
+
+    // ==============================================
+    // OBTENER EXCEL
+    // ==============================================
+
+    const workbook =
+      cargarExcel();
+
+
+    // ==============================================
+    // BUSCAR HOJA
+    // ==============================================
+
+    const nombreHoja =
+      workbook.SheetNames.find(
+        (nombre) =>
+          String(nombre)
+            .trim()
+            .toUpperCase() ===
+          "VS MES ANTERIOR"
+      );
+
+
+    if (!nombreHoja) {
+
+      throw new Error(
+        'No se encontró la hoja "VS MES ANTERIOR"'
+      );
+
+    }
+
+
+    const hoja =
+      workbook.Sheets[
+        nombreHoja
+      ];
+
+
+    // ==============================================
+    // CONVERTIR HOJA A FILAS
+    // ==============================================
+
+    const datos =
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+    // ==============================================
+    // RESULTADO
+    // ==============================================
+
+    const registros = [];
+
+
+    // ==============================================
+    // RECORRER FILAS
+    // ==============================================
+
+    for (
+      let i = 1;
+      i < datos.length;
+      i++
+    ) {
+
+      const fila =
+        datos[i];
+
+
+      // A = SERVICIO
+      const servicio =
+        limpiarTexto(
+          fila[0]
+        );
+
+
+      // B = CANAL
+      const canal =
+        limpiarTexto(
+          fila[1]
+        );
+
+
+      // C = VENTAS
+      const ventas =
+        Number(
+          fila[2]
+        );
+
+
+      // D = MES
+      const mes =
+        limpiarTexto(
+          fila[3]
+        );
+
+
+      // ==========================================
+      // IGNORAR FILAS INVÁLIDAS
+      // ==========================================
+
+      if (
+        !servicio ||
+        !canal ||
+        !mes
+      ) {
+
+        continue;
+
+      }
+
+
+      if (
+        servicio === "SERVICIO" ||
+        canal === "CANAL" ||
+        mes === "MES"
+      ) {
+
+        continue;
+
+      }
+
+
+      if (
+        !Number.isFinite(
+          ventas
+        )
+      ) {
+
+        continue;
+
+      }
+
+
+      // ==========================================
+      // GUARDAR
+      // ==========================================
+
+      registros.push({
+
+        servicio,
+
+        canal,
+
+        ventas:
+          Math.round(
+            ventas
+          ),
+
+        mes,
+
+      });
+
+    }
+
+
+    // ==============================================
+    // SERVICIOS ÚNICOS
+    // ==============================================
+
+    const servicios = [
+
+      ...new Set(
+
+        registros.map(
+          (registro) =>
+            registro.servicio
+        )
+
+      )
+
+    ].sort();
+
+
+    // ==============================================
+    // CANALES ÚNICOS
+    // ==============================================
+
+    const canales = [
+
+      ...new Set(
+
+        registros.map(
+          (registro) =>
+            registro.canal
+        )
+
+      )
+
+    ].sort();
+
+
+    // ==============================================
+    // MESES ÚNICOS
+    // ==============================================
+
+    const meses = [
+
+      ...new Set(
+
+        registros.map(
+          (registro) =>
+            registro.mes
+        )
+
+      )
+
+    ];
+
+
+    // ==============================================
+    // LOG
+    // ==============================================
+
+    console.log(
+      "=========================================="
+    );
+
+    console.log(
+      "📊 VENTA VS MES ANTERIOR"
+    );
+
+    console.log(
+      "📦 REGISTROS:",
+      registros.length
+    );
+
+    console.log(
+      "🛠️ SERVICIOS:",
+      servicios
+    );
+
+    console.log(
+      "📡 CANALES:",
+      canales
+    );
+
+    console.log(
+      "📅 MESES:",
+      meses
+    );
+
+    console.log(
+      "=========================================="
+    );
+
+
+    // ==============================================
+    // DEVOLVER
+    // ==============================================
+
+    return {
+
+      registros,
+
+      servicios,
+
+      canales,
+
+      meses,
+
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "❌ ERROR EN VENTA VS MES ANTERIOR:",
+      error
+    );
+
+
+    return {
+
+      registros: [],
+
+      servicios: [],
+
+      canales: [],
+
+      meses: [],
+
+    };
+
+  }
+
+}
+
+  // ==================================================
   // USAR CACHE SI YA FUE CARGADO
   // ==================================================
 
@@ -2916,6 +3215,8 @@ module.exports = {
   validarUsuario,
 
   leerExcel,
+
+  leerVentaVsMesAnterior,
 
   descargarExcelDesdeSupabase,
 
