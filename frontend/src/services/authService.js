@@ -174,7 +174,7 @@ export async function fetchProtegido(
 
 
   return fetch(
-    url,
+    `${API_URL}${url}`,
     {
 
       ...opciones,
