@@ -268,10 +268,15 @@ function AlertCard({
 
 
           {/* ========================================
-              ☑️ INICIAR SEGUIMIENTO
+              BOTONES DE ACCIÓN
           ======================================== */}
 
           <div className="seguimiento-container">
+
+
+            {/* ======================================
+                ☑️ INICIAR SEGUIMIENTO
+            ====================================== */}
 
             <button
               type="button"
@@ -284,19 +289,20 @@ function AlertCard({
             </button>
 
 
-            {/* ====================================
+            {/* ======================================
                 ➡️ SIGUIENTE FOCO ROJO
-            ==================================== */}
+            ====================================== */}
 
             <button
               type="button"
-              className="boton-checklist"
+              className="boton-siguiente-foco"
               onClick={siguienteFocoRojo}
             >
 
               ➡️ Siguiente foco rojo
 
             </button>
+
 
           </div>
 
