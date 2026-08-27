@@ -293,19 +293,13 @@ function AlertCard({
                 ➡️ SIGUIENTE FOCO ROJO
             ====================================== */}
 
-            <button
-              type="button"
-              className="boton-siguiente-foco"
-              onClick={siguienteFocoRojo}
+              <button
+            type="button"
+           className="boton-checklist"
+           onClick={siguienteFocoRojo}
             >
-
-              ➡️ Siguiente foco rojo
-
-            </button>
-
-
-          </div>
-
+            ➡️ Siguiente foco rojo
+             </button>
 
           {/* ========================================
               🚫 MARCAR AUSENCIA
