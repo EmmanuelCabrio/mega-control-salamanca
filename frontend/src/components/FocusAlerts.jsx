@@ -12,7 +12,8 @@ function FocusAlerts({
   supervisorSeleccionado = "",
   ausencias = {},
   setAusencias,
-  onIniciarSeguimiento
+  onIniciarSeguimiento,
+  onSiguienteFoco
 }) {
 
 
