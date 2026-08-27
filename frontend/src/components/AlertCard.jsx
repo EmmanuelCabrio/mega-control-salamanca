@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+
 function AlertCard({
   promotor,
   ausencia,
@@ -14,6 +15,7 @@ function AlertCard({
   // ==================================================
 
   const [mostrarDetalle, setMostrarDetalle] = useState(false);
+
 
   // ==================================================
   // ESTADO — MOSTRAR / OCULTAR MOTIVOS DE AUSENCIA
@@ -72,19 +74,20 @@ function AlertCard({
 
   }
 
+
   // ==================================================
-// SIGUIENTE FOCO ROJO
-// ==================================================
+  // ➡️ SIGUIENTE FOCO ROJO
+  // ==================================================
 
-function siguienteFoco() {
+  function siguienteFocoRojo() {
 
-  if (typeof onSiguienteFoco === "function") {
+    if (typeof onSiguienteFoco === "function") {
 
-    onSiguienteFoco(promotor);
+      onSiguienteFoco();
+
+    }
 
   }
-
-}
 
 
   // ==================================================
@@ -265,37 +268,45 @@ function siguienteFoco() {
 
 
           {/* ========================================
-              INICIAR SEGUIMIENTO
+              ☑️ INICIAR SEGUIMIENTO
           ======================================== */}
 
           <div className="seguimiento-container">
 
-  <button
-    type="button"
-    className="boton-checklist"
-    onClick={iniciarSeguimiento}
-  >
+            <button
+              type="button"
+              className="boton-checklist"
+              onClick={iniciarSeguimiento}
+            >
 
-    ☑️ Iniciar seguimiento
+              ☑️ Iniciar seguimiento
 
-  </button>
+            </button>
 
-
-  <button
-    type="button"
-    className="boton-siguiente-foco"
-    onClick={siguienteFoco}
-  >
-
-    ➡️ Siguiente foco rojo
-
-  </button>
-
-</div>
+          </div>
 
 
           {/* ========================================
-              MARCAR AUSENCIA
+              ➡️ SIGUIENTE FOCO ROJO
+          ======================================== */}
+
+          <div className="seguimiento-container">
+
+            <button
+              type="button"
+              className="boton-checklist"
+              onClick={siguienteFocoRojo}
+            >
+
+              ➡️ Siguiente foco rojo
+
+            </button>
+
+          </div>
+
+
+          {/* ========================================
+              🚫 MARCAR AUSENCIA
           ======================================== */}
 
           {!ausencia && (
