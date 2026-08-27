@@ -19,15 +19,6 @@ function FocusAlerts({
   // ==================================================
   // ESTADO — FOCOS ROJOS OMITIDOS
   // ==================================================
-  //
-  // IMPORTANTE:
-  // Esto es independiente de las ausencias.
-  //
-  // Si damos "Siguiente foco rojo", guardamos aquí
-  // el nombre del promotor actual para que no vuelva
-  // a aparecer durante este ciclo.
-  //
-  // ==================================================
 
   const [focosOmitidos, setFocosOmitidos] = useState({});
 
@@ -53,13 +44,6 @@ function FocusAlerts({
 
   // ==================================================
   // FOCOS DISPONIBLES
-  // ==================================================
-  //
-  // Un foco NO está disponible si:
-  //
-  // 1. Está marcado como ausencia
-  // 2. Ya fue omitido con "Siguiente foco rojo"
-  //
   // ==================================================
 
   const focosDisponibles = focosRojos.filter(
@@ -90,7 +74,7 @@ function FocusAlerts({
 
 
   // ==================================================
-  // FOCOS OMITIDOS MANUALMENTE
+  // FOCOS SALTADOS MANUALMENTE
   // ==================================================
 
   const focosSaltados = focosRojos.filter(
@@ -145,34 +129,20 @@ function FocusAlerts({
   // ==================================================
   // ➡️ SIGUIENTE FOCO ROJO
   // ==================================================
-  //
-  // Simplemente marcamos el foco actual como omitido.
-  //
-  // React actualiza el estado.
-  //
-  // Entonces focosDisponibles vuelve a calcularse
-  // y automáticamente aparece el siguiente foco.
-  //
-  // ==================================================
 
   function siguienteFocoRojo() {
 
     if (!focoPrioritario) {
-      return false;
+      return;
     }
-
 
     const nombre =
       focoPrioritario.nombre;
-
 
     setFocosOmitidos((actual) => ({
       ...actual,
       [nombre]: true
     }));
-
-
-    return true;
 
   }
 
@@ -184,6 +154,7 @@ function FocusAlerts({
   return (
 
     <div className="focus-alerts">
+
 
       <h2>
         🚨 Focos Rojos
@@ -219,7 +190,7 @@ function FocusAlerts({
 
 
       {/* ============================================
-          FOCOS SALTADOS CON SIGUIENTE
+          FOCOS SALTADOS
       ============================================ */}
 
       {focosSaltados.length > 0 && (
