@@ -91,7 +91,7 @@ function AlertCard({
 
   }
 
-console.log("🔥 ALERT CARD NUEVO CARGADO");
+
   // ==================================================
   // RENDER
   // ==================================================
@@ -270,10 +270,15 @@ console.log("🔥 ALERT CARD NUEVO CARGADO");
 
 
           {/* ========================================
-              ☑️ INICIAR SEGUIMIENTO
+              BOTONES DE ACCIÓN
           ======================================== */}
 
           <div className="seguimiento-container">
+
+
+            {/* ======================================
+                ☑️ INICIAR SEGUIMIENTO
+            ====================================== */}
 
             <button
               type="button"
@@ -286,9 +291,9 @@ console.log("🔥 ALERT CARD NUEVO CARGADO");
             </button>
 
 
-            {/* ========================================
+            {/* ======================================
                 ➡️ SIGUIENTE FOCO ROJO
-            ======================================== */}
+            ====================================== */}
 
             <button
               type="button"
@@ -299,6 +304,7 @@ console.log("🔥 ALERT CARD NUEVO CARGADO");
               ➡️ Siguiente foco rojo
 
             </button>
+
 
           </div>
 
