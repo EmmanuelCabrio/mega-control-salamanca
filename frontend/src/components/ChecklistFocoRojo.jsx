@@ -3,7 +3,8 @@ import { useState } from "react";
 function ChecklistFocoRojo({
   promotor,
   supervisor,
-  onRegresar
+  onRegresar,
+  onSiguienteFoco
 }) {
 
   // =========================================================
@@ -325,6 +326,8 @@ const principalArea =
 
     if (footer) {
       footer.remove();
+
+      
     }
 
     // -------------------------------------------------------
@@ -2050,54 +2053,104 @@ ${copia.outerHTML}
 
 
         {/* =================================================
-            BOTONES
-        ================================================= */}
+    BOTONES
+================================================= */}
 
-        <div
-          data-export-footer="true"
-          style={styles.footer}
-        >
+<div
+  data-export-footer="true"
+  style={styles.footer}
+>
 
-          <button
+  {/* =============================================
+      REGRESAR AL DASHBOARD
+  ============================================= */}
+
+  <button
     type="button"
     onClick={() => {
+
       if (!evidenciaDescargada) {
+
         alert(
           "Primero debes descargar la evidencia HTML del checklist antes de regresar al Dashboard."
         );
+
         return;
       }
 
       onRegresar();
+
     }}
     style={{
       ...styles.backButton,
       opacity: evidenciaDescargada ? 1 : 0.55,
-      cursor: evidenciaDescargada ? "pointer" : "not-allowed"
+      cursor: evidenciaDescargada
+        ? "pointer"
+        : "not-allowed"
     }}
   >
+
     {evidenciaDescargada
+
       ? "↩️ Regresar al Dashboard"
-      : "🔒 Descarga la evidencia para continuar"}
+
+      : "🔒 Descarga la evidencia para continuar"
+
+    }
+
   </button>
 
 
-          <button
-            type="button"
-            style={styles.exportButton}
-            onClick={exportarHTML}
-          >
-            📄 Descargar CheckList
-          </button>
+  {/* =============================================
+      DESCARGAR CHECKLIST
+  ============================================= */}
 
-        </div>
+  <button
+    type="button"
+    style={styles.exportButton}
+    onClick={exportarHTML}
+  >
 
-      </div>
+    📄 Descargar CheckList
 
-    </div>
+  </button>
 
-  );
 
-}
+  {/* =============================================
+      SIGUIENTE FOCO ROJO
+      SOLO APARECE DESPUÉS DE DESCARGAR
+  ============================================= */}
+
+  {evidenciaDescargada && (
+
+    <button
+      type="button"
+      style={{
+        ...styles.exportButton,
+        background: "#198754"
+      }}
+      onClick={() => {
+
+        const haySiguiente =
+          onSiguienteFoco();
+
+        if (!haySiguiente) {
+
+          alert(
+            "🟢 ¡Excelente trabajo!\n\nHas completado todos los focos rojos disponibles."
+          );
+
+        }
+
+      }}
+    >
+
+      ➡️ Siguiente foco rojo
+
+    </button>
+
+  )}
+
+</div>
 
 export default ChecklistFocoRojo;
