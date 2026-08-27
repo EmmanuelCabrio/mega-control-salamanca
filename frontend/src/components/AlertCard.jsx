@@ -60,36 +60,40 @@ function AlertCard({
   }
 
 
-  // ==================================================
-  // INICIAR SEGUIMIENTO
-  // ==================================================
+  {/* ============================================
+    ☑️ INICIAR SEGUIMIENTO
+============================================ */}
 
-  function iniciarSeguimiento() {
+<div className="seguimiento-container">
 
-    if (typeof onIniciarSeguimiento === "function") {
+  <button
+    type="button"
+    className="boton-checklist"
+    onClick={iniciarSeguimiento}
+  >
 
-      onIniciarSeguimiento(promotor);
+    ☑️ Iniciar seguimiento
 
-    }
-
-  }
-
-
-  // ==================================================
-  // ➡️ SIGUIENTE FOCO ROJO
-  // ==================================================
-
-  function siguienteFocoRojo() {
-
-    if (typeof onSiguienteFoco === "function") {
-
-      onSiguienteFoco();
-
-    }
-
-  }
+  </button>
 
 
+  {/* ============================================
+      ➡️ SIGUIENTE FOCO ROJO
+  ============================================ */}
+
+  <button
+    type="button"
+    className="boton-siguiente-foco"
+    onClick={siguienteFocoRojo}
+  >
+
+    ➡️ Siguiente foco rojo
+
+  </button>
+
+</div>
+
+  
   // ==================================================
   // RENDER
   // ==================================================
