@@ -2151,6 +2151,10 @@ ${copia.outerHTML}
 
   )}
 
+  </div>
 </div>
+);
+
+}
 
 export default ChecklistFocoRojo;
