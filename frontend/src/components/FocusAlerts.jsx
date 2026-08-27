@@ -1,3 +1,4 @@
+import { useState } from "react";
 import AlertCard from "./AlertCard";
 
 import {
@@ -14,6 +15,22 @@ function FocusAlerts({
   setAusencias,
   onIniciarSeguimiento
 }) {
+
+  // ==================================================
+  // ESTADO — FOCOS ROJOS OMITIDOS
+  // ==================================================
+  //
+  // IMPORTANTE:
+  // Esto es independiente de las ausencias.
+  //
+  // Si damos "Siguiente foco rojo", guardamos aquí
+  // el nombre del promotor actual para que no vuelva
+  // a aparecer durante este ciclo.
+  //
+  // ==================================================
+
+  const [focosOmitidos, setFocosOmitidos] = useState({});
+
 
   // ==================================================
   // EQUIPO DEL SUPERVISOR
@@ -37,10 +54,18 @@ function FocusAlerts({
   // ==================================================
   // FOCOS DISPONIBLES
   // ==================================================
+  //
+  // Un foco NO está disponible si:
+  //
+  // 1. Está marcado como ausencia
+  // 2. Ya fue omitido con "Siguiente foco rojo"
+  //
+  // ==================================================
 
   const focosDisponibles = focosRojos.filter(
     (promotor) =>
-      !ausencias[promotor.nombre]
+      !ausencias[promotor.nombre] &&
+      !focosOmitidos[promotor.nombre]
   );
 
 
@@ -61,6 +86,16 @@ function FocusAlerts({
   const focosAusentes = focosRojos.filter(
     (promotor) =>
       ausencias[promotor.nombre]
+  );
+
+
+  // ==================================================
+  // FOCOS OMITIDOS MANUALMENTE
+  // ==================================================
+
+  const focosSaltados = focosRojos.filter(
+    (promotor) =>
+      focosOmitidos[promotor.nombre]
   );
 
 
@@ -108,6 +143,41 @@ function FocusAlerts({
 
 
   // ==================================================
+  // ➡️ SIGUIENTE FOCO ROJO
+  // ==================================================
+  //
+  // Simplemente marcamos el foco actual como omitido.
+  //
+  // React actualiza el estado.
+  //
+  // Entonces focosDisponibles vuelve a calcularse
+  // y automáticamente aparece el siguiente foco.
+  //
+  // ==================================================
+
+  function siguienteFocoRojo() {
+
+    if (!focoPrioritario) {
+      return false;
+    }
+
+
+    const nombre =
+      focoPrioritario.nombre;
+
+
+    setFocosOmitidos((actual) => ({
+      ...actual,
+      [nombre]: true
+    }));
+
+
+    return true;
+
+  }
+
+
+  // ==================================================
   // RENDER
   // ==================================================
 
@@ -129,21 +199,41 @@ function FocusAlerts({
 
 
       {/* ============================================
-          FOCOS OMITIDOS
+          FOCOS OMITIDOS POR AUSENCIA
       ============================================ */}
 
       {focosAusentes.length > 0 && (
 
         <p className="focos-resumen">
 
-          ⏭️ {focosAusentes.length}{" "}
+          🚫 {focosAusentes.length}{" "}
 
           {focosAusentes.length === 1
+            ? "foco no disponible"
+            : "focos no disponibles"
+          }
+
+        </p>
+
+      )}
+
+
+      {/* ============================================
+          FOCOS SALTADOS CON SIGUIENTE
+      ============================================ */}
+
+      {focosSaltados.length > 0 && (
+
+        <p className="focos-resumen">
+
+          ⏭️ {focosSaltados.length}{" "}
+
+          {focosSaltados.length === 1
             ? "foco omitido"
             : "focos omitidos"
           }
 
-          {" "}por ausencia
+          {" "}con "Siguiente foco rojo"
 
         </p>
 
@@ -185,6 +275,10 @@ function FocusAlerts({
 
           onIniciarSeguimiento={
             onIniciarSeguimiento
+          }
+
+          onSiguienteFoco={
+            siguienteFocoRojo
           }
 
         />
