@@ -12,10 +12,8 @@ function FocusAlerts({
   supervisorSeleccionado = "",
   ausencias = {},
   setAusencias,
-  onIniciarSeguimiento,
-  onSiguienteFoco
+  onIniciarSeguimiento
 }) {
-
 
   // ==================================================
   // EQUIPO DEL SUPERVISOR
@@ -74,7 +72,7 @@ function FocusAlerts({
 
 
   // ==================================================
-  // CONTAR FOCOS QUE FUERON OMITIDOS
+  // CONTAR FOCOS OMITIDOS POR AUSENCIA
   // ==================================================
 
   const focosAusentes =
@@ -178,7 +176,8 @@ function FocusAlerts({
 
       <p className="subtitulo-focos">
 
-        🎯 1 foco prioritario para hoy, sino está pasa al que sigue:
+        🎯 1 foco prioritario para hoy,
+        si no está pasa al que sigue.
 
       </p>
 
@@ -223,7 +222,6 @@ function FocusAlerts({
         </p>
 
       ) : (
-
 
         /* ==========================================
            MOSTRAR EL FOCO PRIORITARIO
@@ -278,15 +276,6 @@ function FocusAlerts({
 
               onIniciarSeguimiento={
                 onIniciarSeguimiento
-              }
-
-
-              // ======================================
-              // SIGUIENTE FOCO
-              // ======================================
-
-              onSiguienteFoco={
-                onSiguienteFoco
               }
 
             />
