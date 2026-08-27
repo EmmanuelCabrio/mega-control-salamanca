@@ -226,7 +226,7 @@ function FocusAlerts({
 
 
         /* ==========================================
-           MOSTRAR LOS 2 FOCOS
+           MOSTRAR EL FOCO PRIORITARIO
         ========================================== */
 
         lista.map(
@@ -244,7 +244,6 @@ function FocusAlerts({
 
 
               // ======================================
-              // NUEVO
               // ESTADO DE AUSENCIA
               // ======================================
 
@@ -256,7 +255,6 @@ function FocusAlerts({
 
 
               // ======================================
-              // NUEVO
               // MARCAR AUSENCIA
               // ======================================
 
@@ -266,7 +264,6 @@ function FocusAlerts({
 
 
               // ======================================
-              // NUEVO
               // QUITAR AUSENCIA
               // ======================================
 
@@ -274,9 +271,23 @@ function FocusAlerts({
                 quitarAusencia
               }
 
+
+              // ======================================
+              // INICIAR SEGUIMIENTO
+              // ======================================
+
               onIniciarSeguimiento={
-  onIniciarSeguimiento
-}
+                onIniciarSeguimiento
+              }
+
+
+              // ======================================
+              // SIGUIENTE FOCO
+              // ======================================
+
+              onSiguienteFoco={
+                onSiguienteFoco
+              }
 
             />
 
