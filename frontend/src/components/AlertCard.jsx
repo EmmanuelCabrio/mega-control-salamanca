@@ -5,7 +5,8 @@ function AlertCard({
   ausencia,
   onAusencia,
   onQuitarAusencia,
-  onIniciarSeguimiento
+  onIniciarSeguimiento,
+  onSiguienteFoco
 }) {
 
   // ==================================================
@@ -70,6 +71,20 @@ function AlertCard({
     }
 
   }
+
+  // ==================================================
+// SIGUIENTE FOCO ROJO
+// ==================================================
+
+function siguienteFoco() {
+
+  if (typeof onSiguienteFoco === "function") {
+
+    onSiguienteFoco(promotor);
+
+  }
+
+}
 
 
   // ==================================================
@@ -255,17 +270,28 @@ function AlertCard({
 
           <div className="seguimiento-container">
 
-            <button
-              type="button"
-              className="boton-checklist"
-              onClick={iniciarSeguimiento}
-            >
+  <button
+    type="button"
+    className="boton-checklist"
+    onClick={iniciarSeguimiento}
+  >
 
-              ☑️ Iniciar seguimiento
+    ☑️ Iniciar seguimiento
 
-            </button>
+  </button>
 
-          </div>
+
+  <button
+    type="button"
+    className="boton-siguiente-foco"
+    onClick={siguienteFoco}
+  >
+
+    ➡️ Siguiente foco rojo
+
+  </button>
+
+</div>
 
 
           {/* ========================================
