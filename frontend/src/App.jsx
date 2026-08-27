@@ -26,6 +26,12 @@ import ChecklistFocoRojo
 
 import PanelDireccion from "./components/PanelDireccion";
 
+import {
+  calcularPrioridades,
+  filtrarFocosRojos,
+  ordenarPorPrioridad
+} from "./utils/prioridades";
+
 
 
 
@@ -204,6 +210,17 @@ const [
   promotorEnSeguimiento,
   setPromotorEnSeguimiento
 ] = useState(null);
+
+
+
+  // ==================================================
+// 🔴 FOCOS ROJOS YA ATENDIDOS
+// ==================================================
+
+const [
+  focosAtendidos,
+  setFocosAtendidos
+] = useState([]);
   
 
 // ==================================================
@@ -725,6 +742,7 @@ function manejarLogin(
 
 
   setAusencias({});
+  setFocosAtendidos([]);
 
 
   // ==========================================
@@ -795,7 +813,159 @@ function manejarLogin(
       {}
     );
 
+    setFocosAtendidos([]);
+
   }
+
+
+
+
+  // ==================================================
+// 🔴 SIGUIENTE FOCO ROJO
+// ==================================================
+
+function manejarSiguienteFoco() {
+
+  // ================================================
+  // MARCAR EL ACTUAL COMO ATENDIDO
+  // ================================================
+
+  const nombreActual =
+    promotorEnSeguimiento?.nombre;
+
+  if (!nombreActual) {
+
+    return false;
+
+  }
+
+
+  setFocosAtendidos(
+    (actuales) => {
+
+      if (
+        actuales.includes(
+          nombreActual
+        )
+      ) {
+
+        return actuales;
+
+      }
+
+      return [
+        ...actuales,
+        nombreActual
+      ];
+
+    }
+  );
+
+
+  // ================================================
+  // CALCULAR FOCOS ROJOS DEL EQUIPO
+  // ================================================
+
+  const equipo =
+    registros.filter(
+      (promotor) =>
+        promotor.supervisor ===
+        supervisorSeleccionado
+    );
+
+
+  const equipoConPrioridades =
+    calcularPrioridades(
+      equipo
+    );
+
+
+  const focosRojos =
+    filtrarFocosRojos(
+      equipoConPrioridades
+    );
+
+
+  // ================================================
+  // QUITAR AUSENTES
+  // ================================================
+
+  const focosDisponibles =
+    focosRojos.filter(
+      (promotor) => {
+
+        const esAusente =
+          ausencias[
+            promotor.nombre
+          ];
+
+        const yaAtendido =
+          [
+            ...focosAtendidos,
+            nombreActual
+          ].includes(
+            promotor.nombre
+          );
+
+        return (
+          !esAusente &&
+          !yaAtendido
+        );
+
+      }
+    );
+
+
+  // ================================================
+  // ORDENAR POR PRIORIDAD
+  // ================================================
+
+  const ordenados =
+    ordenarPorPrioridad(
+      [...focosDisponibles]
+    );
+
+
+  const siguiente =
+    ordenados[0];
+
+
+  // ================================================
+  // EXISTE SIGUIENTE FOCO
+  // ================================================
+
+  if (siguiente) {
+
+    setPromotorEnSeguimiento(
+      siguiente
+    );
+
+    // IMPORTANTE:
+    // seguimos en la misma vista.
+    setVista(
+      "checklistFocoRojo"
+    );
+
+    return true;
+
+  }
+
+
+  // ================================================
+  // YA NO HAY MÁS FOCOS
+  // ================================================
+
+  setPromotorEnSeguimiento(
+    null
+  );
+
+  setVista(
+    "supervisor"
+  );
+
+  return false;
+
+}
 
 
   // ==================================================
@@ -1286,29 +1456,33 @@ if (
 
   return (
 
-    <ChecklistFocoRojo
+<ChecklistFocoRojo
 
-      promotor={
-        promotorEnSeguimiento
-      }
+  promotor={
+    promotorEnSeguimiento
+  }
 
-      supervisor={
-        supervisorSeleccionado
-      }
+  supervisor={
+    supervisorSeleccionado
+  }
 
-      onRegresar={() => {
+  onSiguienteFoco={
+    manejarSiguienteFoco
+  }
 
-        setPromotorEnSeguimiento(
-          null
-        );
+  onRegresar={() => {
 
-        setVista(
-          "supervisor"
-        );
+    setPromotorEnSeguimiento(
+      null
+    );
 
-      }}
+    setVista(
+      "supervisor"
+    );
 
-    />
+  }}
+
+/>
 
   );
 
