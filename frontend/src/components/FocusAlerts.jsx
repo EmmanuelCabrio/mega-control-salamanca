@@ -19,100 +19,65 @@ function FocusAlerts({
   // EQUIPO DEL SUPERVISOR
   // ==================================================
 
-  const equipo =
-    registros.filter(
-      (promotor) =>
-        promotor.supervisor ===
-        supervisorSeleccionado
-    );
+  const equipo = registros.filter(
+    (promotor) =>
+      promotor.supervisor === supervisorSeleccionado
+  );
 
 
   // ==================================================
-  // CALCULAR PRIORIDADES
+  // OBTENER FOCOS ROJOS
   // ==================================================
 
-  const equipoConPrioridades =
-    calcularPrioridades(
-      equipo
-    );
-
-
-  // ==================================================
-  // OBTENER TODOS LOS FOCOS ROJOS
-  // ==================================================
-
-  const focosRojos =
-    filtrarFocosRojos(
-      equipoConPrioridades
-    );
+  const focosRojos = filtrarFocosRojos(
+    calcularPrioridades(equipo)
+  );
 
 
   // ==================================================
-  // QUITAR TEMPORALMENTE LOS AUSENTES
+  // FOCOS DISPONIBLES
   // ==================================================
 
-  const focosDisponibles =
-    focosRojos.filter(
-      (promotor) =>
-        !ausencias[
-          promotor.nombre
-        ]
-    );
+  const focosDisponibles = focosRojos.filter(
+    (promotor) =>
+      !ausencias[promotor.nombre]
+  );
 
 
   // ==================================================
-  // ORDENAR POR PRIORIDAD
-  // Y MOSTRAR SOLAMENTE EL PRIMERO
+  // FOCO PRIORITARIO
   // ==================================================
 
-  const lista =
+  const focoPrioritario =
     ordenarPorPrioridad(
       [...focosDisponibles]
-    ).slice(0, 1);
+    )[0];
 
 
   // ==================================================
-  // CONTAR FOCOS OMITIDOS POR AUSENCIA
+  // FOCOS OMITIDOS POR AUSENCIA
   // ==================================================
 
-  const focosAusentes =
-    focosRojos.filter(
-      (promotor) =>
-        ausencias[
-          promotor.nombre
-        ]
-    );
+  const focosAusentes = focosRojos.filter(
+    (promotor) =>
+      ausencias[promotor.nombre]
+  );
 
 
   // ==================================================
   // MARCAR AUSENCIA
   // ==================================================
 
-  function manejarAusencia(
-    nombre,
-    motivo
-  ) {
+  function manejarAusencia(nombre, motivo) {
 
-    if (
-      typeof setAusencias !==
-      "function"
-    ) {
-
+    if (typeof setAusencias !== "function") {
       return;
-
     }
 
-
-    setAusencias(
-      (actual) => ({
-
-        ...actual,
-
-        [nombre]:
-          motivo
-
-      })
-    );
+    setAusencias((actual) => ({
+      ...actual,
+      [nombre]: motivo
+    }));
 
   }
 
@@ -121,37 +86,23 @@ function FocusAlerts({
   // QUITAR AUSENCIA
   // ==================================================
 
-  function quitarAusencia(
-    nombre
-  ) {
+  function quitarAusencia(nombre) {
 
-    if (
-      typeof setAusencias !==
-      "function"
-    ) {
-
+    if (typeof setAusencias !== "function") {
       return;
-
     }
 
+    setAusencias((actual) => {
 
-    setAusencias(
-      (actual) => {
+      const nuevo = {
+        ...actual
+      };
 
-        const nuevo = {
-          ...actual
-        };
+      delete nuevo[nombre];
 
+      return nuevo;
 
-        delete nuevo[
-          nombre
-        ];
-
-
-        return nuevo;
-
-      }
-    );
+    });
 
   }
 
@@ -163,11 +114,6 @@ function FocusAlerts({
   return (
 
     <div className="focus-alerts">
-
-
-      {/* ============================================
-          TÍTULO
-      ============================================ */}
 
       <h2>
         🚨 Focos Rojos
@@ -183,18 +129,14 @@ function FocusAlerts({
 
 
       {/* ============================================
-          AVISO DE AUSENCIAS
+          FOCOS OMITIDOS
       ============================================ */}
 
       {focosAusentes.length > 0 && (
 
         <p className="focos-resumen">
 
-          ⏭️{" "}
-
-          {focosAusentes.length}
-
-          {" "}
+          ⏭️ {focosAusentes.length}{" "}
 
           {focosAusentes.length === 1
             ? "foco omitido"
@@ -212,7 +154,7 @@ function FocusAlerts({
           SIN FOCOS
       ============================================ */}
 
-      {lista.length === 0 ? (
+      {!focoPrioritario ? (
 
         <p className="sin-focos">
 
@@ -223,66 +165,29 @@ function FocusAlerts({
 
       ) : (
 
-        /* ==========================================
-           MOSTRAR EL FOCO PRIORITARIO
-        ========================================== */
+        <AlertCard
 
-        lista.map(
-          (promotor) => (
+          key={focoPrioritario.nombre}
 
-            <AlertCard
+          promotor={focoPrioritario}
 
-              key={
-                promotor.nombre
-              }
+          ausencia={
+            ausencias[focoPrioritario.nombre]
+          }
 
-              promotor={
-                promotor
-              }
+          onAusencia={
+            manejarAusencia
+          }
 
+          onQuitarAusencia={
+            quitarAusencia
+          }
 
-              // ======================================
-              // ESTADO DE AUSENCIA
-              // ======================================
+          onIniciarSeguimiento={
+            onIniciarSeguimiento
+          }
 
-              ausencia={
-                ausencias[
-                  promotor.nombre
-                ]
-              }
-
-
-              // ======================================
-              // MARCAR AUSENCIA
-              // ======================================
-
-              onAusencia={
-                manejarAusencia
-              }
-
-
-              // ======================================
-              // QUITAR AUSENCIA
-              // ======================================
-
-              onQuitarAusencia={
-                quitarAusencia
-              }
-
-
-              // ======================================
-              // INICIAR SEGUIMIENTO
-              // ======================================
-
-              onIniciarSeguimiento={
-                onIniciarSeguimiento
-              }
-
-            />
-
-          )
-
-        )
+        />
 
       )}
 
