@@ -1705,35 +1705,49 @@ if (
 
           <FocusAlerts
 
-            registros={
-              registros
-            }
+  registros={
+    registros
+  }
 
-            supervisorSeleccionado={
-              supervisorSeleccionado
-            }
+  supervisorSeleccionado={
+    supervisorSeleccionado
+  }
 
-            ausencias={
-              ausencias
-            }
+  ausencias={
+    ausencias
+  }
 
-            setAusencias={
-              setAusencias
-            }
+  setAusencias={
+    setAusencias
+  }
 
-            onIniciarSeguimiento={(promotor) => {
 
-  setPromotorEnSeguimiento(
-    promotor
-  );
+  // ==========================================
+  // 🔴 INICIAR SEGUIMIENTO
+  // ==========================================
 
-  setVista(
-    "checklistFocoRojo"
-  );
+  onIniciarSeguimiento={(promotor) => {
 
-}}
+    setPromotorEnSeguimiento(
+      promotor
+    );
 
-          />
+    setVista(
+      "checklistFocoRojo"
+    );
+
+  }}
+
+
+  // ==========================================
+  // 🔴 PASAR AL SIGUIENTE FOCO
+  // ==========================================
+
+  onSiguienteFoco={
+    manejarSiguienteFoco
+  }
+
+/>
 
 
           {/* ========================================
