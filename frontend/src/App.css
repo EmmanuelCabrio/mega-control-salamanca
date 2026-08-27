@@ -4912,3 +4912,30 @@ body {
   }
 
 }
+
+
+/* =========================================================
+   ➡️ SIGUIENTE FOCO ROJO
+========================================================= */
+
+.boton-siguiente-foco {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 14px;
+
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #2563eb;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.boton-siguiente-foco:hover {
+  background: #eff6ff;
+}
