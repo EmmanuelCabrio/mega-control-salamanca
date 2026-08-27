@@ -143,6 +143,47 @@ function AlertCard({
 
 
   // ==================================================
+  // CONTINUAR AL SIGUIENTE FOCO
+  // ==================================================
+
+  function continuarAlSiguienteFoco() {
+
+    if (
+      !checklistCompleto
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      typeof onSiguienteFoco ===
+      "function"
+    ) {
+
+      console.log(
+        "✅ CHECKLIST COMPLETADO:"
+      );
+
+      console.log(
+        "👤 Promotor:",
+        promotor.nombre
+      );
+
+      console.log(
+        "➡️ Buscando siguiente foco..."
+      );
+
+
+      onSiguienteFoco();
+
+    }
+
+  }
+
+
+  // ==================================================
   // RENDER
   // ==================================================
 
@@ -351,8 +392,8 @@ function AlertCard({
 
               className="boton-checklist"
 
-            onClick={() =>
-                 onIniciarSeguimiento(
+              onClick={() =>
+                onIniciarSeguimiento(
                   promotor
                 )
               }
@@ -558,15 +599,9 @@ function AlertCard({
                     !checklistCompleto
                   }
 
-             onClick={() => {
-
-                  if (typeof onSiguienteFoco === "function") {
-
-                      onSiguienteFoco();
-
-                 }
-
-                }}
+                  onClick={
+                    continuarAlSiguienteFoco
+                  }
 
                 >
 
