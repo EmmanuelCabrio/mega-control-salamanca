@@ -6,7 +6,8 @@ function AlertCard({
   ausencia,
   onAusencia,
   onQuitarAusencia,
-  onIniciarSeguimiento
+  onIniciarSeguimiento,
+  onSiguienteFoco
 }) {
 
 
@@ -557,14 +558,15 @@ function AlertCard({
                     !checklistCompleto
                   }
 
-                  onClick={() => {
+             onClick={() => {
 
-                    console.log(
-                      "Checklist completado para:",
-                      promotor.nombre
-                    );
+                  if (typeof onSiguienteFoco === "function") {
 
-                  }}
+                      onSiguienteFoco();
+
+                 }
+
+                }}
 
                 >
 
