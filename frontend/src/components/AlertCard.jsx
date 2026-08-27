@@ -60,40 +60,36 @@ function AlertCard({
   }
 
 
-  {/* ============================================
-    ☑️ INICIAR SEGUIMIENTO
-============================================ */}
+  // ==================================================
+  // INICIAR SEGUIMIENTO
+  // ==================================================
 
-<div className="seguimiento-container">
+  function iniciarSeguimiento() {
 
-  <button
-    type="button"
-    className="boton-checklist"
-    onClick={iniciarSeguimiento}
-  >
+    if (typeof onIniciarSeguimiento === "function") {
 
-    ☑️ Iniciar seguimiento
+      onIniciarSeguimiento(promotor);
 
-  </button>
+    }
+
+  }
 
 
-  {/* ============================================
-      ➡️ SIGUIENTE FOCO ROJO
-  ============================================ */}
+  // ==================================================
+  // ➡️ SIGUIENTE FOCO ROJO
+  // ==================================================
 
-  <button
-    type="button"
-    className="boton-siguiente-foco"
-    onClick={siguienteFocoRojo}
-  >
+  function siguienteFocoRojo() {
 
-    ➡️ Siguiente foco rojo
+    if (typeof onSiguienteFoco === "function") {
 
-  </button>
+      onSiguienteFoco();
 
-</div>
+    }
 
-  
+  }
+
+
   // ==================================================
   // RENDER
   // ==================================================
@@ -287,14 +283,10 @@ function AlertCard({
 
             </button>
 
-          </div>
 
-
-          {/* ========================================
-              ➡️ SIGUIENTE FOCO ROJO
-          ======================================== */}
-
-          <div className="seguimiento-container">
+            {/* ====================================
+                ➡️ SIGUIENTE FOCO ROJO
+            ==================================== */}
 
             <button
               type="button"
