@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function ChecklistFocoRojo({
   promotor,
@@ -28,6 +28,19 @@ function ChecklistFocoRojo({
     useState(false);
 
   // =========================================================
+  // FIRMAS
+  // =========================================================
+
+  const supervisorSignatureRef = useRef(null);
+  const promotorSignatureRef = useRef(null);
+
+  const [firmaSupervisor, setFirmaSupervisor] =
+    useState(false);
+
+  const [firmaPromotor, setFirmaPromotor] =
+    useState(false);
+
+  // =========================================================
   // MARCAR / DESMARCAR
   // =========================================================
 
@@ -40,18 +53,6 @@ function ChecklistFocoRojo({
 
   // =========================================================
   // MOTOR DEL DIAGNÓSTICO
-  //
-  // TIPOS:
-  //
-  // individual:
-  // Cada reactivo se evalúa por separado.
-  //
-  // grupo:
-  // Basta con cumplir UNA opción del grupo.
-  //
-  // Esto evita que opciones como:
-  // Internet / TV / Apps / Móvil
-  // sean consideradas fallas simultáneamente.
   // =========================================================
 
   const diagnosticoAreas = {
@@ -109,23 +110,11 @@ function ChecklistFocoRojo({
     ],
 
     "Personalización de la presentación": [
-      // =====================================================
-      // SERVICIO MÁS RELEVANTE
-      //
-      // Basta con detectar UN servicio relevante.
-      // =====================================================
-
-      {
-        tipo: "grupo",
-        ids: [
-          "servicio-internet",
-          "servicio-tv",
-          "servicio-apps",
-          "servicio-casa",
-          "servicio-movil",
-        ],
-      },
-
+      "servicio-internet",
+      "servicio-tv",
+      "servicio-apps",
+      "servicio-casa",
+      "servicio-movil",
       "presentacion-sondeo",
       "presentacion-beneficios",
       "presentacion-necesidad",
@@ -138,18 +127,9 @@ function ChecklistFocoRojo({
     ],
 
     "Apoyo visual / herramientas": [
-      // =====================================================
-      // BASTA CON UTILIZAR UNA HERRAMIENTA
-      // =====================================================
-
-      {
-        tipo: "grupo",
-        ids: [
-          "herramienta-folleto",
-          "herramienta-carpeta",
-          "herramienta-xview",
-        ],
-      },
+      "herramienta-folleto",
+      "herramienta-carpeta",
+      "herramienta-xview",
     ],
 
     "Preparación del cierre": [
@@ -211,13 +191,6 @@ function ChecklistFocoRojo({
       "referidos",
     ],
 
-    // =======================================================
-    // IMPORTANTE:
-    // Esta sección actualmente se evalúa siempre.
-    // Posteriormente podemos hacerla condicional para que
-    // solo se evalúe cuando la venta NO se cierre.
-    // =======================================================
-
     "Prospecto no cerrado": [
       "prospecto-dimme",
       "prospecto-info",
@@ -236,7 +209,7 @@ function ChecklistFocoRojo({
   };
 
   // =========================================================
-  // CALCULAR DIAGNÓSTICO
+  // CALCULAR OPORTUNIDADES
   // =========================================================
 
   const resultadosDiagnostico = Object.entries(
@@ -246,10 +219,7 @@ function ChecklistFocoRojo({
     let evaluaciones = 0;
 
     criterios.forEach((criterio) => {
-      // =====================================================
       // GRUPO
-      // =====================================================
-
       if (
         typeof criterio === "object" &&
         criterio.tipo === "grupo"
@@ -257,7 +227,7 @@ function ChecklistFocoRojo({
         evaluaciones += 1;
 
         const cumplioGrupo = criterio.ids.some(
-          (id) => !!checks[id]
+          (id) => checks[id]
         );
 
         if (!cumplioGrupo) {
@@ -267,10 +237,7 @@ function ChecklistFocoRojo({
         return;
       }
 
-      // =====================================================
-      // REACTIVO INDIVIDUAL
-      // =====================================================
-
+      // CRITERIO INDIVIDUAL
       evaluaciones += 1;
 
       if (!checks[criterio]) {
@@ -278,90 +245,23 @@ function ChecklistFocoRojo({
       }
     });
 
-    // =====================================================
-    // PORCENTAJE DE OPORTUNIDAD
-    // =====================================================
-
-    const porcentajeOportunidad =
-      evaluaciones > 0
-        ? (oportunidades / evaluaciones) * 100
-        : 0;
-
-    // =====================================================
-    // PORCENTAJE DE CUMPLIMIENTO
-    // =====================================================
-
-    const porcentajeCumplimiento =
-      100 - porcentajeOportunidad;
-
     return {
       area,
       oportunidades,
       evaluaciones,
-
-      porcentajeOportunidad: Number(
-        porcentajeOportunidad.toFixed(1)
-      ),
-
-      porcentajeCumplimiento: Number(
-        porcentajeCumplimiento.toFixed(1)
-      ),
     };
   });
 
   // =========================================================
   // RANKING
-  //
-  // 1. Mayor porcentaje de oportunidad.
-  // 2. Si empatan, mayor cantidad de oportunidades.
-  // 3. Si siguen empatados, mayor cantidad de evaluaciones.
   // =========================================================
 
   const rankingDiagnostico = resultadosDiagnostico
-    .filter(
-      (item) => item.oportunidades > 0
-    )
-    .sort((a, b) => {
-      // =====================================================
-      // PRIMER CRITERIO:
-      // PORCENTAJE DE OPORTUNIDAD
-      // =====================================================
-
-      if (
-        b.porcentajeOportunidad !==
-        a.porcentajeOportunidad
-      ) {
-        return (
-          b.porcentajeOportunidad -
-          a.porcentajeOportunidad
-        );
-      }
-
-      // =====================================================
-      // SEGUNDO CRITERIO:
-      // CANTIDAD DE OPORTUNIDADES
-      // =====================================================
-
-      if (
-        b.oportunidades !==
-        a.oportunidades
-      ) {
-        return (
-          b.oportunidades -
-          a.oportunidades
-        );
-      }
-
-      // =====================================================
-      // TERCER CRITERIO:
-      // CANTIDAD DE EVALUACIONES
-      // =====================================================
-
-      return (
-        b.evaluaciones -
-        a.evaluaciones
-      );
-    });
+    .filter((item) => item.oportunidades > 0)
+    .sort(
+      (a, b) =>
+        b.oportunidades - a.oportunidades
+    );
 
   // =========================================================
   // PRINCIPAL ÁREA
@@ -370,6 +270,170 @@ function ChecklistFocoRojo({
   const principalArea =
     rankingDiagnostico[0]?.area ||
     "Sin áreas de oportunidad detectadas";
+
+  // =========================================================
+  // COMPONENTE FIRMA
+  // =========================================================
+
+  const SignaturePad = ({
+    canvasRef,
+    label,
+    setFirmado,
+  }) => {
+    const drawing = useRef(false);
+
+    const obtenerContexto = () => {
+      const canvas = canvasRef.current;
+
+      if (!canvas) return null;
+
+      return canvas.getContext("2d");
+    };
+
+    const obtenerPosicion = (e) => {
+      const canvas = canvasRef.current;
+
+      if (!canvas) {
+        return {
+          x: 0,
+          y: 0,
+        };
+      }
+
+      const rect = canvas.getBoundingClientRect();
+
+      let clientX;
+      let clientY;
+
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      return {
+        x:
+          (clientX - rect.left) *
+          (canvas.width / rect.width),
+
+        y:
+          (clientY - rect.top) *
+          (canvas.height / rect.height),
+      };
+    };
+
+    const iniciarDibujo = (e) => {
+      e.preventDefault();
+
+      const ctx = obtenerContexto();
+
+      if (!ctx) return;
+
+      const posicion = obtenerPosicion(e);
+
+      drawing.current = true;
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        posicion.x,
+        posicion.y
+      );
+    };
+
+    const dibujar = (e) => {
+      e.preventDefault();
+
+      if (!drawing.current) return;
+
+      const ctx = obtenerContexto();
+
+      if (!ctx) return;
+
+      const posicion = obtenerPosicion(e);
+
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#17202a";
+
+      ctx.lineTo(
+        posicion.x,
+        posicion.y
+      );
+
+      ctx.stroke();
+
+      setFirmado(true);
+    };
+
+    const terminarDibujo = (e) => {
+      if (e) {
+        e.preventDefault();
+      }
+
+      drawing.current = false;
+    };
+
+    const limpiarFirma = () => {
+      const canvas = canvasRef.current;
+
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+
+      ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      setFirmado(false);
+    };
+
+    return (
+      <div style={styles.signatureBox}>
+        <div style={styles.signatureTitle}>
+          {label}
+        </div>
+
+        <div style={styles.signatureInstruction}>
+          Firma dentro del recuadro
+        </div>
+
+        <div style={styles.canvasWrapper}>
+          <canvas
+            ref={canvasRef}
+            width={900}
+            height={220}
+            style={styles.signatureCanvas}
+            onMouseDown={iniciarDibujo}
+            onMouseMove={dibujar}
+            onMouseUp={terminarDibujo}
+            onMouseLeave={terminarDibujo}
+            onTouchStart={iniciarDibujo}
+            onTouchMove={dibujar}
+            onTouchEnd={terminarDibujo}
+          />
+
+          <div style={styles.signatureLine}>
+            Firma
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={limpiarFirma}
+          style={styles.clearSignatureButton}
+        >
+          🧹 Limpiar firma
+        </button>
+      </div>
+    );
+  };
 
   // =========================================================
   // EXPORTAR EVIDENCIA HTML
@@ -416,46 +480,31 @@ function ChecklistFocoRojo({
         'input[type="checkbox"]'
       );
 
-    checksCopia.forEach(
-      (checkbox, index) => {
-        const original =
-          checksOriginales[index];
+    checksCopia.forEach((checkbox, index) => {
+      const original = checksOriginales[index];
 
-        const span =
-          document.createElement(
-            "span"
-          );
+      const span =
+        document.createElement("span");
 
-        const cumplio =
-          !!original?.checked;
+      const cumplio = !!original?.checked;
 
-        span.textContent =
-          cumplio
-            ? "☑"
-            : "☐";
+      span.textContent = cumplio
+        ? "☑"
+        : "☐";
 
-        span.style.display =
-          "inline-block";
+      span.style.display = "inline-block";
+      span.style.width = "20px";
+      span.style.fontSize = "18px";
+      span.style.fontWeight = "900";
 
-        span.style.width = "20px";
+      span.style.color = cumplio
+        ? "#176b38"
+        : "#9d1717";
 
-        span.style.fontSize =
-          "18px";
+      span.style.flexShrink = "0";
 
-        span.style.fontWeight =
-          "900";
-
-        span.style.color =
-          cumplio
-            ? "#176b38"
-            : "#9d1717";
-
-        span.style.flexShrink =
-          "0";
-
-        checkbox.replaceWith(span);
-      }
-    );
+      checkbox.replaceWith(span);
+    });
 
     // -------------------------------------------------------
     // INPUT "OTRA ÁREA"
@@ -478,32 +527,22 @@ function ChecklistFocoRojo({
         "";
 
       const bloque =
-        document.createElement(
-          "div"
-        );
+        document.createElement("div");
 
       bloque.textContent =
-        texto ||
-        "No especificado.";
+        texto || "No especificado.";
 
-      bloque.style.padding =
-        "12px";
-
+      bloque.style.padding = "12px";
       bloque.style.border =
         "1px solid #d5dce5";
 
       bloque.style.borderRadius =
         "10px";
 
-      bloque.style.fontSize =
-        "14px";
+      bloque.style.fontSize = "14px";
+      bloque.style.background = "#fff";
 
-      bloque.style.background =
-        "#fff";
-
-      inputCopia.replaceWith(
-        bloque
-      );
+      inputCopia.replaceWith(bloque);
     }
 
     // -------------------------------------------------------
@@ -511,14 +550,10 @@ function ChecklistFocoRojo({
     // -------------------------------------------------------
 
     const textareaOriginal =
-      origen.querySelector(
-        "textarea"
-      );
+      origen.querySelector("textarea");
 
     const textareaCopia =
-      copia.querySelector(
-        "textarea"
-      );
+      copia.querySelector("textarea");
 
     if (textareaCopia) {
       const texto =
@@ -527,18 +562,14 @@ function ChecklistFocoRojo({
         "No se registró acción correctiva.";
 
       const bloque =
-        document.createElement(
-          "div"
-        );
+        document.createElement("div");
 
-      bloque.textContent =
-        texto;
+      bloque.textContent = texto;
 
       bloque.style.whiteSpace =
         "pre-wrap";
 
-      bloque.style.width =
-        "100%";
+      bloque.style.width = "100%";
 
       bloque.style.minHeight =
         "130px";
@@ -558,16 +589,68 @@ function ChecklistFocoRojo({
       bloque.style.fontFamily =
         "Arial, Helvetica, sans-serif";
 
-      bloque.style.fontSize =
-        "14px";
+      bloque.style.fontSize = "14px";
 
       bloque.style.background =
         "#fff";
 
-      textareaCopia.replaceWith(
-        bloque
-      );
+      textareaCopia.replaceWith(bloque);
     }
+
+    // -------------------------------------------------------
+    // FIRMAS
+    // -------------------------------------------------------
+
+    const canvasOriginales =
+      origen.querySelectorAll(
+        "canvas"
+      );
+
+    const canvasCopias =
+      copia.querySelectorAll(
+        "canvas"
+      );
+
+    canvasCopias.forEach(
+      (canvasCopia, index) => {
+        const canvasOriginal =
+          canvasOriginales[index];
+
+        if (!canvasOriginal) return;
+
+        const imagen =
+          document.createElement("img");
+
+        try {
+          imagen.src =
+            canvasOriginal.toDataURL(
+              "image/png"
+            );
+        } catch (error) {
+          imagen.alt =
+            "Firma no disponible";
+        }
+
+        imagen.style.width =
+          "100%";
+
+        imagen.style.height =
+          "180px";
+
+        imagen.style.objectFit =
+          "contain";
+
+        imagen.style.display =
+          "block";
+
+        imagen.style.background =
+          "#fff";
+
+        canvasCopia.replaceWith(
+          imagen
+        );
+      }
+    );
 
     // -------------------------------------------------------
     // ESTILOS DEL HTML EXPORTADO
@@ -597,6 +680,10 @@ function ChecklistFocoRojo({
         line-height: 1.35;
       }
 
+      .signatureBox {
+        break-inside: avoid;
+      }
+
       @media print {
         body {
           background: #fff;
@@ -612,37 +699,46 @@ function ChecklistFocoRojo({
 
     const documento = `<!DOCTYPE html>
 <html lang="es">
+
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checklist Foco Rojo - ${vendedor}</title>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>
+Checklist Foco Rojo - ${vendedor}
+</title>
+
 <style>
 ${estilos}
 </style>
+
 </head>
+
 <body>
+
 ${copia.outerHTML}
+
 </body>
+
 </html>`;
 
-    const blob =
-      new Blob(
-        [documento],
-        {
-          type:
-            "text/html;charset=utf-8",
-        }
-      );
+    const blob = new Blob(
+      [documento],
+      {
+        type:
+          "text/html;charset=utf-8",
+      }
+    );
 
     const url =
-      URL.createObjectURL(
-        blob
-      );
+      URL.createObjectURL(blob);
 
     const enlace =
-      document.createElement(
-        "a"
-      );
+      document.createElement("a");
 
     const nombreLimpio =
       vendedor
@@ -671,16 +767,12 @@ ${copia.outerHTML}
 
     enlace.remove();
 
-    URL.revokeObjectURL(
-      url
-    );
+    URL.revokeObjectURL(url);
 
-    setEvidenciaDescargada(
-      true
-    );
+    setEvidenciaDescargada(true);
 
     alert(
-      "✅ Evidencia descargada correctamente.\n\nYa puedes encontrarla en la carpeta Descargas y compartirla por WhatsApp."
+      "✅ Evidencia descargada correctamente.\n\nLas firmas quedaron integradas en la evidencia y no se guardaron en el sistema."
     );
   };
 
@@ -692,22 +784,16 @@ ${copia.outerHTML}
     id,
     children,
   }) => (
-    <label
-      style={styles.checkItem}
-    >
+    <label style={styles.checkItem}>
       <input
         type="checkbox"
-        checked={
-          !!checks[id]
-        }
+        checked={!!checks[id]}
         onChange={() =>
           toggleCheck(id)
         }
       />
 
-      <span>
-        {children}
-      </span>
+      <span>{children}</span>
     </label>
   );
 
@@ -717,78 +803,55 @@ ${copia.outerHTML}
 
   const styles = {
     page: {
-      minHeight:
-        "100vh",
-      background:
-        "#f4f6f9",
-      padding:
-        "30px 20px",
+      minHeight: "100vh",
+      background: "#f4f6f9",
+      padding: "30px 20px",
       fontFamily:
         "Arial, Helvetica, sans-serif",
-      color:
-        "#17202a",
+      color: "#17202a",
     },
 
     container: {
-      maxWidth:
-        "1100px",
-      margin:
-        "0 auto",
+      maxWidth: "1100px",
+      margin: "0 auto",
     },
 
     header: {
       background:
         "linear-gradient(135deg, #0057b8, #003b7a)",
-      color:
-        "#fff",
-      borderRadius:
-        "18px",
-      padding:
-        "28px",
+      color: "#fff",
+      borderRadius: "18px",
+      padding: "28px",
       boxShadow:
         "0 8px 25px rgba(0,0,0,.15)",
-      marginBottom:
-        "22px",
+      marginBottom: "22px",
     },
 
     mega: {
-      fontSize:
-        "34px",
-      fontWeight:
-        "900",
-      letterSpacing:
-        "2px",
-      marginBottom:
-        "4px",
+      fontSize: "34px",
+      fontWeight: "900",
+      letterSpacing: "2px",
+      marginBottom: "4px",
     },
 
     title: {
-      fontSize:
-        "24px",
-      fontWeight:
-        "800",
-      margin:
-        0,
+      fontSize: "24px",
+      fontWeight: "800",
+      margin: 0,
     },
 
     subtitle: {
-      marginTop:
-        "8px",
-      opacity:
-        ".9",
-      fontSize:
-        "14px",
+      marginTop: "8px",
+      opacity: ".9",
+      fontSize: "14px",
     },
 
     dataGrid: {
-      display:
-        "grid",
+      display: "grid",
       gridTemplateColumns:
         "repeat(auto-fit, minmax(220px, 1fr))",
-      gap:
-        "12px",
-      marginTop:
-        "22px",
+      gap: "12px",
+      marginTop: "22px",
     },
 
     dataBox: {
@@ -796,50 +859,34 @@ ${copia.outerHTML}
         "rgba(255,255,255,.12)",
       border:
         "1px solid rgba(255,255,255,.25)",
-      borderRadius:
-        "12px",
-      padding:
-        "13px 15px",
+      borderRadius: "12px",
+      padding: "13px 15px",
     },
 
     dataLabel: {
-      display:
-        "block",
-      fontSize:
-        "11px",
-      textTransform:
-        "uppercase",
-      opacity:
-        ".75",
-      fontWeight:
-        "700",
-      marginBottom:
-        "4px",
+      display: "block",
+      fontSize: "11px",
+      textTransform: "uppercase",
+      opacity: ".75",
+      fontWeight: "700",
+      marginBottom: "4px",
     },
 
     dataValue: {
-      fontSize:
-        "15px",
-      fontWeight:
-        "700",
+      fontSize: "15px",
+      fontWeight: "700",
     },
 
     productivity: {
-      fontSize:
-        "25px",
-      fontWeight:
-        "900",
+      fontSize: "25px",
+      fontWeight: "900",
     },
 
     section: {
-      background:
-        "#fff",
-      borderRadius:
-        "16px",
-      padding:
-        "22px",
-      marginBottom:
-        "16px",
+      background: "#fff",
+      borderRadius: "16px",
+      padding: "22px",
+      marginBottom: "16px",
       boxShadow:
         "0 3px 12px rgba(0,0,0,.07)",
       border:
@@ -847,93 +894,59 @@ ${copia.outerHTML}
     },
 
     sectionHeader: {
-      display:
-        "flex",
-      alignItems:
-        "center",
-      gap:
-        "12px",
-      marginBottom:
-        "18px",
-      paddingBottom:
-        "12px",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      marginBottom: "18px",
+      paddingBottom: "12px",
       borderBottom:
         "2px solid #eef1f5",
     },
 
     number: {
-      width:
-        "38px",
-      height:
-        "38px",
-      minWidth:
-        "38px",
-      borderRadius:
-        "10px",
-      background:
-        "#0057b8",
-      color:
-        "#fff",
-      display:
-        "flex",
-      alignItems:
-        "center",
-      justifyContent:
-        "center",
-      fontWeight:
-        "900",
-      fontSize:
-        "15px",
+      width: "38px",
+      height: "38px",
+      minWidth: "38px",
+      borderRadius: "10px",
+      background: "#0057b8",
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontWeight: "900",
+      fontSize: "15px",
     },
 
     sectionTitle: {
-      margin:
-        0,
-      fontSize:
-        "17px",
-      fontWeight:
-        "800",
-      color:
-        "#17202a",
+      margin: 0,
+      fontSize: "17px",
+      fontWeight: "800",
+      color: "#17202a",
     },
 
     question: {
-      fontSize:
-        "14px",
-      fontWeight:
-        "700",
-      marginBottom:
-        "12px",
+      fontSize: "14px",
+      fontWeight: "700",
+      marginBottom: "12px",
     },
 
     checksGrid: {
-      display:
-        "grid",
+      display: "grid",
       gridTemplateColumns:
         "repeat(auto-fit, minmax(220px, 1fr))",
-      gap:
-        "8px",
+      gap: "8px",
     },
 
     checkItem: {
-      display:
-        "flex",
-      alignItems:
-        "flex-start",
-      gap:
-        "9px",
-      padding:
-        "10px",
-      borderRadius:
-        "9px",
-      background:
-        "#f7f9fb",
-      cursor:
-        "pointer",
-      fontSize:
-        "14px",
-      lineHeight:
-        "1.35",
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "9px",
+      padding: "10px",
+      borderRadius: "9px",
+      background: "#f7f9fb",
+      cursor: "pointer",
+      fontSize: "14px",
+      lineHeight: "1.35",
     },
 
     example: {
@@ -941,90 +954,138 @@ ${copia.outerHTML}
         "4px 0 12px 30px",
       padding:
         "10px 12px",
-      background:
-        "#f1f6fc",
+      background: "#f1f6fc",
       borderLeft:
         "3px solid #0057b8",
       borderRadius:
         "0 8px 8px 0",
-      fontSize:
-        "13px",
-      color:
-        "#45515e",
-      lineHeight:
-        "1.4",
+      fontSize: "13px",
+      color: "#45515e",
+      lineHeight: "1.4",
     },
 
     textArea: {
-      width:
-        "100%",
-      minHeight:
-        "130px",
-      boxSizing:
-        "border-box",
+      width: "100%",
+      minHeight: "130px",
+      boxSizing: "border-box",
       border:
         "1px solid #d5dce5",
-      borderRadius:
-        "10px",
-      padding:
-        "12px",
+      borderRadius: "10px",
+      padding: "12px",
       fontFamily:
         "Arial, Helvetica, sans-serif",
-      fontSize:
-        "14px",
-      resize:
-        "vertical",
-      outline:
-        "none",
+      fontSize: "14px",
+      resize: "vertical",
+      outline: "none",
+    },
+
+    // =======================================================
+    // FIRMAS
+    // =======================================================
+
+    signaturesGrid: {
+      display: "grid",
+      gridTemplateColumns:
+        "repeat(auto-fit, minmax(320px, 1fr))",
+      gap: "20px",
+      marginTop: "20px",
+    },
+
+    signatureBox: {
+      border:
+        "1px solid #dce2e9",
+      borderRadius: "14px",
+      padding: "16px",
+      background: "#f9fafc",
+      breakInside: "avoid",
+    },
+
+    signatureTitle: {
+      fontSize: "16px",
+      fontWeight: "900",
+      color: "#17202a",
+      marginBottom: "4px",
+    },
+
+    signatureInstruction: {
+      fontSize: "12px",
+      color: "#6c757d",
+      marginBottom: "12px",
+    },
+
+    canvasWrapper: {
+      position: "relative",
+      width: "100%",
+      height: "180px",
+      background: "#fff",
+      border:
+        "1px solid #ccd4de",
+      borderRadius: "10px",
+      overflow: "hidden",
+    },
+
+    signatureCanvas: {
+      width: "100%",
+      height: "180px",
+      display: "block",
+      touchAction: "none",
+      cursor: "crosshair",
+    },
+
+    signatureLine: {
+      position: "absolute",
+      bottom: "28px",
+      left: "8%",
+      right: "8%",
+      borderBottom:
+        "1px dashed #9ca6b2",
+      textAlign: "center",
+      color: "#9ca6b2",
+      fontSize: "11px",
+      pointerEvents: "none",
+      paddingBottom: "3px",
+    },
+
+    clearSignatureButton: {
+      marginTop: "10px",
+      border: "none",
+      borderRadius: "8px",
+      padding: "9px 13px",
+      background: "#eef1f5",
+      color: "#495057",
+      fontSize: "12px",
+      fontWeight: "700",
+      cursor: "pointer",
     },
 
     footer: {
-      display:
-        "flex",
+      display: "flex",
       justifyContent:
         "space-between",
-      gap:
-        "12px",
-      flexWrap:
-        "wrap",
-      marginTop:
-        "25px",
-      paddingBottom:
-        "30px",
+      gap: "12px",
+      flexWrap: "wrap",
+      marginTop: "25px",
+      paddingBottom: "30px",
     },
 
     backButton: {
-      border:
-        "none",
-      borderRadius:
-        "10px",
-      padding:
-        "13px 20px",
-      background:
-        "#6c757d",
-      color:
-        "#fff",
-      fontWeight:
-        "700",
-      cursor:
-        "pointer",
+      border: "none",
+      borderRadius: "10px",
+      padding: "13px 20px",
+      background: "#6c757d",
+      color: "#fff",
+      fontWeight: "700",
+      cursor: "pointer",
     },
 
     exportButton: {
-      border:
-        "none",
-      borderRadius:
-        "10px",
-      padding:
-        "13px 24px",
-      background:
-        "#0057b8",
-      color:
-        "#fff",
-      fontWeight:
-        "800",
-      cursor:
-        "pointer",
+      border: "none",
+      borderRadius: "10px",
+      padding: "13px 24px",
+      background: "#0057b8",
+      color: "#fff",
+      fontWeight: "800",
+      cursor: "pointer",
     },
   };
 
@@ -1033,141 +1094,71 @@ ${copia.outerHTML}
   // =========================================================
 
   return (
-    <div
-      style={styles.page}
-    >
+    <div style={styles.page}>
       <div
         id="checklist-foco-rojo"
-        style={
-          styles.container
-        }
+        style={styles.container}
       >
+
         {/* =================================================
             ENCABEZADO
         ================================================= */}
 
-        <header
-          style={
-            styles.header
-          }
-        >
-          <div
-            style={
-              styles.mega
-            }
-          >
+        <header style={styles.header}>
+          <div style={styles.mega}>
             MEGA
           </div>
 
-          <h1
-            style={
-              styles.title
-            }
-          >
+          <h1 style={styles.title}>
             🔴 CHECKLIST DE FOCO ROJO
           </h1>
 
-          <div
-            style={
-              styles.subtitle
-            }
-          >
+          <div style={styles.subtitle}>
             Herramienta de diagnóstico y desarrollo comercial
           </div>
 
-          <div
-            style={
-              styles.dataGrid
-            }
-          >
-            <div
-              style={
-                styles.dataBox
-              }
-            >
-              <span
-                style={
-                  styles.dataLabel
-                }
-              >
+          <div style={styles.dataGrid}>
+
+            <div style={styles.dataBox}>
+              <span style={styles.dataLabel}>
                 Fecha
               </span>
 
-              <span
-                style={
-                  styles.dataValue
-                }
-              >
+              <span style={styles.dataValue}>
                 {fecha}
               </span>
             </div>
 
-            <div
-              style={
-                styles.dataBox
-              }
-            >
-              <span
-                style={
-                  styles.dataLabel
-                }
-              >
+            <div style={styles.dataBox}>
+              <span style={styles.dataLabel}>
                 Vendedor
               </span>
 
-              <span
-                style={
-                  styles.dataValue
-                }
-              >
+              <span style={styles.dataValue}>
                 {vendedor}
               </span>
             </div>
 
-            <div
-              style={
-                styles.dataBox
-              }
-            >
-              <span
-                style={
-                  styles.dataLabel
-                }
-              >
+            <div style={styles.dataBox}>
+              <span style={styles.dataLabel}>
                 Supervisor
               </span>
 
-              <span
-                style={
-                  styles.dataValue
-                }
-              >
-                {supervisor ||
-                  "—"}
+              <span style={styles.dataValue}>
+                {supervisor || "—"}
               </span>
             </div>
 
-            <div
-              style={
-                styles.dataBox
-              }
-            >
-              <span
-                style={
-                  styles.dataLabel
-                }
-              >
+            <div style={styles.dataBox}>
+              <span style={styles.dataLabel}>
                 Productividad
               </span>
 
-              <span
-                style={
-                  styles.productivity
-                }
-              >
+              <span style={styles.productivity}>
                 {productividad}
               </span>
             </div>
+
           </div>
         </header>
 
@@ -1175,46 +1166,23 @@ ${copia.outerHTML}
             01
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               01
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               IMAGEN Y PRESENTACIÓN
             </h2>
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             ¿Su imagen es la adecuada?
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="imagen-aseado">
               Asead@
             </Check>
@@ -1230,6 +1198,7 @@ ${copia.outerHTML}
             <Check id="imagen-gafete">
               Gafete
             </Check>
+
           </div>
         </section>
 
@@ -1237,46 +1206,23 @@ ${copia.outerHTML}
             02
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               02
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               PREPARACIÓN DE LA ENTREVISTA
             </h2>
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             ¿Prepara la entrevista?
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="preparacion-analiza">
               Analiza
             </Check>
@@ -1288,6 +1234,7 @@ ${copia.outerHTML}
             <Check id="preparacion-dimme">
               Revisa domicilio en DiMMe
             </Check>
+
           </div>
         </section>
 
@@ -1295,38 +1242,18 @@ ${copia.outerHTML}
             03
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               03
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               ROMPIMIENTO DEL HIELO
             </h2>
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             ¿Qué técnica utilizó para romper el hielo?
           </div>
 
@@ -1336,11 +1263,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “¡Amiga, ya te agarré haciendo de comer!
             Huele bien rico 😂. ¿Me regalas 5 minutitos?”
           </div>
@@ -1351,11 +1274,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “¡Disculpa que te interrumpa!
             Sé que estás ocupado, solo te robo 2 minutitos.”
           </div>
@@ -1366,11 +1285,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “¡Justo te agarré llegando!
             Antes de que entres, déjame contarte algo rapidísimo.”
           </div>
@@ -1381,11 +1296,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “Prometo no quitarte mucho tiempo…
             si me tardo más de 5 minutos, me corres 😂.”
           </div>
@@ -1396,11 +1307,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “Antes de explicarte cualquier cosa,
             te quiero hacer una pregunta rápida…”
           </div>
@@ -1414,38 +1321,18 @@ ${copia.outerHTML}
             04
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               04
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               GENERACIÓN DE CONFIANZA
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
             <Check id="confianza">
               Logró generar confianza con el cliente
             </Check>
@@ -1456,38 +1343,18 @@ ${copia.outerHTML}
             05
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               05
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               PERSONALIZACIÓN
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
             <Check id="nombre">
               Preguntó el nombre del prospecto
             </Check>
@@ -1502,38 +1369,18 @@ ${copia.outerHTML}
             06
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               06
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               PRESENTACIÓN
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
             <Check id="presentacion-vendedor">
               Se presentó correctamente
             </Check>
@@ -1548,46 +1395,23 @@ ${copia.outerHTML}
             07
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               07
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               SONDEO
             </h2>
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             ¿Realizó un sondeo adecuado?
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="sondeo-costo">
               Costo mensual
             </Check>
@@ -1623,6 +1447,7 @@ ${copia.outerHTML}
             <Check id="sondeo-servicio">
               Servicio relevante para el cliente
             </Check>
+
           </div>
         </section>
 
@@ -1630,46 +1455,23 @@ ${copia.outerHTML}
             08
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               08
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               PERSONALIZACIÓN DE LA PRESENTACIÓN
             </h2>
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             Servicio más relevante para el cliente
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="servicio-internet">
               Internet
             </Check>
@@ -1689,23 +1491,20 @@ ${copia.outerHTML}
             <Check id="servicio-movil">
               Telefonía móvil
             </Check>
+
           </div>
 
           <div
             style={{
               ...styles.question,
-              marginTop:
-                "18px",
+              marginTop: "18px",
             }}
           >
             Ejecución de la presentación
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="presentacion-sondeo">
               Se apoyó en el sondeo para iniciar la presentación
             </Check>
@@ -1717,6 +1516,7 @@ ${copia.outerHTML}
             <Check id="presentacion-necesidad">
               Relacionó la necesidad con la solución ofrecida
             </Check>
+
           </div>
         </section>
 
@@ -1724,38 +1524,19 @@ ${copia.outerHTML}
             09
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               09
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               VENTA DE BENEFICIOS
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="beneficios-caracteristicas">
               Convirtió características en beneficios
             </Check>
@@ -1767,6 +1548,7 @@ ${copia.outerHTML}
             <Check id="beneficios-precio">
               No limitó la presentación únicamente al precio
             </Check>
+
           </div>
         </section>
 
@@ -1774,38 +1556,19 @@ ${copia.outerHTML}
             10
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               10
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               APOYO VISUAL / HERRAMIENTAS
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="herramienta-folleto">
               Folleto
             </Check>
@@ -1817,6 +1580,7 @@ ${copia.outerHTML}
             <Check id="herramienta-xview">
               Xview Móvil
             </Check>
+
           </div>
         </section>
 
@@ -1824,38 +1588,19 @@ ${copia.outerHTML}
             11
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               11
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               PREPARACIÓN DEL CIERRE
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="cierre-necesidad">
               Detectó una necesidad real
             </Check>
@@ -1879,6 +1624,7 @@ ${copia.outerHTML}
             <Check id="cierre-senales">
               Confirmó señales de interés
             </Check>
+
           </div>
         </section>
 
@@ -1886,29 +1632,13 @@ ${copia.outerHTML}
             12
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               12
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               TÉCNICA DE CIERRE
             </h2>
           </div>
@@ -1919,11 +1649,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “¿Lo hacemos a tu nombre o al de tu esposa?”
           </div>
 
@@ -1933,11 +1659,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “Quedamos que el paquete con los 3 servicios
             es el mejor para lo que necesitas, ¿verdad?”
           </div>
@@ -1948,11 +1670,7 @@ ${copia.outerHTML}
             </strong>
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             Ejemplo: “Perfecto, para dejarlo listo solo necesito tus datos.”
           </div>
 
@@ -1965,90 +1683,46 @@ ${copia.outerHTML}
             13
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               13
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               MANEJO DE DUDAS Y OBJECIONES
             </h2>
           </div>
 
           <Check id="objecion-acepta">
-            <strong>
-              ACEPTA
-            </strong>{" "}
-            — No contradice
+            <strong>ACEPTA</strong> — No contradice
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             “Claro, te entiendo.”
           </div>
 
           <Check id="objecion-profundiza">
-            <strong>
-              PROFUNDIZA
-            </strong>{" "}
-            — Descubre la verdadera objeción
+            <strong>PROFUNDIZA</strong> — Descubre la verdadera objeción
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             “¿Qué es lo que más te preocupa de eso?”
           </div>
 
           <Check id="objecion-responde">
-            <strong>
-              RESPONDE
-            </strong>{" "}
-            — Contesta específicamente
+            <strong>RESPONDE</strong> — Contesta específicamente
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             “Mira, justamente por eso…”
           </div>
 
           <Check id="objecion-cierra">
-            <strong>
-              CIERRA
-            </strong>{" "}
-            — Regresa a la venta
+            <strong>CIERRA</strong> — Regresa a la venta
           </Check>
 
-          <div
-            style={
-              styles.example
-            }
-          >
+          <div style={styles.example}>
             “Entonces, si resolvemos eso, ¿avanzamos?”
           </div>
         </section>
@@ -2057,29 +1731,13 @@ ${copia.outerHTML}
             14
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               14
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               SILENCIO DE CIERRE
             </h2>
           </div>
@@ -2095,46 +1753,23 @@ ${copia.outerHTML}
             15
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               15
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               VENTA ADICIONAL
             </h2>
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             ¿Detectó oportunidades de venta adicional?
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="adicional-movil">
               Móvil
             </Check>
@@ -2154,6 +1789,7 @@ ${copia.outerHTML}
             <Check id="adicional-streaming">
               Streaming
             </Check>
+
           </div>
         </section>
 
@@ -2161,38 +1797,19 @@ ${copia.outerHTML}
             16
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               16
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               TÉRMINOS Y CONDICIONES
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="condiciones-paquete">
               Paquete contratado
             </Check>
@@ -2220,6 +1837,7 @@ ${copia.outerHTML}
             <Check id="condiciones-corte">
               Qué ocurre si sale a corte
             </Check>
+
           </div>
         </section>
 
@@ -2227,29 +1845,13 @@ ${copia.outerHTML}
             17
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               17
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               REFERIDOS
             </h2>
           </div>
@@ -2263,46 +1865,23 @@ ${copia.outerHTML}
             18
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               18
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               PROSPECTO NO CERRADO
             </h2>
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             En caso de no cerrar la venta en frío:
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="prospecto-dimme">
               Registró correctamente al prospecto en DiMMe
             </Check>
@@ -2314,6 +1893,7 @@ ${copia.outerHTML}
             <Check id="prospecto-seguimiento">
               Dejó definido el siguiente paso
             </Check>
+
           </div>
         </section>
 
@@ -2321,38 +1901,19 @@ ${copia.outerHTML}
             19
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               19
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               DESPEDIDA
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="despedida-amable">
               Se despidió amablemente
             </Check>
@@ -2360,6 +1921,7 @@ ${copia.outerHTML}
             <Check id="despedida-impresion">
               Dejó una buena impresión en el cliente
             </Check>
+
           </div>
         </section>
 
@@ -2367,38 +1929,19 @@ ${copia.outerHTML}
             20
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <div style={styles.number}>
               20
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               REGISTRO
             </h2>
           </div>
 
-          <div
-            style={
-              styles.checksGrid
-            }
-          >
+          <div style={styles.checksGrid}>
+
             <Check id="registro-ventas">
               Realizó correctamente su registro de ventas
             </Check>
@@ -2406,6 +1949,7 @@ ${copia.outerHTML}
             <Check id="registro-coincide">
               La información coincide con la actividad realizada
             </Check>
+
           </div>
         </section>
 
@@ -2413,73 +1957,47 @@ ${copia.outerHTML}
             DIAGNÓSTICO
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
+        <section style={styles.section}>
+
+          <div style={styles.sectionHeader}>
+
             <div
               style={{
                 ...styles.number,
-                background:
-                  "#d71920",
+                background: "#d71920",
               }}
             >
               🔴
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               DIAGNÓSTICO DEL SUPERVISOR
             </h2>
+
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             ¿Dónde se encuentra principalmente el área de oportunidad?
           </div>
 
-          {/* =================================================
-              PRINCIPAL ÁREA
-          ================================================= */}
-
           <div
             style={{
-              background:
-                "#fff4f4",
+              background: "#fff4f4",
               border:
                 "1px solid #f3c2c2",
-              borderRadius:
-                "12px",
-              padding:
-                "18px",
-              marginBottom:
-                "20px",
+              borderRadius: "12px",
+              padding: "18px",
+              marginBottom: "20px",
             }}
           >
+
             <div
               style={{
-                fontSize:
-                  "12px",
-                fontWeight:
-                  "800",
-                color:
-                  "#d71920",
-                textTransform:
-                  "uppercase",
-                marginBottom:
-                  "6px",
+                fontSize: "12px",
+                fontWeight: "800",
+                color: "#d71920",
+                textTransform: "uppercase",
+                marginBottom: "6px",
               }}
             >
               🔥 Principal área de oportunidad
@@ -2487,116 +2005,86 @@ ${copia.outerHTML}
 
             <div
               style={{
-                fontSize:
-                  "22px",
-                fontWeight:
-                  "900",
-                color:
-                  "#17202a",
+                fontSize: "22px",
+                fontWeight: "900",
+                color: "#17202a",
               }}
             >
               {principalArea}
             </div>
 
-            {rankingDiagnostico.length >
-              0 && (
+            {rankingDiagnostico.length > 0 && (
               <div
                 style={{
-                  fontSize:
-                    "13px",
-                  color:
-                    "#59636e",
-                  marginTop:
-                    "7px",
+                  fontSize: "13px",
+                  color: "#59636e",
+                  marginTop: "5px",
                 }}
               >
-                {rankingDiagnostico[0]
-                  .oportunidades}{" "}
-                de{" "}
-                {rankingDiagnostico[0]
-                  .evaluaciones}{" "}
-                reactivos presentan oportunidad,
-                equivalente a{" "}
-                {rankingDiagnostico[0]
-                  .porcentajeOportunidad}
-                %.
+                El área con mayor cantidad de oportunidades
+                detectadas durante la observación.
               </div>
             )}
+
           </div>
 
-          {/* =================================================
-              SIN OPORTUNIDADES
-          ================================================= */}
+          {rankingDiagnostico.length === 0 ? (
 
-          {rankingDiagnostico.length ===
-          0 ? (
             <div
               style={{
-                padding:
-                  "20px",
-                textAlign:
-                  "center",
-                background:
-                  "#f1faf4",
-                borderRadius:
-                  "12px",
-                color:
-                  "#19733a",
-                fontWeight:
-                  "700",
+                padding: "20px",
+                textAlign: "center",
+                background: "#f1faf4",
+                borderRadius: "12px",
+                color: "#19733a",
+                fontWeight: "700",
               }}
             >
               🟢 No se detectaron áreas de oportunidad.
             </div>
+
           ) : (
+
             <div>
-              {/* =================================================
-                  RANKING
-              ================================================= */}
 
               {rankingDiagnostico.map(
                 (item) => {
-                  // =================================================
-                  // LA BARRA AHORA REPRESENTA EL PORCENTAJE REAL
-                  // =================================================
+
+                  const maxOportunidades =
+                    rankingDiagnostico[0]
+                      .oportunidades;
 
                   const ancho =
-                    item.porcentajeOportunidad;
+                    maxOportunidades > 0
+                      ? (
+                          item.oportunidades /
+                          maxOportunidades
+                        ) * 100
+                      : 0;
 
                   return (
                     <div
-                      key={
-                        item.area
-                      }
+                      key={item.area}
                       style={{
-                        marginBottom:
-                          "16px",
+                        marginBottom: "16px",
                       }}
                     >
-                      {/* =================================================
-                          ENCABEZADO DE ÁREA
-                      ================================================= */}
 
                       <div
                         style={{
-                          display:
-                            "flex",
+                          display: "flex",
                           justifyContent:
                             "space-between",
                           alignItems:
                             "center",
-                          gap:
-                            "15px",
-                          marginBottom:
-                            "6px",
+                          marginBottom: "6px",
                         }}
                       >
+
                         <span
                           style={{
-                            fontSize:
-                              "14px",
-                            fontWeight:
-                              "700",
+                            fontSize: "14px",
+                            fontWeight: "700",
                           }}
                         >
                           {item.area}
@@ -2604,90 +2092,64 @@ ${copia.outerHTML}
 
                         <span
                           style={{
-                            fontSize:
-                              "13px",
-                            fontWeight:
-                              "900",
-                            color:
-                              "#d71920",
-                            whiteSpace:
-                              "nowrap",
+                            fontSize: "13px",
+                            fontWeight: "900",
+                            color: "#d71920",
                           }}
                         >
                           {item.oportunidades}{" "}
-                          de{" "}
-                          {item.evaluaciones}{" "}
-                          ·{" "}
-                          {
-                            item.porcentajeOportunidad
-                          }
-                          %
+                          {item.oportunidades === 1
+                            ? "oportunidad"
+                            : "oportunidades"}
                         </span>
-                      </div>
 
-                      {/* =================================================
-                          BARRA
-                      ================================================= */}
+                      </div>
 
                       <div
                         style={{
-                          width:
-                            "100%",
-                          height:
-                            "13px",
-                          background:
-                            "#edf0f3",
-                          borderRadius:
-                            "20px",
-                          overflow:
-                            "hidden",
+                          width: "100%",
+                          height: "13px",
+                          background: "#edf0f3",
+                          borderRadius: "20px",
+                          overflow: "hidden",
                         }}
                       >
+
                         <div
                           style={{
-                            width:
-                              `${ancho}%`,
-                            height:
-                              "100%",
-                            background:
-                              "#d71920",
-                            borderRadius:
-                              "20px",
-                            transition:
-                              "width .25s ease",
+                            width: `${ancho}%`,
+                            height: "100%",
+                            background: "#d71920",
+                            borderRadius: "20px",
                           }}
                         />
+
                       </div>
+
                     </div>
                   );
                 }
               )}
+
             </div>
+
           )}
 
-          {/* =================================================
-              OTRA ÁREA
-          ================================================= */}
+          {/* OTRA ÁREA */}
 
           <div
             style={{
-              marginTop:
-                "22px",
+              marginTop: "22px",
             }}
           >
-            <div
-              style={
-                styles.question
-              }
-            >
+
+            <div style={styles.question}>
               Otra:
             </div>
 
             <input
               type="text"
-              value={
-                otraArea
-              }
+              value={otraArea}
               onChange={(e) =>
                 setOtraArea(
                   e.target.value
@@ -2695,76 +2157,118 @@ ${copia.outerHTML}
               }
               placeholder="Especifica otra área de oportunidad..."
               style={{
-                width:
-                  "100%",
-                boxSizing:
-                  "border-box",
-                padding:
-                  "12px",
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "12px",
                 border:
                   "1px solid #d5dce5",
-                borderRadius:
-                  "10px",
-                fontSize:
-                  "14px",
+                borderRadius: "10px",
+                fontSize: "14px",
               }}
             />
+
           </div>
+
         </section>
 
         {/* =================================================
             ACCIÓN CORRECTIVA
         ================================================= */}
 
-        <section
-          style={
-            styles.section
-          }
-        >
-          <div
-            style={
-              styles.sectionHeader
-            }
-          >
-            <div
-              style={
-                styles.number
-              }
-            >
+        <section style={styles.section}>
+
+          <div style={styles.sectionHeader}>
+
+            <div style={styles.number}>
               🔧
             </div>
 
-            <h2
-              style={
-                styles.sectionTitle
-              }
-            >
+            <h2 style={styles.sectionTitle}>
               ACCIÓN CORRECTIVA
             </h2>
+
           </div>
 
-          <div
-            style={
-              styles.question
-            }
-          >
+          <div style={styles.question}>
             ¿Qué debe trabajar específicamente el vendedor?
           </div>
 
           <textarea
-            value={
-              accionCorrectiva
-            }
+            value={accionCorrectiva}
             onChange={(e) =>
               setAccionCorrectiva(
                 e.target.value
               )
             }
-            style={
-              styles.textArea
-            }
+            style={styles.textArea}
             placeholder="Escribe aquí la acción correctiva..."
           />
+
+        </section>
+
+        {/* =================================================
+            FIRMAS
+        ================================================= */}
+
+        <section style={styles.section}>
+
+          <div style={styles.sectionHeader}>
+
+            <div style={styles.number}>
+              ✍️
+            </div>
+
+            <h2 style={styles.sectionTitle}>
+              ACEPTACIÓN DE LA RETROALIMENTACIÓN
+            </h2>
+
+          </div>
+
+          <div
+            style={{
+              fontSize: "13px",
+              color: "#59636e",
+              lineHeight: "1.5",
+              marginBottom: "18px",
+            }}
+          >
+            Las firmas forman parte exclusivamente de esta
+            evidencia del checklist. No se almacenan ni se
+            registran en el sistema.
+          </div>
+
+          <div style={styles.signaturesGrid}>
+
+            {/* FIRMA SUPERVISOR */}
+
+            <SignaturePad
+              canvasRef={
+                supervisorSignatureRef
+              }
+              label={`Firma del supervisor — ${
+                supervisor || "—"
+              }`}
+              setFirmado={
+                setFirmaSupervisor
+              }
+            />
+
+            {/* FIRMA PROMOTOR */}
+
+            <SignaturePad
+              canvasRef={
+                promotorSignatureRef
+              }
+              label={`Firma del promotor — ${
+                vendedor
+              }`}
+              setFirmado={
+                setFirmaPromotor
+              }
+            />
+
+          </div>
+
         </section>
 
         {/* =================================================
@@ -2773,16 +2277,15 @@ ${copia.outerHTML}
 
         <div
           data-export-footer="true"
-          style={
-            styles.footer
-          }
+          style={styles.footer}
         >
+
           <button
             type="button"
             onClick={() => {
-              if (
-                !evidenciaDescargada
-              ) {
+
+              if (!evidenciaDescargada) {
+
                 alert(
                   "Primero debes descargar la evidencia HTML del checklist antes de regresar al Dashboard."
                 );
@@ -2822,7 +2325,9 @@ ${copia.outerHTML}
           >
             📄 Descargar CheckList
           </button>
+
         </div>
+
       </div>
     </div>
   );
