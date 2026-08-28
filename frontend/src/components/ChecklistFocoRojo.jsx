@@ -4,7 +4,6 @@ function ChecklistFocoRojo({
   promotor,
   supervisor,
   onRegresar,
-  onSiguienteFoco,
 }) {
   // =========================================================
   // DATOS AUTOMÁTICOS
@@ -1777,28 +1776,6 @@ ${copia.outerHTML}
           >
             📄 Descargar CheckList
           </button>
-
-          {evidenciaDescargada && (
-            <button
-              type="button"
-              style={{
-                ...styles.exportButton,
-                background: "#198754",
-              }}
-              onClick={() => {
-                const haySiguiente =
-                  onSiguienteFoco();
-
-                if (!haySiguiente) {
-                  alert(
-                    "🟢 ¡Excelente trabajo!\n\nHas completado todos los focos rojos disponibles."
-                  );
-                }
-              }}
-            >
-              ➡️ Siguiente foco rojo
-            </button>
-          )}
         </div>
       </div>
     </div>
