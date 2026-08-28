@@ -91,7 +91,7 @@ function normalizarNombre(
           "¡ERES EL #1!",
 
         mensaje:
-          "Estás liderando el Ranking de Supervisores. ¡Sigue marcando el ritmo y llevando a tu equipo al siguiente nivel!",
+          "Estás liderando el Ranking de Supervisores. ¡Gracias por tu esfuerzo!, ¡Sigue marcando el ritmo y llevando a tu equipo al siguiente nivel!",
 
       };
 
@@ -148,7 +148,7 @@ function normalizarNombre(
           "¡ESTE NO ES TU LUGAR FINAL!",
 
         mensaje:
-          "Hoy estás en la última posición, pero el ranking puede cambiar. ¡Vamos a trabajar para escalar posiciones!",
+          "Hoy estás en la última posición, pero el ranking puede cambiar con tu esfuerzo. ¡Vamos a trabajar para escalar posiciones!",
 
       };
 
