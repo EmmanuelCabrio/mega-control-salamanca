@@ -4,379 +4,343 @@ function ChecklistFocoRojo({
   promotor,
   supervisor,
   onRegresar,
-  onSiguienteFoco
+  onSiguienteFoco,
 }) {
-
   // =========================================================
-  // DATOS AUTOMÁTICOS DEL SEGUIMIENTO
+  // DATOS AUTOMÁTICOS
   // =========================================================
 
   const fecha = new Date().toLocaleDateString("es-MX");
 
-  const vendedor =
-    promotor?.nombre || "—";
+  const vendedor = promotor?.nombre || "—";
 
-  const productividad =
-    Number(
-      promotor?.productividad ?? 0
-    ).toFixed(2);
-
+  const productividad = Number(
+    promotor?.productividad ?? 0
+  ).toFixed(2);
 
   // =========================================================
-  // ESTADO DEL CHECKLIST
-  //
-  // true  = el vendedor SÍ cumplió
-  // false = el vendedor NO cumplió
+  // ESTADOS
   // =========================================================
 
   const [checks, setChecks] = useState({});
-
-  // Texto adicional capturado por el supervisor
   const [otraArea, setOtraArea] = useState("");
   const [accionCorrectiva, setAccionCorrectiva] = useState("");
-const [evidenciaDescargada, setEvidenciaDescargada] = useState(false);
-
+  const [evidenciaDescargada, setEvidenciaDescargada] = useState(false);
 
   // =========================================================
-  // FUNCIÓN PARA MARCAR / DESMARCAR
+  // MARCAR / DESMARCAR
   // =========================================================
 
   const toggleCheck = (id) => {
-
     setChecks((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
-
   };
 
+  // =========================================================
+  // MOTOR DEL DIAGNÓSTICO
+  // =========================================================
 
+  const diagnosticoAreas = {
+    "Imagen / presentación": [
+      "imagen-aseado",
+      "imagen-peinado",
+      "imagen-uniforme",
+      "imagen-gafete",
+    ],
+
+    Preparación: [
+      "preparacion-analiza",
+      "preparacion-acometida",
+      "preparacion-dimme",
+    ],
+
+    "Rompimiento del hielo": [
+      {
+        tipo: "grupo",
+        ids: [
+          "hielo-cumplido",
+          "hielo-disculpa",
+          "hielo-observacion",
+          "hielo-humor",
+          "hielo-pregunta",
+          "hielo-otra",
+        ],
+      },
+    ],
+
+    "Generación de confianza": [
+      "confianza",
+    ],
+
+    Personalización: [
+      "nombre",
+      "nombre-utilizo",
+    ],
+
+    Presentación: [
+      "presentacion-vendedor",
+      "presentacion-empresa",
+    ],
+
+    Sondeo: [
+      "sondeo-costo",
+      "sondeo-compania",
+      "sondeo-megas",
+      "sondeo-canales",
+      "sondeo-telefonia",
+      "sondeo-apps",
+      "sondeo-simetria",
+      "sondeo-tecnologia",
+      "sondeo-servicio",
+    ],
+
+    "Personalización de la presentación": [
+      "servicio-internet",
+      "servicio-tv",
+      "servicio-apps",
+      "servicio-casa",
+      "servicio-movil",
+      "presentacion-sondeo",
+      "presentacion-beneficios",
+      "presentacion-necesidad",
+    ],
+
+    "Venta de beneficios": [
+      "beneficios-caracteristicas",
+      "beneficios-claro",
+      "beneficios-precio",
+    ],
+
+    "Apoyo visual / herramientas": [
+      "herramienta-folleto",
+      "herramienta-carpeta",
+      "herramienta-xview",
+    ],
+
+    "Preparación del cierre": [
+      "cierre-necesidad",
+      "cierre-reconoce",
+      "cierre-conecta",
+      "cierre-sis",
+      "cierre-solucion",
+      "cierre-senales",
+    ],
+
+    "Técnica de cierre": [
+      {
+        tipo: "grupo",
+        ids: [
+          "cierre-eleccion",
+          "cierre-resumen",
+          "cierre-accion",
+          "cierre-otra",
+        ],
+      },
+    ],
+
+    "Manejo de objeciones": [
+      "objecion-acepta",
+      "objecion-profundiza",
+      "objecion-responde",
+      "objecion-cierra",
+    ],
+
+    "Silencio de cierre": [
+      "silencio",
+    ],
+
+    "Venta adicional": [
+      {
+        tipo: "grupo",
+        ids: [
+          "adicional-movil",
+          "adicional-netflix",
+          "adicional-disney",
+          "adicional-max",
+          "adicional-streaming",
+        ],
+      },
+    ],
+
+    "Términos y condiciones": [
+      "condiciones-paquete",
+      "condiciones-mensualidad",
+      "condiciones-instalacion",
+      "condiciones-plazo",
+      "condiciones-activacion",
+      "condiciones-pago",
+      "condiciones-corte",
+    ],
+
+    Referidos: [
+      "referidos",
+    ],
+
+    "Prospecto no cerrado": [
+      "prospecto-dimme",
+      "prospecto-info",
+      "prospecto-seguimiento",
+    ],
+
+    Despedida: [
+      "despedida-amable",
+      "despedida-impresion",
+    ],
+
+    Registro: [
+      "registro-ventas",
+      "registro-coincide",
+    ],
+  };
 
   // =========================================================
-// 📊 MOTOR DEL DIAGNÓSTICO
-// =========================================================
-//
-// El supervisor solamente marca lo que el vendedor SÍ hizo.
-// Lo que no está marcado se considera oportunidad.
-//
-// IMPORTANTE:
-// Algunos puntos son grupos de selección.
-// Ejemplo:
-// Rompimiento del hielo:
-// - Cumplido natural
-// - Disculpa
-// - Observación
-// - Humor
-// - Pregunta inesperada
-//
-// En esos casos NO contamos las opciones no elegidas
-// como errores. Si eligió una técnica, cumplió.
-// =========================================================
+  // CALCULAR OPORTUNIDADES
+  // =========================================================
 
+  const resultadosDiagnostico = Object.entries(
+    diagnosticoAreas
+  ).map(([area, criterios]) => {
+    let oportunidades = 0;
+    let evaluaciones = 0;
 
-const diagnosticoAreas = {
+    criterios.forEach((criterio) => {
+      // GRUPO
+      if (
+        typeof criterio === "object" &&
+        criterio.tipo === "grupo"
+      ) {
+        evaluaciones += 1;
 
-  "Imagen / presentación": [
-    "imagen-aseado",
-    "imagen-peinado",
-    "imagen-uniforme",
-    "imagen-gafete",
-    "presentacion-vendedor",
-    "presentacion-empresa"
-  ],
-
-  "Preparación": [
-    "preparacion-analiza",
-    "preparacion-acometida",
-    "preparacion-dimme"
-  ],
-
-  "Rompimiento del hielo": [
-    {
-      tipo: "grupo",
-      ids: [
-        "hielo-cumplido",
-        "hielo-disculpa",
-        "hielo-observacion",
-        "hielo-humor",
-        "hielo-pregunta",
-        "hielo-otra"
-      ]
-    }
-  ],
-
-  "Generación de confianza": [
-    "confianza"
-  ],
-
-  "Sondeo": [
-    "sondeo-costo",
-    "sondeo-compania",
-    "sondeo-megas",
-    "sondeo-canales",
-    "sondeo-telefonia",
-    "sondeo-apps",
-    "sondeo-simetria",
-    "sondeo-tecnologia",
-    "sondeo-servicio"
-  ],
-
-  "Presentación": [
-    "presentacion-sondeo",
-    "presentacion-beneficios",
-    "presentacion-necesidad"
-  ],
-
-  "Argumentación de beneficios": [
-    "beneficios-caracteristicas",
-    "beneficios-claro",
-    "beneficios-precio"
-  ],
-
-  "Manejo de objeciones": [
-    "objecion-acepta",
-    "objecion-profundiza",
-    "objecion-responde",
-    "objecion-cierra"
-  ],
-
-  "Cierre": [
-    "cierre-necesidad",
-    "cierre-reconoce",
-    "cierre-conecta",
-    "cierre-sis",
-    "cierre-solucion",
-    "cierre-senales",
-    {
-      tipo: "grupo",
-      ids: [
-        "cierre-eleccion",
-        "cierre-resumen",
-        "cierre-accion",
-        "cierre-otra"
-      ]
-    },
-    "silencio"
-  ],
-
-  "Venta adicional": [
-    {
-      tipo: "grupo",
-      ids: [
-        "adicional-movil",
-        "adicional-netflix",
-        "adicional-disney",
-        "adicional-max",
-        "adicional-streaming"
-      ]
-    }
-  ],
-
-  "Explicación de condiciones": [
-    "condiciones-paquete",
-    "condiciones-mensualidad",
-    "condiciones-instalacion",
-    "condiciones-plazo",
-    "condiciones-activacion",
-    "condiciones-pago",
-    "condiciones-corte"
-  ],
-
-  "Seguimiento": [
-    "prospecto-dimme",
-    "prospecto-info",
-    "prospecto-seguimiento"
-  ],
-
-  "Registro": [
-    "registro-ventas",
-    "registro-coincide"
-  ],
-
-  "Referidos": [
-    "referidos"
-  ],
-
-  "Despedida": [
-    "despedida-amable",
-    "despedida-impresion"
-  ]
-
-};
-
-
-// =========================================================
-// 🔎 CALCULAR ÁREAS DE OPORTUNIDAD
-// =========================================================
-
-const resultadosDiagnostico = Object.entries(
-  diagnosticoAreas
-).map(([area, criterios]) => {
-
-  let oportunidades = 0;
-  let evaluaciones = 0;
-
-
-  criterios.forEach((criterio) => {
-
-    // ---------------------------------------------
-    // GRUPO DE OPCIONES
-    // ---------------------------------------------
-
-    if (
-      typeof criterio === "object" &&
-      criterio.tipo === "grupo"
-    ) {
-
-      evaluaciones += 1;
-
-      const cumplioGrupo =
-        criterio.ids.some(
+        const cumplioGrupo = criterio.ids.some(
           (id) => checks[id]
         );
 
-      if (!cumplioGrupo) {
-        oportunidades += 1;
+        if (!cumplioGrupo) {
+          oportunidades += 1;
+        }
+
+        return;
       }
 
-      return;
-    }
+      // CRITERIO INDIVIDUAL
+      evaluaciones += 1;
 
+      if (!checks[criterio]) {
+        oportunidades += 1;
+      }
+    });
 
-    // ---------------------------------------------
-    // CRITERIO INDIVIDUAL
-    // ---------------------------------------------
-
-    evaluaciones += 1;
-
-    if (!checks[criterio]) {
-      oportunidades += 1;
-    }
-
+    return {
+      area,
+      oportunidades,
+      evaluaciones,
+    };
   });
 
+  // =========================================================
+  // RANKING
+  // =========================================================
 
-  return {
-    area,
-    oportunidades,
-    evaluaciones
-  };
-
-});
-
-
-// =========================================================
-// 📊 ORDENAR DE MAYOR A MENOR DOLOR
-// =========================================================
-
-const rankingDiagnostico =
-  resultadosDiagnostico
-    .filter(
-      (item) =>
-        item.oportunidades > 0
-    )
+  const rankingDiagnostico = resultadosDiagnostico
+    .filter((item) => item.oportunidades > 0)
     .sort(
       (a, b) =>
-        b.oportunidades -
-        a.oportunidades
+        b.oportunidades - a.oportunidades
     );
 
+  // =========================================================
+  // PRINCIPAL ÁREA
+  // =========================================================
 
-// =========================================================
-// 🔴 MAYOR ÁREA DE OPORTUNIDAD
-// =========================================================
-
-const principalArea =
-  rankingDiagnostico[0]?.area ||
-  "Sin áreas de oportunidad detectadas";
-
+  const principalArea =
+    rankingDiagnostico[0]?.area ||
+    "Sin áreas de oportunidad detectadas";
 
   // =========================================================
-  // 📄 GENERAR Y DESCARGAR EVIDENCIA HTML
-  // =========================================================
-  //
-  // Tomamos exactamente lo que el supervisor tiene en pantalla:
-  // - casillas marcadas / desmarcadas
-  // - gráfica y diagnóstico
-  // - otra área
-  // - acción correctiva
-  // - datos automáticos del foco rojo
-  //
-  // No usamos WhatsApp ni servidor. El archivo queda en Descargas.
+  // EXPORTAR EVIDENCIA HTML
   // =========================================================
 
   const exportarHTML = () => {
-
-    const origen =
-      document.getElementById("checklist-foco-rojo");
+    const origen = document.getElementById(
+      "checklist-foco-rojo"
+    );
 
     if (!origen) {
-      alert("No se pudo generar la evidencia. Intenta nuevamente.");
+      alert(
+        "No se pudo generar la evidencia. Intenta nuevamente."
+      );
       return;
     }
 
     const copia = origen.cloneNode(true);
 
     // -------------------------------------------------------
-    // Eliminar botones de navegación/exportación de la copia
+    // QUITAR FOOTER
     // -------------------------------------------------------
 
-    const footer =
-      copia.querySelector('[data-export-footer="true"]');
+    const footer = copia.querySelector(
+      '[data-export-footer="true"]'
+    );
 
     if (footer) {
       footer.remove();
-
-      
     }
 
     // -------------------------------------------------------
-    // Convertir checkboxes a evidencia visual fija
+    // CHECKBOXES
     // -------------------------------------------------------
 
     const checksOriginales =
-      origen.querySelectorAll('input[type="checkbox"]');
+      origen.querySelectorAll(
+        'input[type="checkbox"]'
+      );
 
     const checksCopia =
-      copia.querySelectorAll('input[type="checkbox"]');
+      copia.querySelectorAll(
+        'input[type="checkbox"]'
+      );
 
     checksCopia.forEach((checkbox, index) => {
+      const original = checksOriginales[index];
 
-      const original =
-        checksOriginales[index];
+      const span = document.createElement("span");
 
-      const span =
-        document.createElement("span");
+      const cumplio = !!original?.checked;
 
-      const cumplio =
-        !!original?.checked;
-
-      span.textContent =
-        cumplio ? "☑" : "☐";
+      span.textContent = cumplio
+        ? "☑"
+        : "☐";
 
       span.style.display = "inline-block";
       span.style.width = "20px";
       span.style.fontSize = "18px";
       span.style.fontWeight = "900";
-      span.style.color =
-        cumplio ? "#176b38" : "#9d1717";
+      span.style.color = cumplio
+        ? "#176b38"
+        : "#9d1717";
+
       span.style.flexShrink = "0";
 
       checkbox.replaceWith(span);
     });
 
     // -------------------------------------------------------
-    // Convertir campo "Otra" a texto fijo
+    // INPUT "OTRA ÁREA"
     // -------------------------------------------------------
 
     const inputOriginal =
-      origen.querySelector('input[type="text"]');
+      origen.querySelector(
+        'input[type="text"]'
+      );
 
     const inputCopia =
-      copia.querySelector('input[type="text"]');
+      copia.querySelector(
+        'input[type="text"]'
+      );
 
     if (inputCopia) {
-
       const texto =
         inputOriginal?.value ||
         otraArea ||
@@ -389,7 +353,8 @@ const principalArea =
         texto || "No especificado.";
 
       bloque.style.padding = "12px";
-      bloque.style.border = "1px solid #d5dce5";
+      bloque.style.border =
+        "1px solid #d5dce5";
       bloque.style.borderRadius = "10px";
       bloque.style.fontSize = "14px";
       bloque.style.background = "#fff";
@@ -398,7 +363,7 @@ const principalArea =
     }
 
     // -------------------------------------------------------
-    // Convertir acción correctiva a texto fijo
+    // TEXTAREA
     // -------------------------------------------------------
 
     const textareaOriginal =
@@ -408,7 +373,6 @@ const principalArea =
       copia.querySelector("textarea");
 
     if (textareaCopia) {
-
       const texto =
         textareaOriginal?.value ||
         accionCorrectiva ||
@@ -423,7 +387,8 @@ const principalArea =
       bloque.style.width = "100%";
       bloque.style.minHeight = "130px";
       bloque.style.boxSizing = "border-box";
-      bloque.style.border = "1px solid #d5dce5";
+      bloque.style.border =
+        "1px solid #d5dce5";
       bloque.style.borderRadius = "10px";
       bloque.style.padding = "12px";
       bloque.style.fontFamily =
@@ -435,11 +400,14 @@ const principalArea =
     }
 
     // -------------------------------------------------------
-    // HTML independiente, listo para guardar/abrir/imprimir
+    // ESTILOS DEL HTML EXPORTADO
     // -------------------------------------------------------
 
     const estilos = `
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         padding: 30px 20px;
@@ -447,6 +415,7 @@ const principalArea =
         font-family: Arial, Helvetica, sans-serif;
         color: #17202a;
       }
+
       .check-item {
         display: flex;
         align-items: flex-start;
@@ -457,9 +426,17 @@ const principalArea =
         font-size: 14px;
         line-height: 1.35;
       }
+
       @media print {
-        body { background: #fff; padding: 0; }
-        section, header { break-inside: avoid; }
+        body {
+          background: #fff;
+          padding: 0;
+        }
+
+        section,
+        header {
+          break-inside: avoid;
+        }
       }
     `;
 
@@ -469,18 +446,21 @@ const principalArea =
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checklist Foco Rojo - ${vendedor}</title>
-<style>${estilos}</style>
+<style>
+${estilos}
+</style>
 </head>
 <body>
 ${copia.outerHTML}
 </body>
 </html>`;
 
-    const blob =
-      new Blob(
-        [documento],
-        { type: "text/html;charset=utf-8" }
-      );
+    const blob = new Blob(
+      [documento],
+      {
+        type: "text/html;charset=utf-8",
+      }
+    );
 
     const url =
       URL.createObjectURL(blob);
@@ -490,73 +470,68 @@ ${copia.outerHTML}
 
     const nombreLimpio =
       vendedor
-        .replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g, "_")
+        .replace(
+          /[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g,
+          "_"
+        )
         .replace(/_+/g, "_");
 
     enlace.href = url;
+
     enlace.download =
-      `Checklist_Foco_Rojo_${nombreLimpio}_${fecha.replace(/\//g, "-")}.html`;
+      `Checklist_Foco_Rojo_${nombreLimpio}_${fecha.replace(
+        /\//g,
+        "-"
+      )}.html`;
 
     document.body.appendChild(enlace);
+
     enlace.click();
 
-  setEvidenciaDescargada(true);
     enlace.remove();
 
     URL.revokeObjectURL(url);
+
+    setEvidenciaDescargada(true);
 
     alert(
       "✅ Evidencia descargada correctamente.\n\nYa puedes encontrarla en la carpeta Descargas y compartirla por WhatsApp."
     );
   };
 
-
   // =========================================================
-  // COMPONENTE VISUAL PARA CADA CASILLA
+  // COMPONENTE CHECK
   // =========================================================
 
-  const Check = ({
-    id,
-    children
-  }) => (
-
-    <label className="check-item">
-
+  const Check = ({ id, children }) => (
+    <label style={styles.checkItem}>
       <input
         type="checkbox"
         checked={!!checks[id]}
-        onChange={() =>
-          toggleCheck(id)
-        }
+        onChange={() => toggleCheck(id)}
       />
 
-      <span>
-        {children}
-      </span>
-
+      <span>{children}</span>
     </label>
-
   );
-
 
   // =========================================================
   // ESTILOS
   // =========================================================
 
   const styles = {
-
     page: {
       minHeight: "100vh",
       background: "#f4f6f9",
       padding: "30px 20px",
       fontFamily:
         "Arial, Helvetica, sans-serif",
-      color: "#17202a"
+      color: "#17202a",
     },
 
     container: {
       maxWidth: "1100px",
-      margin: "0 auto"
+      margin: "0 auto",
     },
 
     header: {
@@ -567,26 +542,26 @@ ${copia.outerHTML}
       padding: "28px",
       boxShadow:
         "0 8px 25px rgba(0,0,0,.15)",
-      marginBottom: "22px"
+      marginBottom: "22px",
     },
 
     mega: {
       fontSize: "34px",
       fontWeight: "900",
       letterSpacing: "2px",
-      marginBottom: "4px"
+      marginBottom: "4px",
     },
 
     title: {
       fontSize: "24px",
       fontWeight: "800",
-      margin: 0
+      margin: 0,
     },
 
     subtitle: {
       marginTop: "8px",
       opacity: ".9",
-      fontSize: "14px"
+      fontSize: "14px",
     },
 
     dataGrid: {
@@ -594,7 +569,7 @@ ${copia.outerHTML}
       gridTemplateColumns:
         "repeat(auto-fit, minmax(220px, 1fr))",
       gap: "12px",
-      marginTop: "22px"
+      marginTop: "22px",
     },
 
     dataBox: {
@@ -603,7 +578,7 @@ ${copia.outerHTML}
       border:
         "1px solid rgba(255,255,255,.25)",
       borderRadius: "12px",
-      padding: "13px 15px"
+      padding: "13px 15px",
     },
 
     dataLabel: {
@@ -612,17 +587,17 @@ ${copia.outerHTML}
       textTransform: "uppercase",
       opacity: ".75",
       fontWeight: "700",
-      marginBottom: "4px"
+      marginBottom: "4px",
     },
 
     dataValue: {
       fontSize: "15px",
-      fontWeight: "700"
+      fontWeight: "700",
     },
 
     productivity: {
       fontSize: "25px",
-      fontWeight: "900"
+      fontWeight: "900",
     },
 
     section: {
@@ -633,7 +608,7 @@ ${copia.outerHTML}
       boxShadow:
         "0 3px 12px rgba(0,0,0,.07)",
       border:
-        "1px solid #e5e9ef"
+        "1px solid #e5e9ef",
     },
 
     sectionHeader: {
@@ -643,7 +618,7 @@ ${copia.outerHTML}
       marginBottom: "18px",
       paddingBottom: "12px",
       borderBottom:
-        "2px solid #eef1f5"
+        "2px solid #eef1f5",
     },
 
     number: {
@@ -657,27 +632,27 @@ ${copia.outerHTML}
       alignItems: "center",
       justifyContent: "center",
       fontWeight: "900",
-      fontSize: "15px"
+      fontSize: "15px",
     },
 
     sectionTitle: {
       margin: 0,
       fontSize: "17px",
       fontWeight: "800",
-      color: "#17202a"
+      color: "#17202a",
     },
 
     question: {
       fontSize: "14px",
       fontWeight: "700",
-      marginBottom: "12px"
+      marginBottom: "12px",
     },
 
     checksGrid: {
       display: "grid",
       gridTemplateColumns:
         "repeat(auto-fit, minmax(220px, 1fr))",
-      gap: "8px"
+      gap: "8px",
     },
 
     checkItem: {
@@ -689,7 +664,7 @@ ${copia.outerHTML}
       background: "#f7f9fb",
       cursor: "pointer",
       fontSize: "14px",
-      lineHeight: "1.35"
+      lineHeight: "1.35",
     },
 
     example: {
@@ -699,10 +674,11 @@ ${copia.outerHTML}
       background: "#f1f6fc",
       borderLeft:
         "3px solid #0057b8",
-      borderRadius: "0 8px 8px 0",
+      borderRadius:
+        "0 8px 8px 0",
       fontSize: "13px",
       color: "#45515e",
-      lineHeight: "1.4"
+      lineHeight: "1.4",
     },
 
     textArea: {
@@ -717,7 +693,7 @@ ${copia.outerHTML}
         "Arial, Helvetica, sans-serif",
       fontSize: "14px",
       resize: "vertical",
-      outline: "none"
+      outline: "none",
     },
 
     footer: {
@@ -726,7 +702,7 @@ ${copia.outerHTML}
       gap: "12px",
       flexWrap: "wrap",
       marginTop: "25px",
-      paddingBottom: "30px"
+      paddingBottom: "30px",
     },
 
     backButton: {
@@ -736,7 +712,7 @@ ${copia.outerHTML}
       background: "#6c757d",
       color: "#fff",
       fontWeight: "700",
-      cursor: "pointer"
+      cursor: "pointer",
     },
 
     exportButton: {
@@ -746,28 +722,23 @@ ${copia.outerHTML}
       background: "#0057b8",
       color: "#fff",
       fontWeight: "800",
-      cursor: "pointer"
-    }
-
+      cursor: "pointer",
+    },
   };
 
+  // =========================================================
+  // RENDER
+  // =========================================================
 
   return (
-
     <div style={styles.page}>
-
       <div
         id="checklist-foco-rojo"
         style={styles.container}
       >
-
-
-        {/* =================================================
-            ENCABEZADO
-        ================================================= */}
+        {/* ENCABEZADO */}
 
         <header style={styles.header}>
-
           <div style={styles.mega}>
             MEGA
           </div>
@@ -780,9 +751,7 @@ ${copia.outerHTML}
             Herramienta de diagnóstico y desarrollo comercial
           </div>
 
-
           <div style={styles.dataGrid}>
-
             <div style={styles.dataBox}>
               <span style={styles.dataLabel}>
                 Fecha
@@ -792,7 +761,6 @@ ${copia.outerHTML}
                 {fecha}
               </span>
             </div>
-
 
             <div style={styles.dataBox}>
               <span style={styles.dataLabel}>
@@ -804,7 +772,6 @@ ${copia.outerHTML}
               </span>
             </div>
 
-
             <div style={styles.dataBox}>
               <span style={styles.dataLabel}>
                 Supervisor
@@ -815,7 +782,6 @@ ${copia.outerHTML}
               </span>
             </div>
 
-
             <div style={styles.dataBox}>
               <span style={styles.dataLabel}>
                 Productividad
@@ -825,20 +791,13 @@ ${copia.outerHTML}
                 {productividad}
               </span>
             </div>
-
           </div>
-
         </header>
 
-
-        {/* =================================================
-            01. IMAGEN
-        ================================================= */}
+        {/* 01 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               01
             </div>
@@ -846,17 +805,13 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               IMAGEN Y PRESENTACIÓN
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             ¿Su imagen es la adecuada?
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="imagen-aseado">
               Asead@
             </Check>
@@ -872,20 +827,13 @@ ${copia.outerHTML}
             <Check id="imagen-gafete">
               Gafete
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            02. PREPARACIÓN
-        ================================================= */}
+        {/* 02 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               02
             </div>
@@ -893,17 +841,13 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               PREPARACIÓN DE LA ENTREVISTA
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             ¿Prepara la entrevista?
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="preparacion-analiza">
               Analiza
             </Check>
@@ -915,20 +859,13 @@ ${copia.outerHTML}
             <Check id="preparacion-dimme">
               Revisa domicilio en DiMMe
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            03. ROMPIMIENTO DEL HIELO
-        ================================================= */}
+        {/* 03 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               03
             </div>
@@ -936,14 +873,11 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               ROMPIMIENTO DEL HIELO
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             ¿Qué técnica utilizó para romper el hielo?
           </div>
-
 
           <Check id="hielo-cumplido">
             <strong>
@@ -956,7 +890,6 @@ ${copia.outerHTML}
             Huele bien rico 😂. ¿Me regalas 5 minutitos?”
           </div>
 
-
           <Check id="hielo-disculpa">
             <strong>
               La disculpa espontánea
@@ -967,7 +900,6 @@ ${copia.outerHTML}
             Ejemplo: “¡Disculpa que te interrumpa!
             Sé que estás ocupado, solo te robo 2 minutitos.”
           </div>
-
 
           <Check id="hielo-observacion">
             <strong>
@@ -980,7 +912,6 @@ ${copia.outerHTML}
             Antes de que entres, déjame contarte algo rapidísimo.”
           </div>
 
-
           <Check id="hielo-humor">
             <strong>
               La confianza / humor
@@ -991,7 +922,6 @@ ${copia.outerHTML}
             Ejemplo: “Prometo no quitarte mucho tiempo…
             si me tardo más de 5 minutos, me corres 😂.”
           </div>
-
 
           <Check id="hielo-pregunta">
             <strong>
@@ -1004,22 +934,15 @@ ${copia.outerHTML}
             te quiero hacer una pregunta rápida…”
           </div>
 
-
           <Check id="hielo-otra">
             Otra técnica
           </Check>
-
         </section>
 
-
-        {/* =================================================
-            04. CONFIANZA
-        ================================================= */}
+        {/* 04 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               04
             </div>
@@ -1027,29 +950,19 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               GENERACIÓN DE CONFIANZA
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="confianza">
               Logró generar confianza con el cliente
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            05. NOMBRE
-        ================================================= */}
+        {/* 05 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               05
             </div>
@@ -1057,12 +970,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               PERSONALIZACIÓN
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="nombre">
               Preguntó el nombre del prospecto
             </Check>
@@ -1070,20 +980,13 @@ ${copia.outerHTML}
             <Check id="nombre-utilizo">
               Utilizó el nombre durante la conversación
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            06. PRESENTACIÓN
-        ================================================= */}
+        {/* 06 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               06
             </div>
@@ -1091,12 +994,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               PRESENTACIÓN
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="presentacion-vendedor">
               Se presentó correctamente
             </Check>
@@ -1104,20 +1004,13 @@ ${copia.outerHTML}
             <Check id="presentacion-empresa">
               Presentó a la empresa
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            07. SONDEO
-        ================================================= */}
+        {/* 07 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               07
             </div>
@@ -1125,17 +1018,13 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               SONDEO
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             ¿Realizó un sondeo adecuado?
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="sondeo-costo">
               Costo mensual
             </Check>
@@ -1171,20 +1060,13 @@ ${copia.outerHTML}
             <Check id="sondeo-servicio">
               Servicio relevante para el cliente
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            08. PRESENTACIÓN PERSONALIZADA
-        ================================================= */}
+        {/* 08 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               08
             </div>
@@ -1192,17 +1074,13 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               PERSONALIZACIÓN DE LA PRESENTACIÓN
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             Servicio más relevante para el cliente
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="servicio-internet">
               Internet
             </Check>
@@ -1222,22 +1100,18 @@ ${copia.outerHTML}
             <Check id="servicio-movil">
               Telefonía móvil
             </Check>
-
           </div>
-
 
           <div
             style={{
               ...styles.question,
-              marginTop: "18px"
+              marginTop: "18px",
             }}
           >
             Ejecución de la presentación
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="presentacion-sondeo">
               Se apoyó en el sondeo para iniciar la presentación
             </Check>
@@ -1249,20 +1123,13 @@ ${copia.outerHTML}
             <Check id="presentacion-necesidad">
               Relacionó la necesidad con la solución ofrecida
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            09. BENEFICIOS
-        ================================================= */}
+        {/* 09 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               09
             </div>
@@ -1270,12 +1137,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               VENTA DE BENEFICIOS
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="beneficios-caracteristicas">
               Convirtió características en beneficios
             </Check>
@@ -1287,20 +1151,13 @@ ${copia.outerHTML}
             <Check id="beneficios-precio">
               No limitó la presentación únicamente al precio
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            10. HERRAMIENTAS
-        ================================================= */}
+        {/* 10 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               10
             </div>
@@ -1308,12 +1165,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               APOYO VISUAL / HERRAMIENTAS
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="herramienta-folleto">
               Folleto
             </Check>
@@ -1325,20 +1179,13 @@ ${copia.outerHTML}
             <Check id="herramienta-xview">
               Xview Móvil
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            11. PREPARACIÓN DEL CIERRE
-        ================================================= */}
+        {/* 11 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               11
             </div>
@@ -1346,12 +1193,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               PREPARACIÓN DEL CIERRE
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="cierre-necesidad">
               Detectó una necesidad real
             </Check>
@@ -1375,20 +1219,13 @@ ${copia.outerHTML}
             <Check id="cierre-senales">
               Confirmó señales de interés
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            12. TÉCNICA DE CIERRE
-        ================================================= */}
+        {/* 12 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               12
             </div>
@@ -1396,9 +1233,7 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               TÉCNICA DE CIERRE
             </h2>
-
           </div>
-
 
           <Check id="cierre-eleccion">
             <strong>
@@ -1409,7 +1244,6 @@ ${copia.outerHTML}
           <div style={styles.example}>
             Ejemplo: “¿Lo hacemos a tu nombre o al de tu esposa?”
           </div>
-
 
           <Check id="cierre-resumen">
             <strong>
@@ -1422,7 +1256,6 @@ ${copia.outerHTML}
             es el mejor para lo que necesitas, ¿verdad?”
           </div>
 
-
           <Check id="cierre-accion">
             <strong>
               Cierre por acción inmediata
@@ -1433,22 +1266,15 @@ ${copia.outerHTML}
             Ejemplo: “Perfecto, para dejarlo listo solo necesito tus datos.”
           </div>
 
-
           <Check id="cierre-otra">
             Otra técnica
           </Check>
-
         </section>
 
-
-        {/* =================================================
-            13. OBJECIONES
-        ================================================= */}
+        {/* 13 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               13
             </div>
@@ -1456,9 +1282,7 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               MANEJO DE DUDAS Y OBJECIONES
             </h2>
-
           </div>
-
 
           <Check id="objecion-acepta">
             <strong>ACEPTA</strong> — No contradice
@@ -1468,7 +1292,6 @@ ${copia.outerHTML}
             “Claro, te entiendo.”
           </div>
 
-
           <Check id="objecion-profundiza">
             <strong>PROFUNDIZA</strong> — Descubre la verdadera objeción
           </Check>
@@ -1476,7 +1299,6 @@ ${copia.outerHTML}
           <div style={styles.example}>
             “¿Qué es lo que más te preocupa de eso?”
           </div>
-
 
           <Check id="objecion-responde">
             <strong>RESPONDE</strong> — Contesta específicamente
@@ -1486,7 +1308,6 @@ ${copia.outerHTML}
             “Mira, justamente por eso…”
           </div>
 
-
           <Check id="objecion-cierra">
             <strong>CIERRA</strong> — Regresa a la venta
           </Check>
@@ -1494,18 +1315,12 @@ ${copia.outerHTML}
           <div style={styles.example}>
             “Entonces, si resolvemos eso, ¿avanzamos?”
           </div>
-
         </section>
 
-
-        {/* =================================================
-            14. SILENCIO
-        ================================================= */}
+        {/* 14 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               14
             </div>
@@ -1513,27 +1328,19 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               SILENCIO DE CIERRE
             </h2>
-
           </div>
-
 
           <Check id="silencio">
             Después de realizar el cierre,
             permitió que el cliente respondiera
             sin continuar hablando innecesariamente
           </Check>
-
         </section>
 
-
-        {/* =================================================
-            15. VENTA ADICIONAL
-        ================================================= */}
+        {/* 15 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               15
             </div>
@@ -1541,17 +1348,13 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               VENTA ADICIONAL
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             ¿Detectó oportunidades de venta adicional?
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="adicional-movil">
               Móvil
             </Check>
@@ -1571,20 +1374,13 @@ ${copia.outerHTML}
             <Check id="adicional-streaming">
               Streaming
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            16. CONDICIONES
-        ================================================= */}
+        {/* 16 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               16
             </div>
@@ -1592,12 +1388,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               TÉRMINOS Y CONDICIONES
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="condiciones-paquete">
               Paquete contratado
             </Check>
@@ -1625,20 +1418,13 @@ ${copia.outerHTML}
             <Check id="condiciones-corte">
               Qué ocurre si sale a corte
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            17. REFERIDOS
-        ================================================= */}
+        {/* 17 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               17
             </div>
@@ -1646,25 +1432,17 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               REFERIDOS
             </h2>
-
           </div>
-
 
           <Check id="referidos">
             Solicitó referidos al cliente
           </Check>
-
         </section>
 
-
-        {/* =================================================
-            18. PROSPECTO NO CERRADO
-        ================================================= */}
+        {/* 18 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               18
             </div>
@@ -1672,17 +1450,13 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               PROSPECTO NO CERRADO
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             En caso de no cerrar la venta en frío:
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="prospecto-dimme">
               Registró correctamente al prospecto en DiMMe
             </Check>
@@ -1694,20 +1468,13 @@ ${copia.outerHTML}
             <Check id="prospecto-seguimiento">
               Dejó definido el siguiente paso
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            19. DESPEDIDA
-        ================================================= */}
+        {/* 19 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               19
             </div>
@@ -1715,12 +1482,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               DESPEDIDA
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="despedida-amable">
               Se despidió amablemente
             </Check>
@@ -1728,20 +1492,13 @@ ${copia.outerHTML}
             <Check id="despedida-impresion">
               Dejó una buena impresión en el cliente
             </Check>
-
           </div>
-
         </section>
 
-
-        {/* =================================================
-            20. REGISTRO
-        ================================================= */}
+        {/* 20 */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               20
             </div>
@@ -1749,12 +1506,9 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               REGISTRO
             </h2>
-
           </div>
 
-
           <div style={styles.checksGrid}>
-
             <Check id="registro-ventas">
               Realizó correctamente su registro de ventas
             </Check>
@@ -1762,270 +1516,202 @@ ${copia.outerHTML}
             <Check id="registro-coincide">
               La información coincide con la actividad realizada
             </Check>
-
           </div>
-
         </section>
 
+        {/* =================================================
+            DIAGNÓSTICO
+        ================================================= */}
 
-       {/* =================================================
-    DIAGNÓSTICO DEL SUPERVISOR
-================================================= */}
-
-<section style={styles.section}>
-
-  <div style={styles.sectionHeader}>
-
-    <div
-      style={{
-        ...styles.number,
-        background: "#d71920"
-      }}
-    >
-      🔴
-    </div>
-
-    <h2 style={styles.sectionTitle}>
-      DIAGNÓSTICO DEL SUPERVISOR
-    </h2>
-
-  </div>
-
-
-  <div style={styles.question}>
-    ¿Dónde se encuentra principalmente el área de oportunidad?
-  </div>
-
-
-  {/* =================================================
-      PRINCIPAL ÁREA DE DOLOR
-  ================================================= */}
-
-  <div
-    style={{
-      background: "#fff4f4",
-      border: "1px solid #f3c2c2",
-      borderRadius: "12px",
-      padding: "18px",
-      marginBottom: "20px"
-    }}
-  >
-
-    <div
-      style={{
-        fontSize: "12px",
-        fontWeight: "800",
-        color: "#d71920",
-        textTransform: "uppercase",
-        marginBottom: "6px"
-      }}
-    >
-      🔥 Principal área de oportunidad
-    </div>
-
-
-    <div
-      style={{
-        fontSize: "22px",
-        fontWeight: "900",
-        color: "#17202a"
-      }}
-    >
-      {principalArea}
-    </div>
-
-
-    {rankingDiagnostico.length > 0 && (
-
-      <div
-        style={{
-          fontSize: "13px",
-          color: "#59636e",
-          marginTop: "5px"
-        }}
-      >
-        El área con mayor cantidad de oportunidades
-        detectadas durante la observación.
-      </div>
-
-    )}
-
-  </div>
-
-
-  {/* =================================================
-      GRÁFICA DE DOLOR
-  ================================================= */}
-
-  {rankingDiagnostico.length === 0 ? (
-
-    <div
-      style={{
-        padding: "20px",
-        textAlign: "center",
-        background: "#f1faf4",
-        borderRadius: "12px",
-        color: "#19733a",
-        fontWeight: "700"
-      }}
-    >
-      🟢 No se detectaron áreas de oportunidad.
-    </div>
-
-  ) : (
-
-    <div>
-
-      {rankingDiagnostico.map(
-        (item) => {
-
-          const maxOportunidades =
-            rankingDiagnostico[0]
-              .oportunidades;
-
-          const ancho =
-            maxOportunidades > 0
-              ? (
-                  item.oportunidades /
-                  maxOportunidades
-                ) * 100
-              : 0;
-
-
-          return (
-
+        <section style={styles.section}>
+          <div style={styles.sectionHeader}>
             <div
-              key={item.area}
               style={{
-                marginBottom: "16px"
+                ...styles.number,
+                background: "#d71920",
               }}
             >
-
-              {/* ---------------------------------------
-                  NOMBRE + CANTIDAD
-              --------------------------------------- */}
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent:
-                    "space-between",
-                  alignItems: "center",
-                  marginBottom: "6px"
-                }}
-              >
-
-                <span
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "700"
-                  }}
-                >
-                  {item.area}
-                </span>
-
-
-                <span
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: "900",
-                    color: "#d71920"
-                  }}
-                >
-                  {item.oportunidades}
-                  {" "}
-                  {item.oportunidades === 1
-                    ? "oportunidad"
-                    : "oportunidades"}
-                </span>
-
-              </div>
-
-
-              {/* ---------------------------------------
-                  BARRA
-              --------------------------------------- */}
-
-              <div
-                style={{
-                  width: "100%",
-                  height: "13px",
-                  background: "#edf0f3",
-                  borderRadius: "20px",
-                  overflow: "hidden"
-                }}
-              >
-
-                <div
-                  style={{
-                    width: `${ancho}%`,
-                    height: "100%",
-                    background:
-                      "#d71920",
-                    borderRadius:
-                      "20px",
-                    transition:
-                      "width .3s ease"
-                  }}
-                />
-
-              </div>
-
+              🔴
             </div>
 
-          );
+            <h2 style={styles.sectionTitle}>
+              DIAGNÓSTICO DEL SUPERVISOR
+            </h2>
+          </div>
 
-        }
-      )}
+          <div style={styles.question}>
+            ¿Dónde se encuentra principalmente el área de oportunidad?
+          </div>
 
-    </div>
+          <div
+            style={{
+              background: "#fff4f4",
+              border:
+                "1px solid #f3c2c2",
+              borderRadius: "12px",
+              padding: "18px",
+              marginBottom: "20px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "12px",
+                fontWeight: "800",
+                color: "#d71920",
+                textTransform: "uppercase",
+                marginBottom: "6px",
+              }}
+            >
+              🔥 Principal área de oportunidad
+            </div>
 
-  )}
+            <div
+              style={{
+                fontSize: "22px",
+                fontWeight: "900",
+                color: "#17202a",
+              }}
+            >
+              {principalArea}
+            </div>
 
+            {rankingDiagnostico.length > 0 && (
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#59636e",
+                  marginTop: "5px",
+                }}
+              >
+                El área con mayor cantidad de oportunidades
+                detectadas durante la observación.
+              </div>
+            )}
+          </div>
 
-  {/* =================================================
-      OTRA ÁREA
-  ================================================= */}
+          {rankingDiagnostico.length === 0 ? (
+            <div
+              style={{
+                padding: "20px",
+                textAlign: "center",
+                background: "#f1faf4",
+                borderRadius: "12px",
+                color: "#19733a",
+                fontWeight: "700",
+              }}
+            >
+              🟢 No se detectaron áreas de oportunidad.
+            </div>
+          ) : (
+            <div>
+              {rankingDiagnostico.map((item) => {
+                const maxOportunidades =
+                  rankingDiagnostico[0]
+                    .oportunidades;
 
-  <div
-    style={{
-      marginTop: "22px"
-    }}
-  >
+                const ancho =
+                  maxOportunidades > 0
+                    ? (item.oportunidades /
+                        maxOportunidades) *
+                      100
+                    : 0;
 
-    <div style={styles.question}>
-      Otra:
-    </div>
+                return (
+                  <div
+                    key={item.area}
+                    style={{
+                      marginBottom: "16px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent:
+                          "space-between",
+                        alignItems: "center",
+                        marginBottom: "6px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "700",
+                        }}
+                      >
+                        {item.area}
+                      </span>
 
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: "900",
+                          color: "#d71920",
+                        }}
+                      >
+                        {item.oportunidades}{" "}
+                        {item.oportunidades === 1
+                          ? "oportunidad"
+                          : "oportunidades"}
+                      </span>
+                    </div>
 
-    <input
-      type="text"
-      value={otraArea}
-      onChange={(e) => setOtraArea(e.target.value)}
-      placeholder="Especifica otra área de oportunidad..."
-      style={{
-        width: "100%",
-        boxSizing: "border-box",
-        padding: "12px",
-        border:
-          "1px solid #d5dce5",
-        borderRadius: "10px",
-        fontSize: "14px"
-      }}
-    />
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "13px",
+                        background: "#edf0f3",
+                        borderRadius: "20px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${ancho}%`,
+                          height: "100%",
+                          background: "#d71920",
+                          borderRadius: "20px",
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
-  </div>
+          {/* OTRA ÁREA */}
 
-</section>
+          <div style={{ marginTop: "22px" }}>
+            <div style={styles.question}>
+              Otra:
+            </div>
+
+            <input
+              type="text"
+              value={otraArea}
+              onChange={(e) =>
+                setOtraArea(e.target.value)
+              }
+              placeholder="Especifica otra área de oportunidad..."
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                padding: "12px",
+                border:
+                  "1px solid #d5dce5",
+                borderRadius: "10px",
+                fontSize: "14px",
+              }}
+            />
+          </div>
+        </section>
 
         {/* =================================================
             ACCIÓN CORRECTIVA
         ================================================= */}
 
         <section style={styles.section}>
-
           <div style={styles.sectionHeader}>
-
             <div style={styles.number}>
               🔧
             </div>
@@ -2033,128 +1719,90 @@ ${copia.outerHTML}
             <h2 style={styles.sectionTitle}>
               ACCIÓN CORRECTIVA
             </h2>
-
           </div>
-
 
           <div style={styles.question}>
             ¿Qué debe trabajar específicamente el vendedor?
           </div>
 
-
           <textarea
             value={accionCorrectiva}
-            onChange={(e) => setAccionCorrectiva(e.target.value)}
+            onChange={(e) =>
+              setAccionCorrectiva(e.target.value)
+            }
             style={styles.textArea}
             placeholder="Escribe aquí la acción correctiva..."
           />
-
         </section>
 
-
         {/* =================================================
-    BOTONES
-================================================= */}
+            BOTONES
+        ================================================= */}
 
-<div
-  data-export-footer="true"
-  style={styles.footer}
->
+        <div
+          data-export-footer="true"
+          style={styles.footer}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              if (!evidenciaDescargada) {
+                alert(
+                  "Primero debes descargar la evidencia HTML del checklist antes de regresar al Dashboard."
+                );
+                return;
+              }
 
-  {/* =============================================
-      REGRESAR AL DASHBOARD
-  ============================================= */}
+              onRegresar();
+            }}
+            style={{
+              ...styles.backButton,
+              opacity: evidenciaDescargada
+                ? 1
+                : 0.55,
+              cursor: evidenciaDescargada
+                ? "pointer"
+                : "not-allowed",
+            }}
+          >
+            {evidenciaDescargada
+              ? "↩️ Regresar al Dashboard"
+              : "🔒 Descarga la evidencia para continuar"}
+          </button>
 
-  <button
-    type="button"
-    onClick={() => {
+          <button
+            type="button"
+            style={styles.exportButton}
+            onClick={exportarHTML}
+          >
+            📄 Descargar CheckList
+          </button>
 
-      if (!evidenciaDescargada) {
+          {evidenciaDescargada && (
+            <button
+              type="button"
+              style={{
+                ...styles.exportButton,
+                background: "#198754",
+              }}
+              onClick={() => {
+                const haySiguiente =
+                  onSiguienteFoco();
 
-        alert(
-          "Primero debes descargar la evidencia HTML del checklist antes de regresar al Dashboard."
-        );
-
-        return;
-      }
-
-      onRegresar();
-
-    }}
-    style={{
-      ...styles.backButton,
-      opacity: evidenciaDescargada ? 1 : 0.55,
-      cursor: evidenciaDescargada
-        ? "pointer"
-        : "not-allowed"
-    }}
-  >
-
-    {evidenciaDescargada
-
-      ? "↩️ Regresar al Dashboard"
-
-      : "🔒 Descarga la evidencia para continuar"
-
-    }
-
-  </button>
-
-
-  {/* =============================================
-      DESCARGAR CHECKLIST
-  ============================================= */}
-
-  <button
-    type="button"
-    style={styles.exportButton}
-    onClick={exportarHTML}
-  >
-
-    📄 Descargar CheckList
-
-  </button>
-
-
-  {/* =============================================
-      SIGUIENTE FOCO ROJO
-      SOLO APARECE DESPUÉS DE DESCARGAR
-  ============================================= */}
-
-  {evidenciaDescargada && (
-
-    <button
-      type="button"
-      style={{
-        ...styles.exportButton,
-        background: "#198754"
-      }}
-      onClick={() => {
-
-        const haySiguiente =
-          onSiguienteFoco();
-
-        if (!haySiguiente) {
-
-          alert(
-            "🟢 ¡Excelente trabajo!\n\nHas completado todos los focos rojos disponibles."
-          );
-
-        }
-
-      }}
-    >
-
-      ➡️ Siguiente foco rojo
-
-    </button>
-
-  )}
-
-  </div>
-</div>
-);
-
+                if (!haySiguiente) {
+                  alert(
+                    "🟢 ¡Excelente trabajo!\n\nHas completado todos los focos rojos disponibles."
+                  );
+                }
+              }}
+            >
+              ➡️ Siguiente foco rojo
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default ChecklistFocoRojo;
