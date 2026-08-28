@@ -64,7 +64,7 @@ function MenuButtons({ setVista }) {
         }
       >
 
-        🏆 Ranking Clúster
+        🏆 Tabla General 
 
       </button>
 
