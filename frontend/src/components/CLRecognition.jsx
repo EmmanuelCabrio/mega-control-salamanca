@@ -81,9 +81,9 @@ function CLRecognition({
 
         <h3>
 
-          ¡LOS QUE ESTÁN
+          ¡EN LA CIMA
           <br />
-          MARCANDO EL RITMO!
+          TODO SE SIENTE DIFERENTE!
 
         </h3>
 
@@ -171,9 +171,9 @@ function CLRecognition({
 
           <strong>
 
-            🔥 EL RESULTADO DE UN EQUIPO
+            🔥 GRACIAS POR MARCAR
             <br />
-            QUE NO SE CONFORMA.
+            LA DIFERENCIA.
 
           </strong>
 
