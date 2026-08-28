@@ -2233,8 +2233,7 @@ ${copia.outerHTML}
             }}
           >
             Las firmas forman parte exclusivamente de esta
-            evidencia del checklist. No se almacenan ni se
-            registran en el sistema.
+            evidencia del checklist.
           </div>
 
           <div style={styles.signaturesGrid}>
