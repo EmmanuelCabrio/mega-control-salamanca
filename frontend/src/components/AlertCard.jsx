@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-
 function AlertCard({
   promotor,
   ausencia,
@@ -16,13 +15,11 @@ function AlertCard({
 
   const [mostrarDetalle, setMostrarDetalle] = useState(false);
 
-
   // ==================================================
   // ESTADO — MOSTRAR / OCULTAR MOTIVOS DE AUSENCIA
   // ==================================================
 
   const [mostrarAusencia, setMostrarAusencia] = useState(false);
-
 
   // ==================================================
   // SELECCIONAR MOTIVO DE AUSENCIA
@@ -42,7 +39,6 @@ function AlertCard({
     setMostrarAusencia(false);
   }
 
-
   // ==================================================
   // QUITAR AUSENCIA
   // ==================================================
@@ -59,7 +55,6 @@ function AlertCard({
 
   }
 
-
   // ==================================================
   // INICIAR SEGUIMIENTO
   // ==================================================
@@ -68,17 +63,14 @@ function AlertCard({
 
     if (typeof onIniciarSeguimiento === "function") {
 
-      onIniciarSeguimiento(
-        promotor
-      );
+      onIniciarSeguimiento(promotor);
 
     }
 
   }
 
-
   // ==================================================
-  // ➡️ SIGUIENTE FOCO ROJO
+  // SIGUIENTE FOCO ROJO
   // ==================================================
 
   function siguienteFocoRojo() {
@@ -91,7 +83,6 @@ function AlertCard({
 
   }
 
-
   // ==================================================
   // RENDER
   // ==================================================
@@ -99,7 +90,6 @@ function AlertCard({
   return (
 
     <div className="alerta">
-
 
       {/* ============================================
           NOMBRE DEL PROMOTOR
@@ -127,7 +117,6 @@ function AlertCard({
           <strong>
             {ausencia}
           </strong>
-
 
           <button
             type="button"
@@ -171,7 +160,6 @@ function AlertCard({
       {mostrarDetalle && (
 
         <div className="detalle-alerta">
-
 
           {/* ========================================
               PRODUCTIVIDAD
@@ -247,7 +235,6 @@ function AlertCard({
 
                 </strong>
 
-
                 <ul>
 
                   {promotor.detalles.map(
@@ -270,15 +257,10 @@ function AlertCard({
 
 
           {/* ========================================
-              BOTONES DE ACCIÓN
+              ☑️ INICIAR SEGUIMIENTO
           ======================================== */}
 
           <div className="seguimiento-container">
-
-
-            {/* ======================================
-                ☑️ INICIAR SEGUIMIENTO
-            ====================================== */}
 
             <button
               type="button"
@@ -297,14 +279,13 @@ function AlertCard({
 
             <button
               type="button"
-              className="boton-siguiente-foco"
+              className="boton-checklist"
               onClick={siguienteFocoRojo}
             >
 
               ➡️ Siguiente foco rojo
 
             </button>
-
 
           </div>
 
@@ -316,7 +297,6 @@ function AlertCard({
           {!ausencia && (
 
             <div className="ausencia-container">
-
 
               <button
                 type="button"
@@ -340,7 +320,6 @@ function AlertCard({
               {mostrarAusencia && (
 
                 <div className="motivos-ausencia">
-
 
                   <button
                     type="button"
@@ -389,7 +368,6 @@ function AlertCard({
 
                   </button>
 
-
                 </div>
 
               )}
@@ -407,6 +385,5 @@ function AlertCard({
   );
 
 }
-
 
 export default AlertCard;
