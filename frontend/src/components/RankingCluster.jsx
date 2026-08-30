@@ -20,46 +20,7 @@ function RankingCluster({
 
 
   // ==================================================
-  // EXPORTAR RANKING COMO IMAGEN
-  // ==================================================
-
-  const exportarRanking = async () => {
-
-    if (!rankingRef.current) return;
-
-    try {
-
-      const canvas = await html2canvas(
-        rankingRef.current,
-        {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#111111"
-        }
-      );
-
-      const enlace = document.createElement("a");
-
-      enlace.download = "Ranking-CL-Salamanca.png";
-
-      enlace.href = canvas.toDataURL("image/png");
-
-      enlace.click();
-
-    } catch (error) {
-
-      console.error(
-        "Error al exportar el Ranking:",
-        error
-      );
-
-    }
-
-  };
-
-
-  // ==================================================
-  // ORDENAR RANKING
+  // ORDENAR / FILTRAR RANKING
   // ==================================================
 
   const listaCompleta =
@@ -82,6 +43,65 @@ function RankingCluster({
 
 
   // ==================================================
+  // EXPORTAR RANKING COMO IMAGEN
+  // ==================================================
+
+  const exportarRanking = async () => {
+
+    if (!rankingRef.current) {
+      return;
+    }
+
+    try {
+
+      const canvas = await html2canvas(
+        rankingRef.current,
+        {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff"
+        }
+      );
+
+
+      const imagen =
+        canvas.toDataURL("image/png");
+
+
+      const enlace =
+        document.createElement("a");
+
+
+      enlace.href = imagen;
+
+
+      enlace.download =
+        "Ranking-CL-Salamanca.png";
+
+
+      document.body.appendChild(enlace);
+
+      enlace.click();
+
+      document.body.removeChild(enlace);
+
+    } catch (error) {
+
+      console.error(
+        "Error al exportar el ranking:",
+        error
+      );
+
+      alert(
+        "No fue posible exportar el ranking. Intenta nuevamente."
+      );
+
+    }
+
+  };
+
+
+  // ==================================================
   // TARJETA COMPACTA
   // ==================================================
 
@@ -89,7 +109,10 @@ function RankingCluster({
 
     return (
 
-      <div className="honor-board ranking-cl">
+      <div
+        ref={rankingRef}
+        className="honor-board ranking-cl"
+      >
 
         <h2 className="honor-tittle">
           🏆 Ranking CL Salamanca
@@ -149,7 +172,7 @@ function RankingCluster({
                   Productividad:{" "}
 
                   {Number(
-                    promotor.productividad
+                    promotor.productividad ?? 0
                   ).toFixed(2)}
 
 
@@ -190,9 +213,9 @@ function RankingCluster({
 
     <div className="ranking-cluster">
 
-      {/* ==================================================
-          CONTENIDO QUE SE EXPORTARÁ
-      ================================================== */}
+      {/* ==========================================
+          CONTENEDOR QUE SE EXPORTA
+      ========================================== */}
 
       <div ref={rankingRef}>
 
@@ -298,11 +321,10 @@ function RankingCluster({
                   <td>
 
                     {Number(
-                      promotor.productividad
+                      promotor.productividad ?? 0
                     ).toFixed(2)}
 
                   </td>
-
 
                 </tr>
 
@@ -317,31 +339,31 @@ function RankingCluster({
 
 
       {/* ==========================================
-          EXPORTAR
+          ACCIONES
       ========================================== */}
 
-      <button
-        type="button"
-        className="boton-exportar-ranking"
-        onClick={exportarRanking}
-      >
-        📸 Exportar Ranking
-      </button>
+      <div className="ranking-acciones">
+
+        <button
+          type="button"
+          className="boton-exportar"
+          onClick={exportarRanking}
+        >
+          📸 Exportar ranking
+        </button>
 
 
-      {/* ==========================================
-          REGRESAR
-      ========================================== */}
+        <button
+          type="button"
+          className="boton-regresar"
+          onClick={() =>
+            setVista("supervisor")
+          }
+        >
+          ← Regresar al inicio
+        </button>
 
-      <button
-        className="boton-regresar"
-        onClick={() =>
-          setVista("supervisor")
-        }
-      >
-        ← Regresar al inicio
-      </button>
-
+      </div>
 
     </div>
 
