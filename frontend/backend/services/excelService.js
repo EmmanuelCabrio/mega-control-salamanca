@@ -2330,6 +2330,346 @@ function leerRankingSupervisores(
 
 }
 
+// ==================================================
+// 👥 STATUS DE PLANTILLA
+// ==================================================
+
+function leerPlantilla() {
+
+  try {
+
+    // ==============================================
+    // OBTENER EXCEL
+    // ==============================================
+
+    const workbook =
+      cargarExcel();
+
+
+    // ==============================================
+    // BUSCAR HOJA PLANTILLA
+    // ==============================================
+
+    const nombreHoja =
+      workbook.SheetNames.find(
+        (nombre) =>
+          String(nombre)
+            .trim()
+            .toUpperCase() ===
+          "PLANTILLA"
+      );
+
+
+    if (!nombreHoja) {
+
+      throw new Error(
+        'No se encontró la hoja "PLANTILLA"'
+      );
+
+    }
+
+
+    const hoja =
+      workbook.Sheets[
+        nombreHoja
+      ];
+
+
+    // ==============================================
+    // CONVERTIR A FILAS
+    // ==============================================
+
+    const datos =
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+    // ==============================================
+    // COLUMNAS
+    //
+    // X  = 23
+    // Y  = 24
+    // Z  = 25
+    // AA = 26
+    // AB = 27
+    // ==============================================
+
+    const COLUMNA_PUESTO = 23;
+    const COLUMNA_TOTAL = 24;
+    const COLUMNA_ACT = 25;
+    const COLUMNA_VAC = 26;
+    const COLUMNA_TOT = 27;
+
+
+    const registros = [];
+
+
+    // ==============================================
+    // RECORRER FILAS
+    // ==============================================
+
+    for (
+      let i = 0;
+      i < datos.length;
+      i++
+    ) {
+
+      const fila =
+        datos[i];
+
+
+      const puesto =
+        limpiarTexto(
+          fila[COLUMNA_PUESTO]
+        );
+
+
+      // ==========================================
+      // IGNORAR ENCABEZADOS
+      // ==========================================
+
+      if (
+        !puesto ||
+        puesto === "PUESTO"
+      ) {
+
+        continue;
+
+      }
+
+
+      // ==========================================
+      // TOTAL
+      // ==========================================
+
+      let total =
+        Number(
+          fila[COLUMNA_TOTAL]
+        );
+
+
+      if (
+        !Number.isFinite(total)
+      ) {
+
+        total = 0;
+
+      }
+
+
+      // ==========================================
+      // ACTIVOS
+      // ==========================================
+
+      let activos =
+        Number(
+          fila[COLUMNA_ACT]
+        );
+
+
+      if (
+        !Number.isFinite(activos)
+      ) {
+
+        activos = 0;
+
+      }
+
+
+      // ==========================================
+      // VACANTES
+      // ==========================================
+
+      let vacantes =
+        Number(
+          fila[COLUMNA_VAC]
+        );
+
+
+      if (
+        !Number.isFinite(vacantes)
+      ) {
+
+        vacantes = 0;
+
+      }
+
+
+      // ==========================================
+      // TOTAL DE CONTROL
+      // ==========================================
+
+      let tot =
+        Number(
+          fila[COLUMNA_TOT]
+        );
+
+
+      if (
+        !Number.isFinite(tot)
+      ) {
+
+        tot = total;
+
+      }
+
+
+      registros.push({
+
+        puesto,
+
+        total:
+          Math.round(total),
+
+        activos:
+          Math.round(activos),
+
+        vacantes:
+          Math.round(vacantes),
+
+        tot:
+          Math.round(tot),
+
+      });
+
+    }
+
+
+    // ==============================================
+    // TOTALES GENERALES
+    // ==============================================
+
+    const totalGeneral =
+      registros.reduce(
+        (
+          acumulado,
+          registro
+        ) =>
+          acumulado +
+          registro.total,
+        0
+      );
+
+
+    const activosGeneral =
+      registros.reduce(
+        (
+          acumulado,
+          registro
+        ) =>
+          acumulado +
+          registro.activos,
+        0
+      );
+
+
+    const vacantesGeneral =
+      registros.reduce(
+        (
+          acumulado,
+          registro
+        ) =>
+          acumulado +
+          registro.vacantes,
+        0
+      );
+
+
+    const cobertura =
+      totalGeneral > 0
+        ? (
+            activosGeneral /
+            totalGeneral
+          ) * 100
+        : 0;
+
+
+    // ==============================================
+    // LOG
+    // ==============================================
+
+    console.log(
+      "=========================================="
+    );
+
+    console.log(
+      "👥 STATUS DE PLANTILLA"
+    );
+
+    console.log(
+      "TOTAL:",
+      totalGeneral
+    );
+
+    console.log(
+      "ACTIVOS:",
+      activosGeneral
+    );
+
+    console.log(
+      "VACANTES:",
+      vacantesGeneral
+    );
+
+    console.log(
+      "COBERTURA:",
+      cobertura.toFixed(2) + "%"
+    );
+
+    console.log(
+      "=========================================="
+    );
+
+
+    return {
+
+      registros,
+
+      total:
+        totalGeneral,
+
+      activos:
+        activosGeneral,
+
+      vacantes:
+        vacantesGeneral,
+
+      cobertura,
+
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "❌ ERROR EN STATUS DE PLANTILLA:",
+      error
+    );
+
+
+    return {
+
+      registros: [],
+
+      total: 0,
+
+      activos: 0,
+
+      vacantes: 0,
+
+      cobertura: 0,
+
+    };
+
+  }
+
+}
+
 
   // ==================================================
 // 📊 VENTA VS MES ANTERIOR
@@ -3219,6 +3559,8 @@ module.exports = {
   leerExcel,
 
   leerVentaVsMesAnterior,
+
+  leerPlantilla,
 
   descargarExcelDesdeSupabase,
 
