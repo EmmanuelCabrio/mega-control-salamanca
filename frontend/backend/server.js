@@ -9,6 +9,7 @@ const {
   validarUsuario,
   leerExcel,
   leerVentaVsMesAnterior,
+  leerPlantilla,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
@@ -354,7 +355,7 @@ app.post(
         correcto: false,
 
         mensaje:
-          "Error interno del servidor",
+          "Error interno del ",
 
       });
 
@@ -1126,6 +1127,76 @@ app.get(
 
         mensaje:
           "No se pudo cargar Venta vs Mes Anterior",
+
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// 👥 STATUS DE PLANTILLA
+// ==================================================
+
+app.get(
+  "/api/plantilla",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      console.log(
+        "👥 CONSULTANDO STATUS DE PLANTILLA..."
+      );
+
+
+      const datos =
+        leerPlantilla();
+
+
+      return res.json({
+
+        correcto: true,
+
+        registros:
+          datos.registros || [],
+
+        total:
+          datos.total || 0,
+
+        activos:
+          datos.activos || 0,
+
+        vacantes:
+          datos.vacantes || 0,
+
+        cobertura:
+          Number(
+            datos.cobertura || 0
+          ),
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/plantilla:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar el status de plantilla",
 
       });
 
