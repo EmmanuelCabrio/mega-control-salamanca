@@ -5038,6 +5038,9 @@ body {
   border-radius: 24px;
   padding: 28px;
   box-sizing: border-box;
+
+  /* Separación respecto a la tarjeta superior */
+  margin-top: 24px;
 }
 
 
