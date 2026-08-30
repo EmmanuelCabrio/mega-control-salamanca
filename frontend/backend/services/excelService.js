@@ -13,7 +13,6 @@ const RUTA_EXCEL = path.join(
   "../data/SEGUIMIENTO 2.0.xlsx"
 );
 
-
 const RUTA_EXCEL_SUPABASE = path.join(
   os.tmpdir(),
   "SEGUIMIENTO 2.0.xlsx"
@@ -22,10 +21,6 @@ const RUTA_EXCEL_SUPABASE = path.join(
 // ==================================================
 // CACHE DE DATOS
 // ==================================================
-
-// Los datos se cargan una sola vez al iniciar.
-// Para actualizar el Excel durante el día,
-// se reinicia el backend.
 
 let datosCacheados = null;
 let workbookCacheado = null;
@@ -38,34 +33,27 @@ let usuariosCacheados = null;
 const HOJA_BD_PLAN_TRABAJO =
   "BD PLAN DE TRABAJO";
 
-
 // ==================================================
 // FUNCIONES AUXILIARES
 // ==================================================
 
 function limpiarTexto(valor) {
-
   return String(valor ?? "")
     .trim()
     .replace(/\s+/g, " ")
     .toUpperCase();
-
 }
 
 function normalizarNombre(valor) {
-
   return limpiarTexto(valor)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^A-Z0-9 ]/g, "")
     .replace(/\s+/g, " ")
     .trim();
-
 }
 
-
 function esValorInvalido(valor) {
-
   const texto =
     limpiarTexto(valor);
 
@@ -76,7 +64,6 @@ function esValorInvalido(valor) {
     texto === "#VALUE!" ||
     texto === "#DIV/0!"
   );
-
 }
 
 // ==================================================
@@ -84,13 +71,11 @@ function esValorInvalido(valor) {
 // ==================================================
 
 async function descargarExcelDesdeSupabase() {
-
   const supabaseUrl =
     process.env.SUPABASE_URL;
 
   const supabaseSecretKey =
     process.env.SUPABASE_SECRET_KEY;
-
 
   // ================================================
   // SI NO HAY SUPABASE
@@ -100,7 +85,6 @@ async function descargarExcelDesdeSupabase() {
     !supabaseUrl ||
     !supabaseSecretKey
   ) {
-
     console.log(
       "💻 SUPABASE no configurado."
     );
@@ -110,14 +94,11 @@ async function descargarExcelDesdeSupabase() {
     );
 
     return;
-
   }
-
 
   console.log(
     "☁️ Descargando Excel desde Supabase..."
   );
-
 
   // ================================================
   // DATOS DEL BUCKET Y ARCHIVO
@@ -133,7 +114,6 @@ async function descargarExcelDesdeSupabase() {
       "SEGUIMIENTO 2.0.xlsx"
     );
 
-
   // ================================================
   // DESCARGAR ARCHIVO PRIVADO
   // ================================================
@@ -141,11 +121,9 @@ async function descargarExcelDesdeSupabase() {
   const url =
     `${supabaseUrl}/storage/v1/object/authenticated/${bucket}/${archivo}`;
 
-
   console.log(
     "📥 Descargando archivo privado..."
   );
-
 
   const respuestaArchivo =
     await fetch(
@@ -154,34 +132,27 @@ async function descargarExcelDesdeSupabase() {
         method: "GET",
 
         headers: {
-
           apikey:
             supabaseSecretKey,
 
           Authorization:
             `Bearer ${supabaseSecretKey}`,
-
         },
-
       }
     );
-
 
   // ================================================
   // VALIDAR RESPUESTA
   // ================================================
 
   if (!respuestaArchivo.ok) {
-
     const mensaje =
       await respuestaArchivo.text();
 
     throw new Error(
       `No se pudo descargar el Excel: HTTP ${respuestaArchivo.status} ${mensaje}`
     );
-
   }
-
 
   // ================================================
   // CONVERTIR A BUFFER
@@ -193,14 +164,14 @@ async function descargarExcelDesdeSupabase() {
     );
 
   const hashExcel =
-  crypto
-    .createHash("sha256")
-    .update(buffer)
-    .digest("hex");
+    crypto
+      .createHash("sha256")
+      .update(buffer)
+      .digest("hex");
 
-console.log(
-  `🔐 SHA-256 Excel: ${hashExcel}`
-);
+  console.log(
+    `🔐 SHA-256 Excel: ${hashExcel}`
+  );
 
   // ================================================
   // GUARDAR ARCHIVO TEMPORAL
@@ -211,46 +182,37 @@ console.log(
     buffer
   );
 
-
   console.log(
     "✅ Excel descargado desde Supabase"
   );
-
 
   console.log(
     `📊 Tamaño: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`
   );
 
-
   console.log(
     "📂 Archivo temporal:",
     RUTA_EXCEL_SUPABASE
   );
-
 }
 
-
-
+// ==================================================
+// CARGAR EXCEL
+// ==================================================
 
 function cargarExcel() {
-
   try {
-
     // ================================================
     // USAR CACHE SI EL EXCEL YA FUE CARGADO
     // ================================================
 
     if (workbookCacheado) {
-
       return workbookCacheado;
-
     }
-
 
     console.log(
       "📂 Cargando Excel:"
     );
-
 
     const rutaExcelActual =
       (
@@ -261,57 +223,47 @@ function cargarExcel() {
         ? RUTA_EXCEL_SUPABASE
         : RUTA_EXCEL;
 
-
     console.log(
       rutaExcelActual
     );
 
-
-   workbookCacheado =
-  XLSX.readFile(
-    rutaExcelActual,
-    {
-      dense: true,
-      cellHTML: false,
-      cellFormula: false,
-      cellStyles: false,
-      cellNF: false,
-    }
-  );
-
+    workbookCacheado =
+      XLSX.readFile(
+        rutaExcelActual,
+        {
+          dense: true,
+          cellHTML: false,
+          cellFormula: false,
+          cellStyles: false,
+          cellNF: false,
+        }
+      );
 
     console.log(
       "⚡ Excel cargado en memoria"
     );
 
-
     return workbookCacheado;
 
-
   } catch (error) {
-
     console.error(
       "❌ Error al abrir el Excel:"
     );
-
 
     console.error(
       error.message
     );
 
-
     throw error;
-
   }
-
 }
 
-
+// ==================================================
+// CARGAR EXCEL USUARIOS
+// ==================================================
 
 function cargarExcelUsuarios() {
-
   try {
-
     const workbook =
       XLSX.readFile(
         (
@@ -334,7 +286,6 @@ function cargarExcelUsuarios() {
     return workbook;
 
   } catch (error) {
-
     console.error(
       "❌ Error al abrir USERS:"
     );
@@ -344,28 +295,20 @@ function cargarExcelUsuarios() {
     );
 
     throw error;
-
   }
-
 }
-
 
 // ==================================================
 // LEER USERS
 // ==================================================
 
 function obtenerUsuarios() {
-
   if (usuariosCacheados) {
-
     return usuariosCacheados;
-
   }
-
 
   const workbook =
     cargarExcelUsuarios();
-
 
   const nombreHoja =
     workbook.SheetNames.find(
@@ -374,21 +317,16 @@ function obtenerUsuarios() {
         "USERS"
     );
 
-
   if (!nombreHoja) {
-
     throw new Error(
       'No se encontró la pestaña "USERS"'
     );
-
   }
-
 
   const hoja =
     workbook.Sheets[
       nombreHoja
     ];
-
 
   const datos =
     XLSX.utils.sheet_to_json(
@@ -399,9 +337,7 @@ function obtenerUsuarios() {
       }
     );
 
-
   const usuarios = [];
-
 
   // ==================================================
   // USERS
@@ -411,6 +347,7 @@ function obtenerUsuarios() {
   // D = Contraseña
   // E = Estado
   // F = Supervisor
+  // G = Rol
   // ==================================================
 
   const COLUMNA_EMPLEADO = 1;
@@ -420,16 +357,13 @@ function obtenerUsuarios() {
   const COLUMNA_SUPERVISOR = 5;
   const COLUMNA_ROL = 6;
 
-
   for (
     let i = 1;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
 
     const empleado =
       String(
@@ -438,14 +372,12 @@ function obtenerUsuarios() {
         ] ?? ""
       ).trim();
 
-
     const usuario =
       String(
         fila[
           COLUMNA_USUARIO
         ] ?? ""
       ).trim();
-
 
     const password =
       String(
@@ -454,14 +386,12 @@ function obtenerUsuarios() {
         ] ?? ""
       ).trim();
 
-
     const estado =
       String(
         fila[
           COLUMNA_ESTADO
         ] ?? ""
       ).trim();
-
 
     const supervisor =
       String(
@@ -471,53 +401,38 @@ function obtenerUsuarios() {
       ).trim();
 
     const rol =
-  String(
-    fila[
-      COLUMNA_ROL
-    ] ?? ""
-  ).trim();
-
+      String(
+        fila[
+          COLUMNA_ROL
+        ] ?? ""
+      ).trim();
 
     if (
       !usuario ||
       !password
     ) {
-
       continue;
-
     }
 
-
     usuarios.push({
-
       empleado,
-
       usuario,
-
       password,
-
       estado,
-
       supervisor,
-
       rol,
-
     });
-
   }
 
+  console.log(
+    `👥 Usuarios encontrados: ${usuarios.length}`
+  );
 
- console.log(
-  `👥 Usuarios encontrados: ${usuarios.length}`
-);
+  usuariosCacheados =
+    usuarios;
 
-usuariosCacheados =
-  usuarios;
-
-return usuariosCacheados;
-
+  return usuariosCacheados;
 }
-
 
 // ==================================================
 // VALIDAR USUARIO
@@ -527,10 +442,8 @@ function validarUsuario(
   usuarioIngresado,
   passwordIngresada
 ) {
-
   const usuarios =
     obtenerUsuarios();
-
 
   const usuarioNormalizado =
     String(
@@ -539,18 +452,15 @@ function validarUsuario(
       .trim()
       .toLowerCase();
 
-
   const encontrado =
     usuarios.find(
       (usuario) => {
-
         const usuarioExcel =
           String(
             usuario.usuario ?? ""
           )
             .trim()
             .toLowerCase();
-
 
         return (
           usuarioExcel ===
@@ -563,24 +473,16 @@ function validarUsuario(
               passwordIngresada
             )
         );
-
       }
     );
 
-
   if (!encontrado) {
-
     return {
-
       correcto: false,
-
       mensaje:
         "Usuario o contraseña incorrectos",
-
     };
-
   }
-
 
   const estado =
     String(
@@ -589,25 +491,17 @@ function validarUsuario(
       .trim()
       .toUpperCase();
 
-
   if (
     estado !== "ACTIVO"
   ) {
-
     return {
-
       correcto: false,
-
       mensaje:
         "Tu usuario se encuentra inactivo",
-
     };
-
   }
 
-
   return {
-
     correcto: true,
 
     supervisor:
@@ -617,20 +511,15 @@ function validarUsuario(
       encontrado.empleado,
 
     rol:
-  encontrado.rol,
-
+      encontrado.rol,
   };
-
 }
-
-
 
 // ==================================================
 // LEER VENTA VS PPTO
 // ==================================================
 
 function leerVentaVsPpto(hoja) {
-
   const datos =
     XLSX.utils.sheet_to_json(
       hoja,
@@ -640,116 +529,91 @@ function leerVentaVsPpto(hoja) {
       }
     );
 
-
   const mapa =
     new Map();
-
 
   for (
     let i = 0;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
 
     const supervisor =
       limpiarTexto(
         fila[0]
       );
 
-
     const presupuesto =
       Number(
         fila[1]
       );
-
 
     const ventas =
       Number(
         fila[2]
       );
 
-
     const restVsPpto =
       Number(
         fila[5]
       );
-
 
     if (
       esValorInvalido(
         supervisor
       )
     ) {
-
       continue;
-
     }
-
 
     if (
       supervisor === "SUPERVISOR" ||
       supervisor === "TOTAL"
     ) {
-
       continue;
-
     }
-
 
     if (
       !Number.isFinite(
         presupuesto
       )
     ) {
-
       continue;
-
     }
-
 
     if (
       !Number.isFinite(
         ventas
       )
     ) {
-
       continue;
-
     }
-
 
     const clave =
       normalizarNombre(
         supervisor
       );
 
-
     const presupuestoEntero =
       Math.round(
         presupuesto
       );
-
 
     const ventasEnteras =
       Math.round(
         ventas
       );
 
-
     let ventasFaltantes =
       0;
-
 
     if (
       Number.isFinite(
         restVsPpto
       )
     ) {
-
       ventasFaltantes =
         Math.max(
           Math.round(
@@ -759,23 +623,18 @@ function leerVentaVsPpto(hoja) {
           ),
           0
         );
-
     } else {
-
       ventasFaltantes =
         Math.max(
           presupuestoEntero -
           ventasEnteras,
           0
         );
-
     }
-
 
     mapa.set(
       clave,
       {
-
         supervisor,
 
         presupuesto:
@@ -785,24 +644,18 @@ function leerVentaVsPpto(hoja) {
           ventasEnteras,
 
         ventasFaltantes,
-
       }
     );
-
   }
 
-
   return mapa;
-
 }
-
 
 // ==================================================
 // LEER BD SIN VENTA
 // ==================================================
 
 function leerBDSinVenta(hoja) {
-
   const datos =
     XLSX.utils.sheet_to_json(
       hoja,
@@ -812,28 +665,19 @@ function leerBDSinVenta(hoja) {
       }
     );
 
-
   const mapa =
     new Map();
 
-
-  // ================================================
-  // BUSCAR ENCABEZADO
-  // ================================================
-
   let filaEncabezado =
     -1;
-
 
   for (
     let i = 0;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
 
     const contienePromotor =
       fila.some(
@@ -842,49 +686,30 @@ function leerBDSinVenta(hoja) {
           "PROMOTOR"
       );
 
-
     if (
       contienePromotor
     ) {
-
       filaEncabezado =
         i;
 
       break;
-
     }
-
   }
 
-
-  // ================================================
-  // COLUMNAS
-  // ================================================
-
   const COLUMNA_DIA_1 = 6;
-
   const COLUMNA_RX = 37;
-
   const COLUMNA_VENTAS_MES = 38;
-
-
-  // ================================================
-  // PROMOTOR
-  // ================================================
 
   let columnaPromotor =
     5;
 
-
   if (
     filaEncabezado >= 0
   ) {
-
     const encabezados =
       datos[
         filaEncabezado
       ];
-
 
     const indice =
       encabezados.findIndex(
@@ -893,38 +718,26 @@ function leerBDSinVenta(hoja) {
           "PROMOTOR"
       );
 
-
     if (
       indice >= 0
     ) {
-
       columnaPromotor =
         indice;
-
     }
-
   }
-
-
-  // ================================================
-  // RECORRER PROMOTORES
-  // ================================================
 
   const inicio =
     filaEncabezado >= 0
       ? filaEncabezado + 1
       : 0;
 
-
   for (
     let i = inicio;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
 
     const nombre =
       limpiarTexto(
@@ -933,59 +746,42 @@ function leerBDSinVenta(hoja) {
         ]
       );
 
-
     if (
       esValorInvalido(
         nombre
       )
     ) {
-
       continue;
-
     }
-
 
     if (
       nombre === "PROMOTOR" ||
       nombre === "SUPERVISOR" ||
       nombre === "TOTAL"
     ) {
-
       continue;
-
     }
-
-
-    // ==============================================
-    // DÍAS SIN VENTA
-    // ==============================================
 
     let diasSinVenta =
       0;
 
-
     const hoy =
       new Date();
-
 
     const año =
       hoy.getFullYear();
 
-
     const mes =
       hoy.getMonth();
 
-
     const diaActual =
       hoy.getDate();
-
 
     const ultimoDiaDisponible =
       Math.min(
         diaActual - 1,
         31
       );
-
 
     for (
       let numeroDia =
@@ -995,7 +791,6 @@ function leerBDSinVenta(hoja) {
 
       numeroDia--
     ) {
-
       const fecha =
         new Date(
           año,
@@ -1003,17 +798,11 @@ function leerBDSinVenta(hoja) {
           numeroDia
         );
 
-
-      // Domingo no cuenta
-
       if (
         fecha.getDay() === 0
       ) {
-
         continue;
-
       }
-
 
       const columna =
         COLUMNA_DIA_1 +
@@ -1021,12 +810,10 @@ function leerBDSinVenta(hoja) {
           numeroDia - 1
         );
 
-
       const venta =
         Number(
           fila[columna]
         );
-
 
       if (
         Number.isFinite(
@@ -1034,20 +821,11 @@ function leerBDSinVenta(hoja) {
         ) &&
         venta > 0
       ) {
-
         break;
-
       }
 
-
       diasSinVenta++;
-
     }
-
-
-    // ==============================================
-    // RX
-    // ==============================================
 
     let recuperaciones =
       Number(
@@ -1056,22 +834,14 @@ function leerBDSinVenta(hoja) {
         ]
       );
 
-
     if (
       !Number.isFinite(
         recuperaciones
       )
     ) {
-
       recuperaciones =
         0;
-
     }
-
-
-    // ==============================================
-    // VENTAS DEL MES
-    // ==============================================
 
     let ventasMesPromotor =
       Number(
@@ -1080,45 +850,32 @@ function leerBDSinVenta(hoja) {
         ]
       );
 
-
     if (
       !Number.isFinite(
         ventasMesPromotor
       )
     ) {
-
       ventasMesPromotor =
         0;
-
     }
-
 
     ventasMesPromotor =
       Math.round(
         ventasMesPromotor
       );
 
-
     mapa.set(
       nombre,
       {
-
         diasSinVenta,
-
         recuperaciones,
-
         ventasMesPromotor,
-
       }
     );
-
   }
 
-
   return mapa;
-
 }
-
 
 // ==================================================
 // LEER BD PLAN DE TRABAJO
@@ -1127,7 +884,6 @@ function leerBDSinVenta(hoja) {
 function leerBDPlanTrabajo(
   hoja
 ) {
-
   const datos =
     XLSX.utils.sheet_to_json(
       hoja,
@@ -1137,47 +893,22 @@ function leerBDPlanTrabajo(
       }
     );
 
-
   const resultado = [];
 
-
-  // ==================================================
-  // COLUMNAS
-  //
-  // D = Sucursal
-  // E = Colonia
-  // F = NSE
-  // I = Potenciales
-  // K = Activos Internet
-  // N = Penetración
-  // ==================================================
-
   const COLUMNA_SUCURSAL = 3;
-
   const COLUMNA_COLONIA = 4;
-
   const COLUMNA_NSE = 5;
-
   const COLUMNA_POTENCIALES = 8;
-
   const COLUMNA_ACTIVOS_INTERNET = 10;
-
   const COLUMNA_PENETRACION = 13;
-
-
-  // ==================================================
-  // RECORRER BASE
-  // ==================================================
 
   for (
     let i = 0;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
 
     const sucursal =
       limpiarTexto(
@@ -1186,14 +917,12 @@ function leerBDPlanTrabajo(
         ]
       );
 
-
     const colonia =
       limpiarTexto(
         fila[
           COLUMNA_COLONIA
         ]
       );
-
 
     const nse =
       limpiarTexto(
@@ -1202,56 +931,35 @@ function leerBDPlanTrabajo(
         ]
       );
 
-
-    // ==================================================
-    // FILTROS
-    // ==================================================
-
     if (
       esValorInvalido(
         sucursal
       )
     ) {
-
       continue;
-
     }
-
 
     if (
       esValorInvalido(
         colonia
       )
     ) {
-
       continue;
-
     }
-
 
     if (
       sucursal === "0" ||
       colonia === "0"
     ) {
-
       continue;
-
     }
-
 
     if (
       sucursal === "SUCURSAL" ||
       colonia === "COLONIA"
     ) {
-
       continue;
-
     }
-
-
-    // ==================================================
-    // POTENCIALES
-    // ==================================================
 
     let potenciales =
       Number(
@@ -1260,27 +968,19 @@ function leerBDPlanTrabajo(
         ]
       );
 
-
     if (
       !Number.isFinite(
         potenciales
       )
     ) {
-
-      potenciales = 0;
-
+      potenciales =
+        0;
     }
-
 
     potenciales =
       Math.round(
         potenciales
       );
-
-
-    // ==================================================
-    // ACTIVOS INTERNET
-    // ==================================================
 
     let activosInternet =
       Number(
@@ -1289,27 +989,19 @@ function leerBDPlanTrabajo(
         ]
       );
 
-
     if (
       !Number.isFinite(
         activosInternet
       )
     ) {
-
-      activosInternet = 0;
-
+      activosInternet =
+        0;
     }
-
 
     activosInternet =
       Math.round(
         activosInternet
       );
-
-
-    // ==================================================
-    // PENETRACIÓN
-    // ==================================================
 
     let penetracion =
       Number(
@@ -1318,39 +1010,22 @@ function leerBDPlanTrabajo(
         ]
       );
 
-
     if (
       !Number.isFinite(
         penetracion
       )
     ) {
-
-      penetracion = 0;
-
+      penetracion =
+        0;
     }
-
-
-    // ==================================================
-    // CONVERTIR A PORCENTAJE
-    //
-    // 0.36   → 36
-    // 0.3333 → 33.33
-    // ==================================================
 
     if (
       penetracion > 0 &&
       penetracion <= 1
     ) {
-
       penetracion =
-        penetracion*100;
-
+        penetracion * 100;
     }
-
-
-    // ==================================================
-    // POR VENDER
-    // ==================================================
 
     const porVender =
       Math.max(
@@ -1359,51 +1034,28 @@ function leerBDPlanTrabajo(
         0
       );
 
-
-    // ==================================================
-    // GUARDAR
-    // ==================================================
-
     resultado.push({
-
       sucursal,
-
       colonia,
-
       nse,
-
       potenciales,
-
       activosInternet,
-
       penetracion,
-
       porVender,
-
     });
-
   }
-
-
-  // ==================================================
-  // ELIMINAR DUPLICADOS
-  // ==================================================
 
   const registrosUnicos =
     Array.from(
       new Map(
         resultado.map(
           (registro) => [
-
             `${registro.sucursal}-${registro.colonia}`,
-
             registro,
-
           ]
         )
       ).values()
     );
-
 
   console.log(
     "=========================================="
@@ -1422,30 +1074,14 @@ function leerBDPlanTrabajo(
     "=========================================="
   );
 
-
   return registrosUnicos;
-
 }
-
 
 // ==================================================
 // LEER BD AVANCE SEMANAL
 // ==================================================
-//
-// A = Supervisor
-// D = Promotor
-// E = Productividad
-// F = Dobles
-// G = Triples
-// H = Móvil
-// I = Netflix
-// J = Disney+
-// K = MAX
-//
-// ==================================================
 
 function leerAvanceSemanal(hoja) {
-
   const datos =
     XLSX.utils.sheet_to_json(
       hoja,
@@ -1455,61 +1091,32 @@ function leerAvanceSemanal(hoja) {
       }
     );
 
-
   const registros = [];
-
-
-  // ==================================================
-  // RECORRER BASE
-  // ==================================================
 
   for (
     let i = 0;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
-
-    // ==================================================
-    // A = SUPERVISOR
-    // ==================================================
 
     const supervisor =
       limpiarTexto(
         fila[0]
       );
 
-
-    // ==================================================
-    // D = PROMOTOR
-    // ==================================================
-
     const nombre =
       limpiarTexto(
         fila[3]
       );
 
-
-    // ==================================================
-    // IGNORAR ENCABEZADOS
-    // ==================================================
-
     if (
       supervisor === "SUP" ||
       nombre === "PROMOTOR"
     ) {
-
       continue;
-
     }
-
-
-    // ==================================================
-    // IGNORAR FILAS VACÍAS
-    // ==================================================
 
     if (
       esValorInvalido(
@@ -1519,90 +1126,46 @@ function leerAvanceSemanal(hoja) {
         nombre
       )
     ) {
-
       continue;
-
     }
-
-
-    // ==================================================
-    // E = PRODUCTIVIDAD
-    // ==================================================
 
     const productividad =
       Number(
         fila[4]
       );
 
-
-    // ==================================================
-    // F = DOBLES
-    // ==================================================
-
     const dobles =
       Number(
         fila[5]
       );
-
-
-    // ==================================================
-    // G = TRIPLES
-    // ==================================================
 
     const triples =
       Number(
         fila[6]
       );
 
-
-    // ==================================================
-    // H = MEGA MÓVIL
-    // ==================================================
-
     const movil =
       Number(
         fila[7]
       );
-
-
-    // ==================================================
-    // I = NETFLIX
-    // ==================================================
 
     const netflix =
       Number(
         fila[8]
       );
 
-
-    // ==================================================
-    // J = DISNEY+
-    // ==================================================
-
     const disney =
       Number(
         fila[9]
       );
-
-
-    // ==================================================
-    // K = MAX
-    // ==================================================
 
     const max =
       Number(
         fila[10]
       );
 
-
-    // ==================================================
-    // GUARDAR
-    // ==================================================
-
     registros.push({
-
       supervisor,
-
       nombre,
 
       productividad:
@@ -1653,11 +1216,8 @@ function leerAvanceSemanal(hoja) {
         )
           ? max
           : 0,
-
     });
-
   }
-
 
   console.log(
     "📊 AVANCE SEMANAL CARGADO:",
@@ -1665,24 +1225,16 @@ function leerAvanceSemanal(hoja) {
     "promotores"
   );
 
-
   return registros;
-
 }
-
 
 // ==================================================
 // LEER DÍAS HÁBILES DESDE PRODUCTIVIDAD
 // ==================================================
-//
-// H1 = DÍAS HÁBILES TOTALES
-// H2 = DÍAS TRANSCURRIDOS
-// H3 = DÍAS POR TRANSCURRIR
-//
-// ==================================================
 
-function leerDiasHabiles(hojaProduccion) {
-
+function leerDiasHabiles(
+  hojaProduccion
+) {
   const datos =
     XLSX.utils.sheet_to_json(
       hojaProduccion,
@@ -1692,29 +1244,15 @@ function leerDiasHabiles(hojaProduccion) {
       }
     );
 
-
-  // ==================================================
-  // H1 = fila 1, columna H
-  // H2 = fila 2, columna H
-  // ==================================================
-
   const diasHabilesTotales =
     Number(
       datos[0]?.[7] ?? 0
     );
 
-
   const diasHabilesTranscurridos =
     Number(
       datos[1]?.[7] ?? 0
     );
-
-
-  // ==================================================
-  // DÍAS RESTANTES
-  //
-  // H3 = H1 - H2
-  // ==================================================
 
   const diasHabilesRestantes =
     Math.max(
@@ -1722,7 +1260,6 @@ function leerDiasHabiles(hojaProduccion) {
       diasHabilesTranscurridos,
       0
     );
-
 
   console.log(
     "📅 DÍAS HÁBILES:",
@@ -1738,18 +1275,13 @@ function leerDiasHabiles(hojaProduccion) {
     }
   );
 
-
   return {
-
     diasHabilesTotales,
-
     diasHabilesTranscurridos,
-
     diasHabilesRestantes,
-
   };
-
 }
+
 // ==================================================
 // LEER REGISTROS DE PRODUCTIVIDAD
 // ==================================================
@@ -1760,7 +1292,6 @@ function leerRegistros(
   hojaVentaVsPpto,
   diasHabiles
 ) {
-
   const datos =
     XLSX.utils.sheet_to_json(
       hojaProduccion,
@@ -1770,76 +1301,50 @@ function leerRegistros(
       }
     );
 
-
   const datosSinVenta =
     leerBDSinVenta(
       hojaSinVenta
     );
-
 
   const mapaVentaVsPpto =
     leerVentaVsPpto(
       hojaVentaVsPpto
     );
 
-
   const registros = [];
-
 
   let supervisorActual =
     "";
-
-
-  // ==============================================
-  // RECORRER PRODUCCIÓN
-  // ==============================================
 
   for (
     let i = 0;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
-
-    // A = Supervisor
 
     const columnaA =
       limpiarTexto(
         fila[0]
       );
 
-
-    // F = Promotor
-
     const columnaF =
       limpiarTexto(
         fila[5]
       );
 
-
-    // H = Productividad
-
     const columnaH =
       fila[7];
-
-
-    // ==========================================
-    // DETECTAR SUPERVISOR
-    // ==========================================
 
     if (
       columnaF ===
       "SUPERVISOR"
     ) {
-
       const nombreSupervisor =
         limpiarTexto(
           fila[7]
         );
-
 
       if (
         nombreSupervisor &&
@@ -1847,35 +1352,19 @@ function leerRegistros(
           nombreSupervisor
         )
       ) {
-
         supervisorActual =
           nombreSupervisor;
-
       }
 
-
       continue;
-
     }
-
-
-    // ==========================================
-    // IGNORAR ENCABEZADO
-    // ==========================================
 
     if (
       columnaF ===
       "PROMOTOR"
     ) {
-
       continue;
-
     }
-
-
-    // ==========================================
-    // SUPERVISOR EN A
-    // ==========================================
 
     if (
       columnaA &&
@@ -1883,40 +1372,26 @@ function leerRegistros(
         columnaA
       )
     ) {
-
       supervisorActual =
         columnaA;
-
     }
-
-
-    // ==========================================
-    // PROMOTOR
-    // ==========================================
 
     const nombrePromotor =
       columnaF;
 
-
     if (
       !nombrePromotor
     ) {
-
       continue;
-
     }
-
 
     if (
       esValorInvalido(
         nombrePromotor
       )
     ) {
-
       continue;
-
     }
-
 
     if (
       nombrePromotor ===
@@ -1924,15 +1399,8 @@ function leerRegistros(
       nombrePromotor ===
         "PROMOTOR"
     ) {
-
       continue;
-
     }
-
-
-    // ==========================================
-    // PRODUCTIVIDAD
-    // ==========================================
 
     const productividad =
       typeof columnaH === "number"
@@ -1941,70 +1409,49 @@ function leerRegistros(
             columnaH
           );
 
-
     if (
       !supervisorActual
     ) {
-
       continue;
-
     }
-
 
     if (
       !Number.isFinite(
         productividad
       )
     ) {
-
       continue;
-
     }
-
-
-    // ==========================================
-    // DATOS PROMOTOR
-    // ==========================================
 
     const datosPromotor =
       datosSinVenta.get(
         nombrePromotor
       );
 
-
     const diasSinVenta =
       datosPromotor
         ?.diasSinVenta ??
       0;
-
 
     const recuperaciones =
       datosPromotor
         ?.recuperaciones ??
       0;
 
-
     const ventasMesPromotor =
       datosPromotor
         ?.ventasMesPromotor ??
       0;
-
-
-    // ==========================================
-    // DATOS PPTO
-    // ==========================================
 
     const claveSupervisor =
       normalizarNombre(
         supervisorActual
       );
 
-
     const datosPpto =
       mapaVentaVsPpto.get(
         claveSupervisor
       );
-
 
     const presupuesto =
       Math.round(
@@ -2014,7 +1461,6 @@ function leerRegistros(
         )
       );
 
-
     const ventasMes =
       Math.round(
         Number(
@@ -2022,7 +1468,6 @@ function leerRegistros(
           0
         )
       );
-
 
     const ventasFaltantes =
       Math.round(
@@ -2032,36 +1477,18 @@ function leerRegistros(
         )
       );
 
-
-    // ==========================================
-    // DÍAS HÁBILES
-    // ==========================================
-
-   const diasHabilesRestantes =
-  diasHabiles.diasHabilesRestantes;
-
-
-    // ==========================================
-    // RITMO NECESARIO
-    // ==========================================
+    const diasHabilesRestantes =
+      diasHabiles.diasHabilesRestantes;
 
     const ventasPorDia =
       diasHabilesRestantes > 0
-
         ? Math.ceil(
             ventasFaltantes /
             diasHabilesRestantes
           )
-
         : ventasFaltantes;
 
-
-    // ==========================================
-    // GUARDAR
-    // ==========================================
-
     registros.push({
-
       supervisor:
         supervisorActual,
 
@@ -2085,58 +1512,28 @@ function leerRegistros(
       diasHabilesRestantes,
 
       ventasPorDia,
-
     });
-
   }
 
-
-  // ==============================================
-  // ELIMINAR DUPLICADOS
-  // ==============================================
-
   return Array.from(
-
     new Map(
-
       registros.map(
         (registro) => [
-
           `${registro.supervisor}-${registro.nombre}`,
-
           registro,
-
         ]
       )
-
     ).values()
-
   );
-
 }
-
-
-
 
 // ==================================================
 // RANKING DE SUPERVISORES
-// ==================================================
-//
-// Hoja: VENTA DIARIA POR SUPERVISOR
-//
-// Fila 18 = encabezados
-// C = Supervisor
-// E = Productividad
-//
-// Se excluye:
-// MORALES PEREZ BENJAMIN
-//
 // ==================================================
 
 function leerRankingSupervisores(
   hoja
 ) {
-
   const datos =
     XLSX.utils.sheet_to_json(
       hoja,
@@ -2146,35 +1543,19 @@ function leerRankingSupervisores(
       }
     );
 
-
   const ranking = [];
 
-
-  // ==========================================
-  // FILA 18 = ENCABEZADOS
-  // FILA 19 = PRIMER REGISTRO
-  // ==========================================
-
   const FILA_INICIO = 18;
-
-
-  // C = índice 2
   const COLUMNA_SUPERVISOR = 2;
-
-
-  // E = índice 4
   const COLUMNA_PRODUCTIVIDAD = 4;
-
 
   for (
     let i = FILA_INICIO;
     i < datos.length;
     i++
   ) {
-
     const fila =
       datos[i];
-
 
     const supervisor =
       limpiarTexto(
@@ -2183,7 +1564,6 @@ function leerRankingSupervisores(
         ]
       );
 
-
     const productividad =
       Number(
         fila[
@@ -2191,143 +1571,82 @@ function leerRankingSupervisores(
         ]
       );
 
-
-    // ==========================================
-    // FILTRAR
-    // ==========================================
-
     if (
       esValorInvalido(
         supervisor
       )
     ) {
-
       continue;
-
     }
-
 
     if (
       supervisor ===
       "SUPERVISOR"
     ) {
-
       continue;
-
     }
-
-
-    // ==========================================
-    // EXCLUIR BENJAMÍN
-    // ==========================================
 
     if (
       supervisor ===
       "MORALES PEREZ BENJAMIN"
     ) {
-
       continue;
-
     }
-
-
-    // ==========================================
-    // VALIDAR PRODUCTIVIDAD
-    // ==========================================
 
     if (
       !Number.isFinite(
         productividad
       )
     ) {
-
       continue;
-
     }
 
-
     ranking.push({
-
       supervisor,
-
       productividad,
-
     });
-
   }
-
-
-  // ==========================================
-  // ELIMINAR DUPLICADOS
-  // ==========================================
 
   const rankingUnico =
     Array.from(
-
       new Map(
-
         ranking.map(
           (registro) => [
-
             registro.supervisor,
-
             registro,
-
           ]
         )
-
       ).values()
-
     );
 
-
-  // ==========================================
-  // ORDENAR MAYOR → MENOR
-  // ==========================================
-
   rankingUnico.sort(
-
     (
       supervisorA,
       supervisorB
     ) =>
-
       supervisorB.productividad -
       supervisorA.productividad
-
   );
-
-
-  // ==========================================
-  // ASIGNAR POSICIÓN
-  // ==========================================
 
   const resultado =
     rankingUnico.map(
-
       (
         registro,
         index
       ) => ({
-
         ...registro,
 
         posicion:
           index + 1,
-
       })
-
     );
-
 
   console.log(
     "🏆 RANKING SUPERVISORES:",
     resultado
   );
 
-
   return resultado;
-
 }
 
 // ==================================================
@@ -2335,20 +1654,9 @@ function leerRankingSupervisores(
 // ==================================================
 
 function leerPlantilla() {
-
   try {
-
-    // ==============================================
-    // OBTENER EXCEL
-    // ==============================================
-
     const workbook =
       cargarExcel();
-
-
-    // ==============================================
-    // BUSCAR HOJA PLANTILLA
-    // ==============================================
 
     const nombreHoja =
       workbook.SheetNames.find(
@@ -2359,25 +1667,16 @@ function leerPlantilla() {
           "PLANTILLA"
       );
 
-
     if (!nombreHoja) {
-
       throw new Error(
         'No se encontró la hoja "PLANTILLA"'
       );
-
     }
-
 
     const hoja =
       workbook.Sheets[
         nombreHoja
       ];
-
-
-    // ==============================================
-    // CONVERTIR A FILAS
-    // ==============================================
 
     const datos =
       XLSX.utils.sheet_to_json(
@@ -2388,139 +1687,79 @@ function leerPlantilla() {
         }
       );
 
-
-    // ==============================================
-    // COLUMNAS
-    //
-    // X  = 23
-    // Y  = 24
-    // Z  = 25
-    // AA = 26
-    // AB = 27
-    // ==============================================
-
     const COLUMNA_PUESTO = 23;
     const COLUMNA_TOTAL = 24;
     const COLUMNA_ACT = 25;
     const COLUMNA_VAC = 26;
     const COLUMNA_TOT = 27;
 
-
     const registros = [];
-
-
-    // ==============================================
-    // RECORRER FILAS
-    // ==============================================
 
     for (
       let i = 0;
       i < datos.length;
       i++
     ) {
-
       const fila =
         datos[i];
-
 
       const puesto =
         limpiarTexto(
           fila[COLUMNA_PUESTO]
         );
 
-
-      // ==========================================
-      // IGNORAR ENCABEZADOS
-      // ==========================================
-
       if (
         !puesto ||
         puesto === "PUESTO"
       ) {
-
         continue;
-
       }
-
-
-      // ==========================================
-      // TOTAL
-      // ==========================================
 
       let total =
         Number(
           fila[COLUMNA_TOTAL]
         );
 
-
       if (
         !Number.isFinite(total)
       ) {
-
         total = 0;
-
       }
-
-
-      // ==========================================
-      // ACTIVOS
-      // ==========================================
 
       let activos =
         Number(
           fila[COLUMNA_ACT]
         );
 
-
       if (
         !Number.isFinite(activos)
       ) {
-
         activos = 0;
-
       }
-
-
-      // ==========================================
-      // VACANTES
-      // ==========================================
 
       let vacantes =
         Number(
           fila[COLUMNA_VAC]
         );
 
-
       if (
         !Number.isFinite(vacantes)
       ) {
-
         vacantes = 0;
-
       }
-
-
-      // ==========================================
-      // TOTAL DE CONTROL
-      // ==========================================
 
       let tot =
         Number(
           fila[COLUMNA_TOT]
         );
 
-
       if (
         !Number.isFinite(tot)
       ) {
-
         tot = total;
-
       }
 
-
       registros.push({
-
         puesto,
 
         total:
@@ -2534,15 +1773,8 @@ function leerPlantilla() {
 
         tot:
           Math.round(tot),
-
       });
-
     }
-
-
-    // ==============================================
-    // TOTALES GENERALES
-    // ==============================================
 
     const totalGeneral =
       registros.reduce(
@@ -2555,7 +1787,6 @@ function leerPlantilla() {
         0
       );
 
-
     const activosGeneral =
       registros.reduce(
         (
@@ -2566,7 +1797,6 @@ function leerPlantilla() {
           registro.activos,
         0
       );
-
 
     const vacantesGeneral =
       registros.reduce(
@@ -2579,7 +1809,6 @@ function leerPlantilla() {
         0
       );
 
-
     const cobertura =
       totalGeneral > 0
         ? (
@@ -2587,11 +1816,6 @@ function leerPlantilla() {
             totalGeneral
           ) * 100
         : 0;
-
-
-    // ==============================================
-    // LOG
-    // ==============================================
 
     console.log(
       "=========================================="
@@ -2625,9 +1849,7 @@ function leerPlantilla() {
       "=========================================="
     );
 
-
     return {
-
       registros,
 
       total:
@@ -2640,56 +1862,32 @@ function leerPlantilla() {
         vacantesGeneral,
 
       cobertura,
-
     };
 
-
   } catch (error) {
-
     console.error(
       "❌ ERROR EN STATUS DE PLANTILLA:",
       error
     );
 
-
     return {
-
       registros: [],
-
       total: 0,
-
       activos: 0,
-
       vacantes: 0,
-
       cobertura: 0,
-
     };
-
   }
-
 }
 
-
-  // ==================================================
+// ==================================================
 // 📊 VENTA VS MES ANTERIOR
 // ==================================================
 
 function leerVentaVsMesAnterior() {
-
   try {
-
-    // ==============================================
-    // OBTENER EXCEL
-    // ==============================================
-
     const workbook =
       cargarExcel();
-
-
-    // ==============================================
-    // BUSCAR HOJA
-    // ==============================================
 
     const nombreHoja =
       workbook.SheetNames.find(
@@ -2700,25 +1898,16 @@ function leerVentaVsMesAnterior() {
           "VS MES ANTERIOR"
       );
 
-
     if (!nombreHoja) {
-
       throw new Error(
         'No se encontró la hoja "VS MES ANTERIOR"'
       );
-
     }
-
 
     const hoja =
       workbook.Sheets[
         nombreHoja
       ];
-
-
-    // ==============================================
-    // CONVERTIR HOJA A FILAS
-    // ==============================================
 
     const datos =
       XLSX.utils.sheet_to_json(
@@ -2729,101 +1918,62 @@ function leerVentaVsMesAnterior() {
         }
       );
 
-
-    // ==============================================
-    // RESULTADO
-    // ==============================================
-
     const registros = [];
-
-
-    // ==============================================
-    // RECORRER FILAS
-    // ==============================================
 
     for (
       let i = 1;
       i < datos.length;
       i++
     ) {
-
       const fila =
         datos[i];
 
-
-      // A = SERVICIO
       const servicio =
         limpiarTexto(
           fila[0]
         );
 
-
-      // B = CANAL
       const canal =
         limpiarTexto(
           fila[1]
         );
 
-
-      // C = VENTAS
       const ventas =
         Number(
           fila[2]
         );
 
-
-      // D = MES
       const mes =
         limpiarTexto(
           fila[3]
         );
-
-
-      // ==========================================
-      // IGNORAR FILAS INVÁLIDAS
-      // ==========================================
 
       if (
         !servicio ||
         !canal ||
         !mes
       ) {
-
         continue;
-
       }
-
 
       if (
         servicio === "SERVICIO" ||
         canal === "CANAL" ||
         mes === "MES"
       ) {
-
         continue;
-
       }
-
 
       if (
         !Number.isFinite(
           ventas
         )
       ) {
-
         continue;
-
       }
 
-
-      // ==========================================
-      // GUARDAR
-      // ==========================================
-
       registros.push({
-
         servicio,
-
         canal,
 
         ventas:
@@ -2832,69 +1982,35 @@ function leerVentaVsMesAnterior() {
           ),
 
         mes,
-
       });
-
     }
 
-
-    // ==============================================
-    // SERVICIOS ÚNICOS
-    // ==============================================
-
     const servicios = [
-
       ...new Set(
-
         registros.map(
           (registro) =>
             registro.servicio
         )
-
-      )
-
+      ),
     ].sort();
 
-
-    // ==============================================
-    // CANALES ÚNICOS
-    // ==============================================
-
     const canales = [
-
       ...new Set(
-
         registros.map(
           (registro) =>
             registro.canal
         )
-
-      )
-
+      ),
     ].sort();
 
-
-    // ==============================================
-    // MESES ÚNICOS
-    // ==============================================
-
     const meses = [
-
       ...new Set(
-
         registros.map(
           (registro) =>
             registro.mes
         )
-
-      )
-
+      ),
     ];
-
-
-    // ==============================================
-    // LOG
-    // ==============================================
 
     console.log(
       "=========================================="
@@ -2928,6 +2044,345 @@ function leerVentaVsMesAnterior() {
       "=========================================="
     );
 
+    return {
+      registros,
+      servicios,
+      canales,
+      meses,
+    };
+
+  } catch (error) {
+    console.error(
+      "❌ ERROR EN VENTA VS MES ANTERIOR:",
+      error
+    );
+
+    return {
+      registros: [],
+      servicios: [],
+      canales: [],
+      meses: [],
+    };
+  }
+}
+
+// ==================================================
+// 📈 PRODUCTIVIDAD POR CANAL
+// ==================================================
+//
+// HOJA:
+// KPI´s ventas
+//
+// K = CANAL
+// L = VTA PROD
+// M = PROD
+// N = ESPACIO
+// O = VTA + RX
+// P = PROD + RX
+// Q = ESPACIO
+// R = DIFERENCIA
+//
+// Ejemplo:
+//
+// CANAL | VTA PROD | PROD | VTA + RX | PROD + RX | DIFERENCIA
+// CAM   |  ...     | 1.00 | ...      | 1.15      | +0.15
+//
+// ==================================================
+
+function leerProductividadPorCanal() {
+
+  try {
+
+    // ==============================================
+    // OBTENER EXCEL
+    // ==============================================
+
+    const workbook =
+      cargarExcel();
+
+
+    // ==============================================
+    // BUSCAR HOJA KPI´s ventas
+    // ==============================================
+
+    const nombreHoja =
+      workbook.SheetNames.find(
+        (nombre) =>
+          String(nombre)
+            .trim()
+            .toUpperCase() ===
+          "KPI´S VENTAS"
+      );
+
+
+    if (!nombreHoja) {
+
+      throw new Error(
+        'No se encontró la hoja "KPI´s ventas"'
+      );
+
+    }
+
+
+    const hoja =
+      workbook.Sheets[
+        nombreHoja
+      ];
+
+
+    // ==============================================
+    // CONVERTIR A FILAS
+    // ==============================================
+
+    const datos =
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+    // ==============================================
+    // COLUMNAS
+    // ==============================================
+
+    const COLUMNA_CANAL = 10;       // K
+    const COLUMNA_VTA_PROD = 11;    // L
+    const COLUMNA_PROD = 12;        // M
+    const COLUMNA_VTA_RX = 14;      // O
+    const COLUMNA_PROD_RX = 15;     // P
+    const COLUMNA_DIFERENCIA = 17;  // R
+
+
+    const registros = [];
+
+
+    // ==============================================
+    // RECORRER FILAS
+    // ==============================================
+
+    for (
+      let i = 0;
+      i < datos.length;
+      i++
+    ) {
+
+      const fila =
+        datos[i];
+
+
+      // ============================================
+      // CANAL
+      // ============================================
+
+      const canal =
+        limpiarTexto(
+          fila[
+            COLUMNA_CANAL
+          ]
+        );
+
+
+      // ============================================
+      // IGNORAR FILAS VACÍAS
+      // ============================================
+
+      if (
+        esValorInvalido(
+          canal
+        )
+      ) {
+
+        continue;
+
+      }
+
+
+      // ============================================
+      // IGNORAR ENCABEZADOS
+      // ============================================
+
+      if (
+        canal === "CANAL"
+      ) {
+
+        continue;
+
+      }
+
+
+      // ============================================
+      // VTA PROD
+      // ============================================
+
+      let vtaProd =
+        Number(
+          fila[
+            COLUMNA_VTA_PROD
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          vtaProd
+        )
+      ) {
+
+        vtaProd = 0;
+
+      }
+
+
+      // ============================================
+      // PRODUCTIVIDAD
+      // ============================================
+
+      let productividad =
+        Number(
+          fila[
+            COLUMNA_PROD
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          productividad
+        )
+      ) {
+
+        productividad = 0;
+
+      }
+
+
+      // ============================================
+      // VTA + RX
+      // ============================================
+
+      let vtaRx =
+        Number(
+          fila[
+            COLUMNA_VTA_RX
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          vtaRx
+        )
+      ) {
+
+        vtaRx = 0;
+
+      }
+
+
+      // ============================================
+      // PRODUCTIVIDAD + RX
+      // ============================================
+
+      let productividadRx =
+        Number(
+          fila[
+            COLUMNA_PROD_RX
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          productividadRx
+        )
+      ) {
+
+        productividadRx = 0;
+
+      }
+
+
+      // ============================================
+      // DIFERENCIA
+      // ============================================
+
+      let diferencia =
+        Number(
+          fila[
+            COLUMNA_DIFERENCIA
+          ]
+        );
+
+
+      // ============================================
+      // SI R NO VIENE NUMÉRICO
+      // CALCULAR M - P
+      // ============================================
+
+      if (
+        !Number.isFinite(
+          diferencia
+        )
+      ) {
+
+        diferencia =
+          productividadRx -
+          productividad;
+
+      }
+
+
+      // ============================================
+      // GUARDAR
+      // ============================================
+
+      registros.push({
+
+        canal,
+
+        vtaProd,
+
+        productividad,
+
+        vtaRx,
+
+        productividadRx,
+
+        diferencia,
+
+      });
+
+    }
+
+
+    // ==============================================
+    // LOG
+    // ==============================================
+
+    console.log(
+      "=========================================="
+    );
+
+    console.log(
+      "📈 PRODUCTIVIDAD POR CANAL"
+    );
+
+    console.log(
+      "📦 REGISTROS:",
+      registros.length
+    );
+
+    console.log(
+      registros
+    );
+
+    console.log(
+      "=========================================="
+    );
+
 
     // ==============================================
     // DEVOLVER
@@ -2937,19 +2392,13 @@ function leerVentaVsMesAnterior() {
 
       registros,
 
-      servicios,
-
-      canales,
-
-      meses,
-
     };
 
 
   } catch (error) {
 
     console.error(
-      "❌ ERROR EN VENTA VS MES ANTERIOR:",
+      "❌ ERROR EN PRODUCTIVIDAD POR CANAL:",
       error
     );
 
@@ -2958,30 +2407,14 @@ function leerVentaVsMesAnterior() {
 
       registros: [],
 
-      servicios: [],
-
-      canales: [],
-
-      meses: [],
-
     };
 
   }
 
 }
 
-
-
 // ==================================================
 // LEER EXCEL COMPLETO
-// ==================================================
-//
-// Por ahora conectamos:
-// ✅ USERS
-// ✅ BD PLAN DE TRABAJO
-//
-// Posteriormente agregaremos:
-// 📊 BD AVANCE SEMANAL
 // ==================================================
 
 async function leerExcel() {
@@ -3000,301 +2433,123 @@ async function leerExcel() {
 
   }
 
+
   try {
 
     const workbook =
       cargarExcel();
 
 
-
-      const hojaProduccion =
-  workbook.Sheets[
-    "PRODUCTIVIDAD"
-  ];
-
-const hojaSinVenta =
-  workbook.Sheets[
-    "BD SIN VENTA"
-  ];
-
-const hojaVentaVsPpto =
-  workbook.Sheets[
-    "VENTA VS PPTO"
-  ];
-
-
-if (
-  !hojaProduccion ||
-  !hojaSinVenta ||
-  !hojaVentaVsPpto
-) {
-
-  throw new Error(
-    "No se encontraron las hojas necesarias para REGISTROS"
-  );
-
-}
-
-
-const diasHabiles =
-  leerDiasHabiles(
-    hojaProduccion
-  );
-
-
-const registros =
-  leerRegistros(
-    hojaProduccion,
-    hojaSinVenta,
-    hojaVentaVsPpto,
-    diasHabiles
-  );
-
-// ==================================================
-// PLAN DE TRABAJO
-// ==================================================
-
-const HOJA_BD_PLAN_TRABAJO =
-  "BD PLAN DE TRABAJO";
-
-const HOJA_PLAN_TRABAJO =
-  "PLAN DE TRABAJO";
-
-
-// ==================================================
-// HOJA BD PLAN DE TRABAJO
-// ==================================================
-
-const hojaBDPlanTrabajo =
-  workbook.Sheets[
-    HOJA_BD_PLAN_TRABAJO
-  ];
-
-if (
-  !hojaBDPlanTrabajo
-) {
-
-  throw new Error(
-    `No se encontró la hoja "${HOJA_BD_PLAN_TRABAJO}"`
-  );
-
-}
-
-
-// ==================================================
-// HOJA PLAN DE TRABAJO
-// ==================================================
-
-const hojaPlanTrabajo =
-  workbook.Sheets[
-    HOJA_PLAN_TRABAJO
-  ];
-
-if (
-  !hojaPlanTrabajo
-) {
-
-  throw new Error(
-    `No se encontró la hoja "${HOJA_PLAN_TRABAJO}"`
-  );
-
-}
-
-
-// ==================================================
-// DATOS PLAN DE TRABAJO
-// ==================================================
-
-const planTrabajo =
-  leerPlanTrabajo(
-    hojaPlanTrabajo
-  );
-
-
-// ==================================================
-// PENETRACIÓN
-// ==================================================
-
-const penetracion =
-  leerBDPlanTrabajo(
-    hojaBDPlanTrabajo
-  );
-
-
-
-
-// ==================================================
-// LEER PLAN DE TRABAJO
-// ==================================================
-
-function leerPlanTrabajo(
-  hoja
-) {
-
-  const datos =
-    XLSX.utils.sheet_to_json(
-      hoja,
-      {
-        header: 1,
-        defval: "",
-      }
-    );
-
-
-  const resultado = [];
-
-
-  // ==================================================
-  // COLUMNAS PLAN DE TRABAJO
-  // ==================================================
-
-  const COLUMNA_SUPERVISOR = 0;
-  const COLUMNA_COLONIA = 4;
-  const COLUMNA_POTENCIALES = 9;
-  const COLUMNA_ACTIVOS = 10;
-  const COLUMNA_PENETRACION = 11;
-  const COLUMNA_VENTAS = 51;
-
-
-  // ==================================================
-  // RECORRER FILAS
-  // ==================================================
-
-  for (
-    let i = 0;
-    i < datos.length;
-    i++
-  ) {
-
-    const fila =
-      datos[i];
-
-
     // ==================================================
-    // SUPERVISOR
+    // PRODUCTIVIDAD
     // ==================================================
 
-    const supervisor =
-      limpiarTexto(
-        fila[
-          COLUMNA_SUPERVISOR
-        ]
+    const hojaProduccion =
+      workbook.Sheets[
+        "PRODUCTIVIDAD"
+      ];
+
+
+    const hojaSinVenta =
+      workbook.Sheets[
+        "BD SIN VENTA"
+      ];
+
+
+    const hojaVentaVsPpto =
+      workbook.Sheets[
+        "VENTA VS PPTO"
+      ];
+
+
+    if (
+      !hojaProduccion ||
+      !hojaSinVenta ||
+      !hojaVentaVsPpto
+    ) {
+
+      throw new Error(
+        "No se encontraron las hojas necesarias para REGISTROS"
+      );
+
+    }
+
+
+    const diasHabiles =
+      leerDiasHabiles(
+        hojaProduccion
+      );
+
+
+    const registros =
+      leerRegistros(
+        hojaProduccion,
+        hojaSinVenta,
+        hojaVentaVsPpto,
+        diasHabiles
       );
 
 
     // ==================================================
-    // COLONIA
+    // PLAN DE TRABAJO
     // ==================================================
 
-    const colonia =
-      limpiarTexto(
-        fila[
-          COLUMNA_COLONIA
-        ]
+    const HOJA_BD_PLAN_TRABAJO =
+      "BD PLAN DE TRABAJO";
+
+    const HOJA_PLAN_TRABAJO =
+      "PLAN DE TRABAJO";
+
+
+    // ==================================================
+    // HOJA BD PLAN DE TRABAJO
+    // ==================================================
+
+    const hojaBDPlanTrabajo =
+      workbook.Sheets[
+        HOJA_BD_PLAN_TRABAJO
+      ];
+
+
+    if (
+      !hojaBDPlanTrabajo
+    ) {
+
+      throw new Error(
+        `No se encontró la hoja "${HOJA_BD_PLAN_TRABAJO}"`
       );
 
-
-    // ==================================================
-    // FILTROS
-    // ==================================================
-
-    if (
-      esValorInvalido(
-        supervisor
-      )
-    ) {
-
-      continue;
-
-    }
-
-
-    if (
-      esValorInvalido(
-        colonia
-      )
-    ) {
-
-      continue;
-
-    }
-
-
-    if (
-      supervisor === "SUPERVISOR" ||
-      colonia === "COLONIA"
-    ) {
-
-      continue;
-
-    }
-
-
-    if (
-      supervisor === "0" ||
-      colonia === "0"
-    ) {
-
-      continue;
-
     }
 
 
     // ==================================================
-    // POTENCIALES
+    // HOJA PLAN DE TRABAJO
     // ==================================================
 
-    let potenciales =
-      Number(
-        fila[
-          COLUMNA_POTENCIALES
-        ]
+    const hojaPlanTrabajo =
+      workbook.Sheets[
+        HOJA_PLAN_TRABAJO
+      ];
+
+
+    if (
+      !hojaPlanTrabajo
+    ) {
+
+      throw new Error(
+        `No se encontró la hoja "${HOJA_PLAN_TRABAJO}"`
       );
 
-
-    if (
-      !Number.isFinite(
-        potenciales
-      )
-    ) {
-
-      potenciales = 0;
-
     }
 
 
-    potenciales =
-      Math.round(
-        potenciales
-      );
-
-
     // ==================================================
-    // ACTIVOS INTERNET
+    // DATOS PLAN DE TRABAJO
     // ==================================================
 
-    let activos =
-      Number(
-        fila[
-          COLUMNA_ACTIVOS
-        ]
-      );
-
-
-    if (
-      !Number.isFinite(
-        activos
-      )
-    ) {
-
-      activos = 0;
-
-    }
-
-
-    activos =
-      Math.round(
-        activos
+    const planTrabajo =
+      leerPlanTrabajo(
+        hojaPlanTrabajo
       );
 
 
@@ -3302,231 +2557,422 @@ function leerPlanTrabajo(
     // PENETRACIÓN
     // ==================================================
 
-    let penetracion =
-      Number(
-        fila[
-          COLUMNA_PENETRACION
-        ]
+    const penetracion =
+      leerBDPlanTrabajo(
+        hojaBDPlanTrabajo
       );
 
 
-    if (
-      !Number.isFinite(
-        penetracion
-      )
+    // ==================================================
+    // LEER PLAN DE TRABAJO
+    // ==================================================
+
+    function leerPlanTrabajo(
+      hoja
     ) {
 
-      penetracion = 0;
+      const datos =
+        XLSX.utils.sheet_to_json(
+          hoja,
+          {
+            header: 1,
+            defval: "",
+          }
+        );
+
+
+      const resultado = [];
+
+
+      // ==================================================
+      // COLUMNAS PLAN DE TRABAJO
+      // ==================================================
+
+      const COLUMNA_SUPERVISOR = 0;
+      const COLUMNA_COLONIA = 4;
+      const COLUMNA_POTENCIALES = 9;
+      const COLUMNA_ACTIVOS = 10;
+      const COLUMNA_PENETRACION = 11;
+      const COLUMNA_VENTAS = 51;
+
+
+      // ==================================================
+      // RECORRER FILAS
+      // ==================================================
+
+      for (
+        let i = 0;
+        i < datos.length;
+        i++
+      ) {
+
+        const fila =
+          datos[i];
+
+
+        // ==================================================
+        // SUPERVISOR
+        // ==================================================
+
+        const supervisor =
+          limpiarTexto(
+            fila[
+              COLUMNA_SUPERVISOR
+            ]
+          );
+
+
+        // ==================================================
+        // COLONIA
+        // ==================================================
+
+        const colonia =
+          limpiarTexto(
+            fila[
+              COLUMNA_COLONIA
+            ]
+          );
+
+
+        // ==================================================
+        // FILTROS
+        // ==================================================
+
+        if (
+          esValorInvalido(
+            supervisor
+          )
+        ) {
+
+          continue;
+
+        }
+
+
+        if (
+          esValorInvalido(
+            colonia
+          )
+        ) {
+
+          continue;
+
+        }
+
+
+        if (
+          supervisor === "SUPERVISOR" ||
+          colonia === "COLONIA"
+        ) {
+
+          continue;
+
+        }
+
+
+        if (
+          supervisor === "0" ||
+          colonia === "0"
+        ) {
+
+          continue;
+
+        }
+
+
+        // ==================================================
+        // POTENCIALES
+        // ==================================================
+
+        let potenciales =
+          Number(
+            fila[
+              COLUMNA_POTENCIALES
+            ]
+          );
+
+
+        if (
+          !Number.isFinite(
+            potenciales
+          )
+        ) {
+
+          potenciales = 0;
+
+        }
+
+
+        potenciales =
+          Math.round(
+            potenciales
+          );
+
+
+        // ==================================================
+        // ACTIVOS INTERNET
+        // ==================================================
+
+        let activos =
+          Number(
+            fila[
+              COLUMNA_ACTIVOS
+            ]
+          );
+
+
+        if (
+          !Number.isFinite(
+            activos
+          )
+        ) {
+
+          activos = 0;
+
+        }
+
+
+        activos =
+          Math.round(
+            activos
+          );
+
+
+        // ==================================================
+        // PENETRACIÓN
+        // ==================================================
+
+        let penetracion =
+          Number(
+            fila[
+              COLUMNA_PENETRACION
+            ]
+          );
+
+
+        if (
+          !Number.isFinite(
+            penetracion
+          )
+        ) {
+
+          penetracion = 0;
+
+        }
+
+
+        if (
+          penetracion > 0 &&
+          penetracion <= 1
+        ) {
+
+          penetracion =
+            penetracion * 100;
+
+        }
+
+
+        // ==================================================
+        // POR VENDER
+        // ==================================================
+
+        const porVender =
+          Math.max(
+            potenciales -
+            activos,
+            0
+          );
+
+
+        // ==================================================
+        // VENTAS
+        // ==================================================
+
+        let ventas =
+          Number(
+            fila[
+              COLUMNA_VENTAS
+            ]
+          );
+
+
+        if (
+          !Number.isFinite(
+            ventas
+          )
+        ) {
+
+          ventas = 0;
+
+        }
+
+
+        ventas =
+          Math.round(
+            ventas
+          );
+
+
+        // ==================================================
+        // GUARDAR
+        // ==================================================
+
+        resultado.push({
+
+          supervisor,
+
+          colonia,
+
+          potenciales,
+
+          penetracion,
+
+          porVender,
+
+          ventas,
+
+        });
+
+      }
+
+
+      // ==================================================
+      // ELIMINAR DUPLICADOS
+      // ==================================================
+
+      const registrosUnicos =
+        Array.from(
+
+          new Map(
+
+            resultado.map(
+              (registro) => [
+
+                `${registro.supervisor}-${registro.colonia}`,
+
+                registro,
+
+              ]
+            )
+
+          ).values()
+
+        );
+
+
+      console.log(
+        "=========================================="
+      );
+
+      console.log(
+        "🎯 PLAN DE TRABAJO CARGADO:",
+        registrosUnicos.length
+      );
+
+      console.log(
+        "🔎 EJEMPLO RINCONADA:",
+        registrosUnicos.find(
+          (registro) =>
+            registro.colonia ===
+            "RINCONADA DE LA PAZ"
+        )
+      );
+
+      console.log(
+        "=========================================="
+      );
+
+
+      return registrosUnicos;
 
     }
 
 
-    // Excel guarda:
-    //
-    // 0.06  → 6
-    // 0.12  → 12
-    // 0.3333 → 33.33
-    //
+    // ==================================================
+    // BD AVANCE SEMANAL
+    // ==================================================
+
+    const hojaAvanceSemanal =
+      workbook.Sheets[
+        "BD AVANCE SEMANAL"
+      ];
+
 
     if (
-      penetracion > 0 &&
-      penetracion <= 1
+      !hojaAvanceSemanal
     ) {
 
-      penetracion =
-        penetracion *100;
+      throw new Error(
+        'No se encontró la hoja "BD AVANCE SEMANAL"'
+      );
 
     }
 
 
-    // ==================================================
-    // POR VENDER
-    // ==================================================
-
-    const porVender =
-      Math.max(
-        potenciales -
-        activos,
-        0
+    const avanceSemanal =
+      leerAvanceSemanal(
+        hojaAvanceSemanal
       );
 
 
     // ==================================================
-    // VENTAS
+    // RANKING SUPERVISORES
     // ==================================================
 
-    let ventas =
-      Number(
-        fila[
-          COLUMNA_VENTAS
-        ]
-      );
+    const hojaRankingSupervisores =
+      workbook.Sheets[
+        "VENTA DIARIA POR SUPERVISOR"
+      ];
 
 
     if (
-      !Number.isFinite(
-        ventas
-      )
+      !hojaRankingSupervisores
     ) {
 
-      ventas = 0;
+      throw new Error(
+        'No se encontró la hoja "VENTA DIARIA POR SUPERVISOR"'
+      );
 
     }
 
 
-    ventas =
-      Math.round(
-        ventas
+    const rankingSupervisores =
+      leerRankingSupervisores(
+        hojaRankingSupervisores
       );
 
 
     // ==================================================
-    // GUARDAR REGISTRO
+    // 📈 PRODUCTIVIDAD POR CANAL
     // ==================================================
 
-    resultado.push({
+    const productividadPorCanal =
+      leerProductividadPorCanal();
 
-      supervisor,
 
-      colonia,
+    // ==================================================
+    // GUARDAR CACHE
+    // ==================================================
 
-      potenciales,
+    datosCacheados = {
+
+      registros,
+
+      planTrabajo,
 
       penetracion,
 
-      porVender,
+      avanceSemanal,
 
-      ventas,
+      rankingSupervisores,
 
-    });
+      productividadPorCanal,
 
-  }
-
-
-  // ==================================================
-  // ELIMINAR DUPLICADOS
-  // ==================================================
-
-  const registrosUnicos =
-    Array.from(
-      new Map(
-        resultado.map(
-          (registro) => [
-
-            `${registro.supervisor}-${registro.colonia}`,
-
-            registro,
-
-          ]
-        )
-      ).values()
-    );
+    };
 
 
-  // ==================================================
-  // LOG
-  // ==================================================
+    return datosCacheados;
 
-  console.log(
-    "=========================================="
-  );
-
-  console.log(
-    "🎯 PLAN DE TRABAJO CARGADO:",
-    registrosUnicos.length
-  );
-
-  console.log(
-    "🔎 EJEMPLO RINCONADA:",
-    registrosUnicos.find(
-      (registro) =>
-        registro.colonia ===
-        "RINCONADA DE LA PAZ"
-    )
-  );
-
-  console.log(
-    "=========================================="
-  );
-
-
-  return registrosUnicos;
-
-}
-
-
-// ==================================================
-// BD AVANCE SEMANAL
-// ==================================================
-
-const hojaAvanceSemanal =
-  workbook.Sheets[
-    "BD AVANCE SEMANAL"
-  ];
-
-
-if (
-  !hojaAvanceSemanal
-) {
-
-  throw new Error(
-    'No se encontró la hoja "BD AVANCE SEMANAL"'
-  );
-
-}
-
-
-const avanceSemanal =
-  leerAvanceSemanal(
-    hojaAvanceSemanal
-  );
-
-
-
-
-  // ==================================================
-// RANKING SUPERVISORES
-// ==================================================
-
-const hojaRankingSupervisores =
-  workbook.Sheets[
-    "VENTA DIARIA POR SUPERVISOR"
-  ];
-
-
-if (
-  !hojaRankingSupervisores
-) {
-
-  throw new Error(
-    'No se encontró la hoja "VENTA DIARIA POR SUPERVISOR"'
-  );
-
-}
-
-
-const rankingSupervisores =
-  leerRankingSupervisores(
-    hojaRankingSupervisores
-  );
-
-
-   datosCacheados = {
-
-  registros,
-
-  planTrabajo,
-
-  penetracion,
-
-  avanceSemanal,
-
-  rankingSupervisores,
-
-};
-
-
-return datosCacheados;
 
   } catch (error) {
 
@@ -3538,13 +2984,11 @@ return datosCacheados;
       error
     );
 
-
     throw error;
 
   }
 
 }
-
 
 // ==================================================
 // EXPORTACIONES
@@ -3561,6 +3005,8 @@ module.exports = {
   leerVentaVsMesAnterior,
 
   leerPlantilla,
+
+  leerProductividadPorCanal,
 
   descargarExcelDesdeSupabase,
 
