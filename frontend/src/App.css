@@ -5381,3 +5381,330 @@ body {
   }
 
 }
+
+
+
+/* =========================================================
+   👥 STATUS DE PLANTILLA
+========================================================= */
+
+.plantilla-status {
+  width: 100%;
+  max-width: 1200px;
+  margin: 24px auto 0;
+
+  background: #ffffff;
+
+  border-radius: 24px;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.plantilla-status-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 22px;
+}
+
+
+.plantilla-status-header > span {
+  font-size: 32px;
+}
+
+
+.plantilla-status-header h2 {
+  margin: 0;
+
+  font-size: 25px;
+
+  font-weight: 900;
+
+  color: #0f2347;
+}
+
+
+.plantilla-status-header p {
+  margin: 4px 0 0;
+
+  color: #64748b;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   KPIs
+========================================================= */
+
+.plantilla-kpis {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 16px;
+
+  margin-bottom: 24px;
+}
+
+
+.plantilla-kpi {
+  position: relative;
+
+  padding: 18px 20px;
+
+  background: #f8fafc;
+
+  border: 1px solid #dbe2e5;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+}
+
+
+.plantilla-kpi::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+  bottom: 0;
+
+  width: 5px;
+
+  background: #2563eb;
+}
+
+
+.plantilla-kpi small {
+  display: block;
+
+  color: #64748b;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.4px;
+}
+
+
+.plantilla-kpi strong {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #0f172a;
+
+  font-size: 26px;
+
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   ACTIVOS
+========================================================= */
+
+.plantilla-kpi-activos::before {
+  background: #16a34a;
+}
+
+
+/* =========================================================
+   VACANTES
+========================================================= */
+
+.plantilla-kpi-vacantes::before {
+  background: #dc2626;
+}
+
+
+/* =========================================================
+   COBERTURA
+========================================================= */
+
+.plantilla-kpi-cobertura::before {
+  background: #7c3aed;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.plantilla-tabla {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+
+.plantilla-tabla table {
+  width: 100%;
+
+  border-collapse: separate;
+
+  border-spacing: 0;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  border: 1px solid #dbe2e5;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.plantilla-tabla th {
+  padding: 13px 12px;
+
+  background: #2563eb;
+
+  color: white;
+
+  text-align: center;
+
+  font-size: 14px;
+
+  font-weight: 800;
+}
+
+
+.plantilla-tabla th:first-child {
+  text-align: left;
+}
+
+
+/* =========================================================
+   CELDAS
+========================================================= */
+
+.plantilla-tabla td {
+  padding: 11px 12px;
+
+  border-bottom: 1px solid #e2e8f0;
+
+  color: #0f172a;
+
+  text-align: center;
+
+  background: white;
+}
+
+
+.plantilla-tabla td:first-child {
+  text-align: left;
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.plantilla-tabla tbody tr:hover td {
+  background: #f1f5ff;
+}
+
+
+/* =========================================================
+   VACANTES
+========================================================= */
+
+.plantilla-vacante {
+  color: #dc2626 !important;
+
+  font-weight: 900;
+}
+
+
+.plantilla-sin-vacante {
+  color: #16a34a !important;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   TOTAL GENERAL
+========================================================= */
+
+.plantilla-total td {
+  background: #eef4ff !important;
+
+  color: #0f2347 !important;
+
+  font-weight: 900;
+
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.plantilla-error {
+  color: #dc2626 !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .plantilla-status {
+    padding: 18px;
+
+    border-radius: 18px;
+  }
+
+
+  .plantilla-kpis {
+    grid-template-columns:
+      1fr 1fr;
+
+    gap: 12px;
+  }
+
+
+  .plantilla-kpi {
+    padding: 15px;
+  }
+
+
+  .plantilla-kpi strong {
+    font-size: 22px;
+  }
+
+
+  .plantilla-tabla table {
+    min-width: 650px;
+  }
+
+}
