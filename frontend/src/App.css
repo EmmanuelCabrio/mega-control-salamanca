@@ -5708,3 +5708,525 @@ body {
   }
 
 }
+
+/* =========================================================
+   📈 PRODUCTIVIDAD POR CANAL
+   SEGUIMIENTO 2.0
+   ========================================================= */
+
+.productividad-por-canal {
+  width: 100%;
+  margin-top: 24px;
+  padding: 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #0b1220 0%,
+      #111b2e 55%,
+      #0b1220 100%
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  color: #ffffff;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  position: relative;
+}
+
+
+/* =========================================================
+   BRILLO SUPERIOR
+   ========================================================= */
+
+.productividad-por-canal::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #00a8ff,
+    #0072ff,
+    #6c5ce7
+  );
+
+  border-radius: 20px 20px 0 0;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.productividad-por-canal-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+
+  padding-bottom: 20px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.productividad-por-canal-header h2 {
+  margin: 0;
+
+  font-size: 25px;
+
+  font-weight: 800;
+
+  letter-spacing: -0.4px;
+
+  color: #ffffff;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+.productividad-por-canal-header p {
+  margin: 7px 0 0;
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+  color: #8fa3bf;
+
+  letter-spacing: 0.2px;
+}
+
+
+/* =========================================================
+   CONTENEDOR TABLA
+   ========================================================= */
+
+.productividad-por-canal-tabla {
+  width: 100%;
+
+  overflow-x: auto;
+
+  border-radius: 14px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(5, 12, 24, 0.55);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+
+/* =========================================================
+   TABLA
+   ========================================================= */
+
+.productividad-por-canal-tabla table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 620px;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   HEADER TABLA
+   ========================================================= */
+
+.productividad-por-canal-tabla thead {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(30, 53, 88, 0.95),
+      rgba(20, 38, 67, 0.95)
+    );
+}
+
+
+.productividad-por-canal-tabla th {
+  padding: 15px 18px;
+
+  text-align: center;
+
+  color: #a9c7ed;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.7px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  white-space: nowrap;
+}
+
+
+.productividad-por-canal-tabla th:first-child {
+  text-align: left;
+}
+
+
+/* =========================================================
+   CELDAS
+   ========================================================= */
+
+.productividad-por-canal-tabla td {
+  padding: 16px 18px;
+
+  text-align: center;
+
+  color: #dbe7f5;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.055);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.productividad-por-canal-tabla td:first-child {
+  text-align: left;
+}
+
+
+/* =========================================================
+   ÚLTIMA FILA
+   ========================================================= */
+
+.productividad-por-canal-tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.productividad-por-canal-tabla tbody tr:hover {
+  background:
+    rgba(0, 132, 255, 0.08);
+}
+
+
+.productividad-por-canal-tabla tbody tr:hover td {
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   NOMBRE DEL CANAL
+   ========================================================= */
+
+.productividad-por-canal-tabla td:first-child strong {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 58px;
+
+  padding: 7px 11px;
+
+  border-radius: 8px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 140, 255, 0.18),
+      rgba(72, 93, 255, 0.18)
+    );
+
+  border:
+    1px solid rgba(74, 153, 255, 0.20);
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   COLUMNAS DE PRODUCTIVIDAD
+   ========================================================= */
+
+.productividad-por-canal-tabla td:nth-child(2),
+.productividad-por-canal-tabla td:nth-child(3) {
+  font-size: 17px;
+
+  font-weight: 800;
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   PROD VTA
+   ========================================================= */
+
+.productividad-por-canal-tabla td:nth-child(2) {
+  color: #70b7ff;
+}
+
+
+/* =========================================================
+   PROD VTA + RX
+   ========================================================= */
+
+.productividad-por-canal-tabla td:nth-child(3) {
+  color: #65e6bd;
+}
+
+
+/* =========================================================
+   PLUS RX
+   ========================================================= */
+
+.productividad-por-canal-tabla td:nth-child(4) strong {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 65px;
+
+  padding: 7px 12px;
+
+  border-radius: 8px;
+
+  background:
+    rgba(39, 201, 150, 0.12);
+
+  border:
+    1px solid rgba(39, 201, 150, 0.22);
+
+  color: #54e0b1;
+
+  font-size: 15px;
+
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   VALOR NEGATIVO
+   ========================================================= */
+
+.productividad-por-canal-tabla td:nth-child(4) strong:has(
+  + *
+) {
+  color: #ff8b8b;
+}
+
+
+/* =========================================================
+   FILAS ALTERNADAS
+   ========================================================= */
+
+.productividad-por-canal-tabla tbody tr:nth-child(even) {
+  background:
+    rgba(255, 255, 255, 0.018);
+}
+
+
+.productividad-por-canal-tabla tbody tr:nth-child(even):hover {
+  background:
+    rgba(0, 132, 255, 0.08);
+}
+
+
+/* =========================================================
+   ESTADO SIN DATOS
+   ========================================================= */
+
+.productividad-por-canal-tabla td[colspan="4"] {
+  padding: 35px 20px;
+
+  text-align: center;
+
+  color: #8295ae;
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   ESTADO CARGANDO / ERROR
+   ========================================================= */
+
+.productividad-por-canal-header p {
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.productividad-por-canal-tabla::-webkit-scrollbar {
+  height: 7px;
+}
+
+
+.productividad-por-canal-tabla::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+
+.productividad-por-canal-tabla::-webkit-scrollbar-thumb {
+  background: rgba(86, 132, 190, 0.45);
+
+  border-radius: 10px;
+}
+
+
+.productividad-por-canal-tabla::-webkit-scrollbar-thumb:hover {
+  background: rgba(86, 132, 190, 0.70);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .productividad-por-canal {
+    padding: 22px;
+
+    border-radius: 16px;
+  }
+
+
+  .productividad-por-canal-header h2 {
+    font-size: 21px;
+  }
+
+
+  .productividad-por-canal-header p {
+    font-size: 13px;
+  }
+
+
+  .productividad-por-canal-tabla th {
+    padding: 13px 14px;
+  }
+
+
+  .productividad-por-canal-tabla td {
+    padding: 14px;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — CELULAR
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .productividad-por-canal {
+    margin-top: 16px;
+
+    padding: 17px;
+
+    border-radius: 14px;
+  }
+
+
+  .productividad-por-canal-header {
+    margin-bottom: 17px;
+
+    padding-bottom: 15px;
+  }
+
+
+  .productividad-por-canal-header h2 {
+    font-size: 18px;
+  }
+
+
+  .productividad-por-canal-header p {
+    font-size: 12px;
+
+    margin-top: 5px;
+  }
+
+
+  .productividad-por-canal-tabla {
+    border-radius: 11px;
+  }
+
+
+  .productividad-por-canal-tabla table {
+    min-width: 560px;
+  }
+
+
+  .productividad-por-canal-tabla th {
+    padding: 11px 12px;
+
+    font-size: 10px;
+  }
+
+
+  .productividad-por-canal-tabla td {
+    padding: 12px;
+
+    font-size: 13px;
+  }
+
+
+  .productividad-por-canal-tabla td:nth-child(2),
+  .productividad-por-canal-tabla td:nth-child(3) {
+    font-size: 15px;
+  }
+
+}
