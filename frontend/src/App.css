@@ -576,7 +576,6 @@ body {
   padding: 15px 12px;
   text-align: center;
 
-  /* Encabezado normal */
   position: static;
 
   box-shadow: none;
@@ -592,8 +591,6 @@ body {
 .tabla-ranking tr:last-child td {
   border-bottom: none;
 }
-
-
 /* =========================================================
    LOGIN
 ========================================================= */
