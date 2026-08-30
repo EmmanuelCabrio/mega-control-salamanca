@@ -2073,17 +2073,21 @@ function leerVentaVsMesAnterior() {
 // HOJA:
 // KPI´s ventas
 //
-// TABLA 1 — PROD VTA
-//
 // L = CANAL
 // M = PROD VTA
-//
-// TABLA 2 — PROD VTA + RX
 //
 // O = CANAL
 // P = PROD VTA + RX
 //
 // R = PLUS RX
+//
+// SOLO SE ACEPTAN:
+// CAM
+// PDV
+// EMP
+// REC
+// POOL
+// TOTAL
 //
 // ==================================================
 
@@ -2100,7 +2104,7 @@ function leerProductividadPorCanal() {
 
 
     // ==============================================
-    // BUSCAR HOJA KPI´s ventas
+    // BUSCAR HOJA
     // ==============================================
 
     const nombreHoja =
@@ -2143,39 +2147,67 @@ function leerProductividadPorCanal() {
 
 
     // ==============================================
-    // COLUMNAS REALES DEL EXCEL
+    // COLUMNAS
     // ==============================================
 
-    // TABLA PROD VTA
-    const COLUMNA_CANAL_PROD_VTA = 11;   // L
-    const COLUMNA_PROD_VTA = 12;         // M
+    const COLUMNA_CANAL_VTA = 11; // L
+
+    const COLUMNA_PROD_VTA = 12; // M
+
+    const COLUMNA_CANAL_RX = 14; // O
+
+    const COLUMNA_PROD_RX = 15; // P
+
+    const COLUMNA_PLUS_RX = 17; // R
 
 
-    // TABLA PROD VTA + RX
-    const COLUMNA_CANAL_PROD_RX = 14;    // O
-    const COLUMNA_PROD_RX = 15;          // P
+    // ==============================================
+    // CANALES VÁLIDOS
+    // ==============================================
+
+    const canalesValidos =
+      new Set([
+        "CAM",
+        "PDV",
+        "EMP",
+        "REC",
+        "POOL",
+        "TOTAL",
+      ]);
 
 
-    // PLUS RX
-    const COLUMNA_PLUS_RX = 17;          // R
+    // ==============================================
+    // ORDEN FINAL
+    // ==============================================
+
+    const ordenCanales = [
+      "CAM",
+      "PDV",
+      "EMP",
+      "REC",
+      "POOL",
+      "TOTAL",
+    ];
 
 
     // ==============================================
     // MAPAS
     // ==============================================
 
-    const mapaProdVta =
+    const mapaVenta =
       new Map();
 
-    const mapaProdRx =
+
+    const mapaVentaRx =
       new Map();
+
 
     const mapaPlusRx =
       new Map();
 
 
     // ==============================================
-    // LEER TABLA PROD VTA
+    // RECORRER FILAS
     // ==============================================
 
     for (
@@ -2188,362 +2220,193 @@ function leerProductividadPorCanal() {
         datos[i];
 
 
-      const canal =
+      // ============================================
+      // TABLA PROD VTA
+      // ============================================
+
+      const canalVenta =
         limpiarTexto(
           fila[
-            COLUMNA_CANAL_PROD_VTA
+            COLUMNA_CANAL_VTA
           ]
         );
 
 
       if (
-        esValorInvalido(
-          canal
+        canalesValidos.has(
+          canalVenta
         )
       ) {
 
-        continue;
-
-      }
-
-
-      if (
-        canal === "CANAL"
-      ) {
-
-        continue;
-
-      }
-
-
-      let productividad =
-        Number(
-          fila[
-            COLUMNA_PROD_VTA
-          ]
-        );
-
-
-      if (
-        !Number.isFinite(
-          productividad
-        )
-      ) {
-
-        continue;
-
-      }
-
-
-      mapaProdVta.set(
-        canal,
-        productividad
-      );
-
-    }
-
-
-    // ==============================================
-    // LEER TABLA PROD VTA + RX
-    // ==============================================
-
-    for (
-      let i = 0;
-      i < datos.length;
-      i++
-    ) {
-
-      const fila =
-        datos[i];
-
-
-      const canal =
-        limpiarTexto(
-          fila[
-            COLUMNA_CANAL_PROD_RX
-          ]
-        );
-
-
-      if (
-        esValorInvalido(
-          canal
-        )
-      ) {
-
-        continue;
-
-      }
-
-
-      if (
-        canal === "CANAL"
-      ) {
-
-        continue;
-
-      }
-
-
-      let productividadRx =
-        Number(
-          fila[
-            COLUMNA_PROD_RX
-          ]
-        );
-
-
-      if (
-        !Number.isFinite(
-          productividadRx
-        )
-      ) {
-
-        continue;
-
-      }
-
-
-      mapaProdRx.set(
-        canal,
-        productividadRx
-      );
-
-    }
-
-
-    // ==============================================
-    // LEER PLUS RX
-    // ==============================================
-
-    //
-    // La columna R contiene:
-    //
-    // CAM = 0.15
-    // PDV = 0.08
-    // EMP = 0
-    // REC = 0
-    // POOL = 0
-    //
-    // ==============================================
-
-    for (
-      let i = 0;
-      i < datos.length;
-      i++
-    ) {
-
-      const fila =
-        datos[i];
-
-
-      const canal =
-        limpiarTexto(
-          fila[
-            COLUMNA_CANAL_PROD_RX
-          ]
-        );
-
-
-      if (
-        esValorInvalido(
-          canal
-        )
-      ) {
-
-        continue;
-
-      }
-
-
-      if (
-        canal === "CANAL"
-      ) {
-
-        continue;
-
-      }
-
-
-      let plusRx =
-        Number(
-          fila[
-            COLUMNA_PLUS_RX
-          ]
-        );
-
-
-      if (
-        !Number.isFinite(
-          plusRx
-        )
-      ) {
-
-        continue;
-
-      }
-
-
-      mapaPlusRx.set(
-        canal,
-        plusRx
-      );
-
-    }
-
-
-    // ==============================================
-    // UNIR CANALES
-    // ==============================================
-
-    const canales =
-      new Set([
-        ...mapaProdVta.keys(),
-        ...mapaProdRx.keys(),
-        ...mapaPlusRx.keys(),
-      ]);
-
-
-    const registros = [];
-
-
-    // ==============================================
-    // CONSTRUIR RESULTADO FINAL
-    // ==============================================
-
-    for (
-      const canal of canales
-    ) {
-
-      const productividad =
-        Number(
-          mapaProdVta.get(
-            canal
-          ) ?? 0
-        );
-
-
-      const productividadRx =
-        Number(
-          mapaProdRx.get(
-            canal
-          ) ?? 0
-        );
-
-
-      const diferencia =
-        Number(
-          mapaPlusRx.get(
-            canal
+        const productividadVenta =
+          Number(
+            fila[
+              COLUMNA_PROD_VTA
+            ]
+          );
+
+
+        if (
+          Number.isFinite(
+            productividadVenta
           )
+        ) {
+
+          mapaVenta.set(
+            canalVenta,
+            productividadVenta
+          );
+
+        }
+
+      }
+
+
+      // ============================================
+      // TABLA PROD VTA + RX
+      // ============================================
+
+      const canalRx =
+        limpiarTexto(
+          fila[
+            COLUMNA_CANAL_RX
+          ]
         );
 
 
-      const diferenciaFinal =
-        Number.isFinite(
-          diferencia
+      if (
+        canalesValidos.has(
+          canalRx
         )
-          ? diferencia
-          : (
-              productividadRx -
-              productividad
-            );
+      ) {
+
+        const productividadVentaRx =
+          Number(
+            fila[
+              COLUMNA_PROD_RX
+            ]
+          );
 
 
-      registros.push({
+        if (
+          Number.isFinite(
+            productividadVentaRx
+          )
+        ) {
 
-        canal,
+          mapaVentaRx.set(
+            canalRx,
+            productividadVentaRx
+          );
 
-        // PROD VTA
-        vtaProd:
-          productividad,
+        }
 
-        productividad:
-          productividad,
 
-        // PROD VTA + RX
-        vtaRx:
-          productividadRx,
-
-        productividadRx:
-          productividadRx,
-
+        // ==========================================
         // PLUS RX
-        diferencia:
-          diferenciaFinal,
+        // ==========================================
 
-      });
+        const plusRx =
+          Number(
+            fila[
+              COLUMNA_PLUS_RX
+            ]
+          );
+
+
+        if (
+          Number.isFinite(
+            plusRx
+          )
+        ) {
+
+          mapaPlusRx.set(
+            canalRx,
+            plusRx
+          );
+
+        }
+
+      }
 
     }
 
 
     // ==============================================
-    // ORDEN DE CANALES
+    // CONSTRUIR RESULTADO
     // ==============================================
 
-    const ordenCanales = [
-      "CAM",
-      "EMP",
-      "PDV",
-      "REC",
-      "POOL",
-    ];
+    const registros =
+      ordenCanales
+        .filter(
+          (canal) =>
+            mapaVenta.has(
+              canal
+            ) ||
+            mapaVentaRx.has(
+              canal
+            )
+        )
+        .map(
+          (canal) => {
+
+            const productividadVenta =
+              Number(
+                mapaVenta.get(
+                  canal
+                ) ?? 0
+              );
 
 
-    registros.sort(
-      (
-        registroA,
-        registroB
-      ) => {
-
-        const posicionA =
-          ordenCanales.indexOf(
-            registroA.canal
-          );
-
-        const posicionB =
-          ordenCanales.indexOf(
-            registroB.canal
-          );
+            const productividadVentaRx =
+              Number(
+                mapaVentaRx.get(
+                  canal
+                ) ?? 0
+              );
 
 
-        if (
-          posicionA === -1 &&
-          posicionB === -1
-        ) {
-
-          return registroA.canal.localeCompare(
-            registroB.canal
-          );
-
-        }
+            let plusRx =
+              mapaPlusRx.get(
+                canal
+              );
 
 
-        if (
-          posicionA === -1
-        ) {
+            // ======================================
+            // SI R NO TRAE NÚMERO,
+            // CALCULAR P - M
+            //
+            // Esto también calcula TOTAL,
+            // porque en R7 aparece "TOTAL".
+            // ======================================
 
-          return 1;
+            if (
+              !Number.isFinite(
+                plusRx
+              )
+            ) {
 
-        }
+              plusRx =
+                productividadVentaRx -
+                productividadVenta;
+
+            }
 
 
-        if (
-          posicionB === -1
-        ) {
+            return {
 
-          return -1;
+              canal,
 
-        }
+              productividadVenta,
 
+              productividadVentaRx,
 
-        return (
-          posicionA -
-          posicionB
+              plusRx,
+
+            };
+
+          }
         );
-
-      }
-    );
 
 
     // ==============================================
@@ -2600,7 +2463,6 @@ function leerProductividadPorCanal() {
   }
 
 }
-
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
