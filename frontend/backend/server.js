@@ -10,6 +10,7 @@ const {
   leerExcel,
   leerVentaVsMesAnterior,
   leerPlantilla,
+  leerProductividadPorCanal,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
@@ -1197,6 +1198,61 @@ app.get(
 
         mensaje:
           "No se pudo cargar el status de plantilla",
+
+      });
+
+    }
+
+  }
+);
+
+// ==================================================
+// 📊 PRODUCTIVIDAD POR CANAL
+// ==================================================
+
+app.get(
+  "/api/productividad-por-canal",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      console.log(
+        "📊 CONSULTANDO PRODUCTIVIDAD POR CANAL..."
+      );
+
+
+      const datos =
+        leerProductividadPorCanal();
+
+
+      return res.json({
+
+        correcto: true,
+
+        registros:
+          datos.registros || [],
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/productividad-por-canal:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar la productividad por canal",
 
       });
 
