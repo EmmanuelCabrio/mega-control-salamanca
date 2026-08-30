@@ -4934,3 +4934,96 @@ body {
 .boton-siguiente-foco:hover {
   background: #eff6ff;
 }
+
+/* =========================================================
+   ACCIONES RANKING CLUSTER
+========================================================= */
+
+.ranking-acciones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   BOTÓN EXPORTAR RANKING
+========================================================= */
+
+.boton-exportar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 22px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  border: none;
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+
+/* Hover */
+
+.boton-exportar:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+
+/* Cuando se presiona */
+
+.boton-exportar:active {
+  transform: translateY(0);
+
+  box-shadow: 0 3px 7px rgba(37, 99, 235, 0.25);
+}
+
+
+/* =========================================================
+   BOTÓN REGRESAR
+========================================================= */
+
+.ranking-acciones .boton-regresar {
+  margin-top: 0;
+}
+
+
+/* =========================================================
+   RESPONSIVE — CELULAR
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .ranking-acciones {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .ranking-acciones button {
+    width: 100%;
+    max-width: 320px;
+  }
+
+}
