@@ -1,3 +1,4 @@
+```jsx
 import React, {
   useEffect,
   useState
@@ -131,13 +132,17 @@ function ProductividadPorCanal() {
 
         <div className="productividad-por-canal-header">
 
-          <h2>
-            📈 Productividad por Canal
-          </h2>
+          <div>
 
-          <p>
-            Cargando información...
-          </p>
+            <h2>
+              📈 Productividad por Canal
+            </h2>
+
+            <p>
+              Cargando información...
+            </p>
+
+          </div>
 
         </div>
 
@@ -162,13 +167,17 @@ function ProductividadPorCanal() {
 
         <div className="productividad-por-canal-header">
 
-          <h2>
-            📈 Productividad por Canal
-          </h2>
+          <div>
 
-          <p>
-            🔴 {error}
-          </p>
+            <h2>
+              📈 Productividad por Canal
+            </h2>
+
+            <p>
+              🔴 {error}
+            </p>
+
+          </div>
 
         </div>
 
@@ -245,70 +254,89 @@ function ProductividadPorCanal() {
           <tbody>
 
             {registros.map(
-              (registro, index) => (
+              (registro, index) => {
 
-                <tr
-                  key={
-                    `${registro.canal}-${index}`
-                  }
-                >
+                const productividad =
+                  Number(
+                    registro.productividad ?? 0
+                  );
 
-                  {/* CANAL */}
+                const productividadRx =
+                  Number(
+                    registro.productividadRx ?? 0
+                  );
 
-                  <td>
-
-                    <strong>
-                      {registro.canal}
-                    </strong>
-
-                  </td>
-
-
-                  {/* PRODUCTIVIDAD VENTA */}
-
-                  <td>
-
-                    {Number(
-                      registro.productividadVenta ?? 0
-                    ).toFixed(2)}
-
-                  </td>
+                const plusRx =
+                  Number(
+                    registro.diferencia ?? 0
+                  );
 
 
-                  {/* PRODUCTIVIDAD VENTA + RX */}
+                return (
 
-                  <td>
+                  <tr
+                    key={
+                      `${registro.canal}-${index}`
+                    }
+                  >
 
-                    {Number(
-                      registro.productividadVentaRx ?? 0
-                    ).toFixed(2)}
+                    {/* ==================================
+                        CANAL
+                    ================================== */}
 
-                  </td>
+                    <td>
+
+                      <strong>
+                        {registro.canal}
+                      </strong>
+
+                    </td>
 
 
-                  {/* PLUS RX */}
+                    {/* ==================================
+                        PRODUCTIVIDAD VENTA
+                    ================================== */}
 
-                  <td>
+                    <td>
 
-                    <strong>
+                      {productividad.toFixed(2)}
 
-                      {Number(
-                        registro.plusRx ?? 0
-                      ) > 0
-                        ? `+${Number(
-                            registro.plusRx
-                          ).toFixed(2)}`
-                        : Number(
-                            registro.plusRx ?? 0
-                          ).toFixed(2)}
+                    </td>
 
-                    </strong>
 
-                  </td>
+                    {/* ==================================
+                        PRODUCTIVIDAD VENTA + RX
+                    ================================== */}
 
-                </tr>
+                    <td>
 
-              )
+                      {productividadRx.toFixed(2)}
+
+                    </td>
+
+
+                    {/* ==================================
+                        PLUS RX
+                    ================================== */}
+
+                    <td>
+
+                      <strong>
+
+                        {plusRx > 0
+                          ? `+${plusRx.toFixed(2)}`
+                          : plusRx.toFixed(2)
+                        }
+
+                      </strong>
+
+                    </td>
+
+                  </tr>
+
+                );
+
+              }
             )}
 
 
@@ -347,3 +375,4 @@ function ProductividadPorCanal() {
 
 
 export default ProductividadPorCanal;
+```
