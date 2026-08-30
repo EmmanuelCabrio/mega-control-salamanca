@@ -5165,13 +5165,11 @@ body {
 
 .venta-vs-mes-anterior-tabla table {
   width: 100%;
-
   border-collapse: separate;
   border-spacing: 0;
-
   min-width: 700px;
 
-  font-size: 15px;
+  font-size: 13px;
 }
 
 
@@ -5180,12 +5178,13 @@ body {
 ========================================================= */
 
 .venta-vs-mes-anterior-tabla th {
-  padding: 15px 14px;
+  padding: 13px 12px;
 
   background: #2563eb;
 
   color: #ffffff;
 
+  font-size: 14px;
   font-weight: 700;
 
   text-align: center;
