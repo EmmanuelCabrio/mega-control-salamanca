@@ -5029,23 +5029,33 @@ body {
 }
 
 /* =========================================================
-   VENTAS VS MES ANTERIOR
-   ========================================================= */
+   📊 VENTA VS MES ANTERIOR
+========================================================= */
 
 .venta-vs-mes-anterior {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px;
-  box-sizing: border-box;
-
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 24px;
+  padding: 28px;
+  box-sizing: border-box;
+}
 
-  box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.08);
 
-  color: #172033;
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.venta-vs-mes-anterior h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: #0f2347;
+}
+
+.venta-vs-mes-anterior > div:first-child p {
+  margin: 4px 0 0;
+  font-size: 17px;
+  color: #111827;
 }
 
 
@@ -5054,69 +5064,115 @@ body {
 ========================================================= */
 
 .venta-vs-mes-anterior-filtros {
+  margin-top: 18px;
+
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  align-items: center;
 
-  margin-bottom: 22px;
-  padding: 18px 20px;
+  gap: 20px;
 
-  background: linear-gradient(
-    135deg,
-    #f8fafc,
-    #eef4ff
-  );
+  padding: 20px 22px;
 
-  border: 1px solid #dbe4f0;
-  border-radius: 14px;
+  background: #f3f7ff;
+
+  border: 1px solid #d8e2f2;
+
+  border-radius: 18px;
 
   box-shadow:
-    0 4px 14px rgba(15, 23, 42, 0.05);
+    0 8px 22px rgba(15, 35, 71, 0.06);
+}
+
+
+.venta-vs-mes-anterior-filtros > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.venta-vs-mes-anterior-filtros label {
+  font-size: 16px;
+  color: #0f2347;
+  font-weight: 500;
+}
+
+
+.venta-vs-mes-anterior-filtros select {
+  min-width: 210px;
+
+  padding: 11px 16px;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 10px;
+
+  background: white;
+
+  color: #0f2347;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  outline: none;
+
+  cursor: pointer;
+}
+
+
+.venta-vs-mes-anterior-filtros select:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 
 /* =========================================================
-   RESUMEN
+   RESUMEN / KPIs
 ========================================================= */
 
 .venta-vs-mes-anterior-resumen {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(220px, 1fr)
-  );
 
-  gap: 16px;
+  grid-template-columns:
+    repeat(4, 1fr);
 
-  margin-bottom: 24px;
+  gap: 18px;
+
+  margin-top: 24px;
 }
 
-
-/* =========================================================
-   TARJETAS DEL RESUMEN
-========================================================= */
 
 .venta-vs-mes-anterior-resumen > div {
   position: relative;
 
-  padding: 20px 22px;
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  min-height: 72px;
+
+  padding: 18px 20px;
 
   background: #ffffff;
 
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  border: 1px solid #dbe2e5;
 
-  overflow: hidden;
+  border-radius: 18px;
 
   box-shadow:
-    0 6px 18px rgba(15, 23, 42, 0.07);
+    0 8px 20px rgba(15, 35, 71, 0.07);
 
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
+
+/* Línea azul lateral */
 
 .venta-vs-mes-anterior-resumen > div::before {
   content: "";
@@ -5133,11 +5189,21 @@ body {
 }
 
 
-.venta-vs-mes-anterior-resumen > div:hover {
-  transform: translateY(-3px);
+.venta-vs-mes-anterior-resumen small {
+  font-size: 14px;
 
-  box-shadow:
-    0 10px 24px rgba(15, 23, 42, 0.11);
+  color: #0f2347;
+
+  margin-bottom: 5px;
+}
+
+
+.venta-vs-mes-anterior-resumen strong {
+  font-size: 24px;
+
+  color: #0f2347;
+
+  font-weight: 800;
 }
 
 
@@ -5148,61 +5214,55 @@ body {
 .venta-vs-mes-anterior-tabla {
   width: 100%;
 
+  margin-top: 28px;
+
   overflow-x: auto;
-
-  border-radius: 14px;
-
-  border: 1px solid #dbe2ea;
-
-  box-shadow:
-    0 5px 16px rgba(15, 23, 42, 0.06);
 }
 
-
-/* =========================================================
-   TABLA INTERNA
-========================================================= */
 
 .venta-vs-mes-anterior-tabla table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  min-width: 700px;
 
-  font-size: 13px;
+  border-collapse: separate;
+
+  border-spacing: 0;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+
+  border: 1px solid #dbe2e5;
+
+  font-size: 16px;
 }
 
 
 /* =========================================================
-   ENCABEZADOS
+   ENCABEZADO TABLA
 ========================================================= */
 
 .venta-vs-mes-anterior-tabla th {
-  padding: 13px 12px;
+  padding: 15px 14px;
 
   background: #2563eb;
 
-  color: #ffffff;
-
-  font-size: 14px;
-  font-weight: 700;
+  color: white;
 
   text-align: center;
 
-  white-space: nowrap;
+  font-size: 16px;
 
-  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 800;
 }
 
 
 .venta-vs-mes-anterior-tabla th:first-child {
-  border-top-left-radius: 13px;
+  border-top-left-radius: 16px;
 }
 
 
 .venta-vs-mes-anterior-tabla th:last-child {
-  border-top-right-radius: 13px;
-  border-right: none;
+  border-top-right-radius: 16px;
 }
 
 
@@ -5211,148 +5271,40 @@ body {
 ========================================================= */
 
 .venta-vs-mes-anterior-tabla td {
-  padding: 13px 14px;
+  padding: 14px;
 
   text-align: center;
 
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e2e8f0;
 
-  color: #1f2937;
+  color: #0f172a;
 
   background: #ffffff;
 }
 
 
-/* =========================================================
-   PRIMERA COLUMNA
-========================================================= */
-
 .venta-vs-mes-anterior-tabla td:first-child {
-  font-weight: 700;
   text-align: left;
 }
 
 
-/* =========================================================
-   HOVER
-========================================================= */
-
-.venta-vs-mes-anterior-tabla tbody tr {
-  transition:
-    background-color 0.15s ease;
-}
-
-
 .venta-vs-mes-anterior-tabla tbody tr:hover td {
-  background: #f3f7ff;
+  background: #f1f5ff;
 }
 
 
 /* =========================================================
-   ÚLTIMA FILA
+   FILA TOTAL
 ========================================================= */
 
 .venta-vs-mes-anterior-tabla tbody tr:last-child td {
+  background: #eef4ff;
+
+  color: #0f2347;
+
+  font-weight: 800;
+
   border-bottom: none;
-}
-
-
-/* =========================================================
-   NÚMEROS POSITIVOS
-========================================================= */
-
-.venta-vs-mes-anterior-tabla td.positivo {
-  color: #15803d;
-  font-weight: 800;
-}
-
-
-/* =========================================================
-   NÚMEROS NEGATIVOS
-========================================================= */
-
-.venta-vs-mes-anterior-tabla td.negativo {
-  color: #dc2626;
-  font-weight: 800;
-}
-
-
-/* =========================================================
-   SELECTS / INPUTS DENTRO DEL MÓDULO
-========================================================= */
-
-.venta-vs-mes-anterior select,
-.venta-vs-mes-anterior input {
-  padding: 10px 13px;
-
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-
-  background: #ffffff;
-
-  color: #172033;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-
-.venta-vs-mes-anterior select:focus,
-.venta-vs-mes-anterior input:focus {
-  border-color: #2563eb;
-
-  box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.14);
-}
-
-
-/* =========================================================
-   BOTONES DEL MÓDULO
-========================================================= */
-
-.venta-vs-mes-anterior button {
-  padding: 10px 17px;
-
-  border: none;
-  border-radius: 10px;
-
-  background: #2563eb;
-
-  color: #ffffff;
-
-  font-size: 14px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 5px 12px rgba(37, 99, 235, 0.22);
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease;
-}
-
-
-.venta-vs-mes-anterior button:hover {
-  background: #1d4ed8;
-
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 7px 16px rgba(37, 99, 235, 0.28);
-}
-
-
-.venta-vs-mes-anterior button:active {
-  transform: translateY(0);
 }
 
 
@@ -5360,24 +5312,59 @@ body {
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
 
   .venta-vs-mes-anterior {
-    padding: 14px;
-    border-radius: 14px;
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+
+  .venta-vs-mes-anterior h2 {
+    font-size: 24px;
+  }
+
+
+  .venta-vs-mes-anterior > div:first-child p {
+    font-size: 15px;
   }
 
 
   .venta-vs-mes-anterior-filtros {
     flex-direction: column;
+
     align-items: stretch;
 
-    padding: 14px;
+    padding: 16px;
+  }
+
+
+  .venta-vs-mes-anterior-filtros > div {
+    justify-content: space-between;
+  }
+
+
+  .venta-vs-mes-anterior-filtros select {
+    min-width: 0;
+
+    width: 65%;
   }
 
 
   .venta-vs-mes-anterior-resumen {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+  }
+
+
+  .venta-vs-mes-anterior-resumen > div {
+    padding: 14px;
+  }
+
+
+  .venta-vs-mes-anterior-resumen strong {
+    font-size: 21px;
   }
 
 
@@ -5388,13 +5375,6 @@ body {
 
   .venta-vs-mes-anterior-tabla table {
     min-width: 650px;
-    font-size: 13px;
-  }
-
-
-  .venta-vs-mes-anterior-tabla th,
-  .venta-vs-mes-anterior-tabla td {
-    padding: 10px 9px;
   }
 
 }
