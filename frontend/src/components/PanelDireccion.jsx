@@ -3,6 +3,9 @@ import React from "react";
 import VentaVsMesAnterior
   from "./VentaVsMesAnterior";
 
+import PlantillaStatus
+from "./PlantillaStatus";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -100,7 +103,8 @@ function PanelDireccion({
   </div>
 
 </section>
-
+      
+<PlantillaStatus />
 
 <VentaVsMesAnterior />
 
