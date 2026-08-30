@@ -4,7 +4,10 @@ import VentaVsMesAnterior
   from "./VentaVsMesAnterior";
 
 import PlantillaStatus
-from "./PlantillaStatus";
+  from "./PlantillaStatus";
+
+import ProductividadPorCanal
+  from "./ProductividadPorCanal";
 
 
 // ==================================================
@@ -80,33 +83,38 @@ function PanelDireccion({
           CENTRO DE CONTROL COMERCIAL
       ================================================== */}
 
-     <section className="panel-direccion-proximamente">
+      <section className="panel-direccion-proximamente">
 
-  <div>
+        <div>
 
-    <span>
-      🚀
-    </span>
+          <span>
+            🚀
+          </span>
 
-    <div>
+          <div>
 
-      <h2>
-        Centro de control comercial
-      </h2>
+            <h2>
+              Centro de control comercial
+            </h2>
 
-      <p>
-        Indicadores estratégicos de Dirección.
-      </p>
+            <p>
+              Indicadores estratégicos de Dirección.
+            </p>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-</section>
-      
-<PlantillaStatus />
+      </section>
 
-<VentaVsMesAnterior />
+
+      <PlantillaStatus />
+
+
+      <VentaVsMesAnterior />
+
+
+      <ProductividadPorCanal />
 
 
     </div>
