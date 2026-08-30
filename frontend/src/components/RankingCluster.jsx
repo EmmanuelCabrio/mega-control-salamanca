@@ -52,21 +52,126 @@ function RankingCluster({
       return;
     }
 
+    const contenedor = rankingRef.current;
+
+    // Elementos cuyo estilo modificaremos temporalmente
+    const encabezados =
+      contenedor.querySelectorAll(".ranking-header");
+
+    const titulos =
+      contenedor.querySelectorAll("h2");
+
+
+    // Guardar estilos originales
+    const estilosEncabezados =
+      Array.from(encabezados).map(
+        (elemento) => ({
+          position: elemento.style.position,
+          top: elemento.style.top,
+          zIndex: elemento.style.zIndex
+        })
+      );
+
+
+    const estilosTitulos =
+      Array.from(titulos).map(
+        (elemento) => ({
+          color: elemento.style.color,
+          backgroundColor:
+            elemento.style.backgroundColor
+        })
+      );
+
+
+    // Guardar estilo original del contenedor
+    const estiloContenedor = {
+      backgroundColor:
+        contenedor.style.backgroundColor,
+      color:
+        contenedor.style.color
+    };
+
+
     try {
 
-      const canvas = await html2canvas(
-        rankingRef.current,
-        {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff"
+      // ==================================================
+      // PREPARAR CONTENEDOR PARA EXPORTACIÓN
+      // ==================================================
+
+      contenedor.style.backgroundColor = "#ffffff";
+      contenedor.style.color = "#111111";
+
+
+      // ==================================================
+      // EVITAR QUE EL HEADER STICKY SE REPITA
+      // ==================================================
+
+      encabezados.forEach(
+        (elemento) => {
+
+          elemento.style.position = "static";
+          elemento.style.top = "auto";
+          elemento.style.zIndex = "auto";
+
         }
       );
 
 
+      // ==================================================
+      // HACER VISIBLE EL TÍTULO SOBRE FONDO BLANCO
+      // ==================================================
+
+      titulos.forEach(
+        (elemento) => {
+
+          elemento.style.color = "#111111";
+          elemento.style.backgroundColor =
+            "transparent";
+
+        }
+      );
+
+
+      // ==================================================
+      // ESPERAR A QUE EL NAVEGADOR APLIQUE LOS CAMBIOS
+      // ==================================================
+
+      await new Promise(
+        (resolve) => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(resolve);
+          });
+        }
+      );
+
+
+      // ==================================================
+      // GENERAR CAPTURA
+      // ==================================================
+
+      const canvas =
+        await html2canvas(
+          contenedor,
+          {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            logging: false
+          }
+        );
+
+
+      // ==================================================
+      // CONVERTIR A IMAGEN
+      // ==================================================
+
       const imagen =
         canvas.toDataURL("image/png");
 
+
+      // ==================================================
+      // DESCARGAR IMAGEN
+      // ==================================================
 
       const enlace =
         document.createElement("a");
@@ -85,6 +190,7 @@ function RankingCluster({
 
       document.body.removeChild(enlace);
 
+
     } catch (error) {
 
       console.error(
@@ -95,6 +201,54 @@ function RankingCluster({
       alert(
         "No fue posible exportar el ranking. Intenta nuevamente."
       );
+
+
+    } finally {
+
+      // ==================================================
+      // RESTAURAR ESTILOS ORIGINALES
+      // ==================================================
+
+      encabezados.forEach(
+        (elemento, index) => {
+
+          const original =
+            estilosEncabezados[index];
+
+          elemento.style.position =
+            original.position;
+
+          elemento.style.top =
+            original.top;
+
+          elemento.style.zIndex =
+            original.zIndex;
+
+        }
+      );
+
+
+      titulos.forEach(
+        (elemento, index) => {
+
+          const original =
+            estilosTitulos[index];
+
+          elemento.style.color =
+            original.color;
+
+          elemento.style.backgroundColor =
+            original.backgroundColor;
+
+        }
+      );
+
+
+      contenedor.style.backgroundColor =
+        estiloContenedor.backgroundColor;
+
+      contenedor.style.color =
+        estiloContenedor.color;
 
     }
 
