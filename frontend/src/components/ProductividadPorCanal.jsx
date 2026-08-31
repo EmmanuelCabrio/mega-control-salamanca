@@ -321,8 +321,8 @@ function ProductividadPorCanal() {
                       <strong>
 
                         {plusRx > 0
-                          ? `+${plusRx.toFixed(2)}`
-                          : plusRx.toFixed(2)
+                          ? "+" + plusRx.toFixed(2)
+                     : plusRx.toFixed(2)
                         }
 
                       </strong>
