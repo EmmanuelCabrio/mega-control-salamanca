@@ -3407,6 +3407,15 @@ async function leerExcel() {
 
 
     // ==================================================
+// 👥 CARTERA POR DÍA
+// ==================================================
+
+const carteraPorDia =
+  leerCarteraPorDia();
+
+    
+
+    // ==================================================
     // GUARDAR CACHE
     // ==================================================
 
@@ -3423,6 +3432,8 @@ async function leerExcel() {
       rankingSupervisores,
 
       productividadPorCanal,
+      
+      carteraPorDia,
 
     };
 
@@ -3464,6 +3475,10 @@ module.exports = {
 
   leerProductividadPorCanal,
 
+  leerCarteraPorDia,
+
   descargarExcelDesdeSupabase,
+
+  
 
 };
