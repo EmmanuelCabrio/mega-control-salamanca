@@ -374,4 +374,3 @@ function ProductividadPorCanal() {
 
 
 export default ProductividadPorCanal;
-```
