@@ -70,7 +70,12 @@ function ProductividadPorCanal() {
 
         const datos =
           await respuesta.json();
+        console.log(
 
+          
+  "📊 PRODUCTIVIDAD POR CANAL - RESPUESTA:",
+  datos
+);
 
         if (
           !datos.correcto
