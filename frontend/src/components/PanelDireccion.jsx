@@ -9,6 +9,9 @@ import PlantillaStatus
 import ProductividadPorCanal
   from "./ProductividadPorCanal";
 
+import CarteraPorDia
+from "./CarteraPorDia";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -115,6 +118,8 @@ function PanelDireccion({
 
 
       <ProductividadPorCanal />
+
+      <CarteraPorDia />
 
 
     </div>
