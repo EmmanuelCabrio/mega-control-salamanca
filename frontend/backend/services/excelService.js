@@ -2463,6 +2463,412 @@ function leerProductividadPorCanal() {
   }
 
 }
+
+// ==================================================
+// 👥 CARTERA POR DÍA
+// ==================================================
+//
+// HOJA:
+// CARTERA POR DÍA
+//
+// FILA 2:
+// DÍAS 1 - 31
+//
+// FILAS:
+// 3 = VTA CL SALAMANCA
+// 4 = RECONEXIONES
+// 5 = CORTES
+// 6 = SUSPENSIONES
+// 7 = CANCELACIONES
+//
+// ==================================================
+
+function leerCarteraPorDia() {
+
+  try {
+
+    // ==============================================
+    // OBTENER EXCEL
+    // ==============================================
+
+    const workbook =
+      cargarExcel();
+
+
+    // ==============================================
+    // BUSCAR HOJA
+    // ==============================================
+
+    const nombreHoja =
+      workbook.SheetNames.find(
+        (nombre) =>
+          String(nombre)
+            .trim()
+            .toUpperCase() ===
+          "CARTERA POR DÍA"
+      );
+
+
+    if (!nombreHoja) {
+
+      throw new Error(
+        'No se encontró la hoja "CARTERA POR DÍA"'
+      );
+
+    }
+
+
+    const hoja =
+      workbook.Sheets[
+        nombreHoja
+      ];
+
+
+    // ==============================================
+    // CONVERTIR A FILAS
+    // ==============================================
+
+    const datos =
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+    // ==============================================
+    // VALIDAR ESTRUCTURA
+    // ==============================================
+
+    if (
+      datos.length < 7
+    ) {
+
+      throw new Error(
+        'La hoja "CARTERA POR DÍA" no contiene la estructura esperada'
+      );
+
+    }
+
+
+    // ==============================================
+    // FILAS
+    // ==============================================
+
+    const FILA_DIAS = 1;
+
+    const FILA_VENTAS = 2;
+
+    const FILA_RECONEXIONES = 3;
+
+    const FILA_CORTES = 4;
+
+    const FILA_SUSPENSIONES = 5;
+
+    const FILA_CANCELACIONES = 6;
+
+
+    // ==============================================
+    // COLUMNAS
+    // ==============================================
+
+    // B = día 1
+    // C = día 2
+    // ...
+    // AF = día 31
+
+    const COLUMNA_DIA_1 = 1;
+
+
+    // ==============================================
+    // RESULTADO
+    // ==============================================
+
+    const dias = [];
+
+
+    // ==============================================
+    // RECORRER DÍAS
+    // ==============================================
+
+    for (
+      let dia = 1;
+      dia <= 31;
+      dia++
+    ) {
+
+      const columna =
+        COLUMNA_DIA_1 +
+        (dia - 1);
+
+
+      // ============================================
+      // VALIDAR DÍA
+      // ============================================
+
+      const diaExcel =
+        Number(
+          datos[
+            FILA_DIAS
+          ]?.[
+            columna
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          diaExcel
+        )
+      ) {
+
+        continue;
+
+      }
+
+
+      // ============================================
+      // VENTAS
+      // ============================================
+
+      let ventas =
+        Number(
+          datos[
+            FILA_VENTAS
+          ]?.[
+            columna
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          ventas
+        )
+      ) {
+
+        ventas = 0;
+
+      }
+
+
+      // ============================================
+      // RECONEXIONES
+      // ============================================
+
+      let reconexiones =
+        Number(
+          datos[
+            FILA_RECONEXIONES
+          ]?.[
+            columna
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          reconexiones
+        )
+      ) {
+
+        reconexiones = 0;
+
+      }
+
+
+      // ============================================
+      // CORTES
+      // ============================================
+
+      let cortes =
+        Number(
+          datos[
+            FILA_CORTES
+          ]?.[
+            columna
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          cortes
+        )
+      ) {
+
+        cortes = 0;
+
+      }
+
+
+      // ============================================
+      // SUSPENSIONES
+      // ============================================
+
+      let suspensiones =
+        Number(
+          datos[
+            FILA_SUSPENSIONES
+          ]?.[
+            columna
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          suspensiones
+        )
+      ) {
+
+        suspensiones = 0;
+
+      }
+
+
+      // ============================================
+      // CANCELACIONES
+      // ============================================
+
+      let cancelaciones =
+        Number(
+          datos[
+            FILA_CANCELACIONES
+          ]?.[
+            columna
+          ]
+        );
+
+
+      if (
+        !Number.isFinite(
+          cancelaciones
+        )
+      ) {
+
+        cancelaciones = 0;
+
+      }
+
+
+      // ============================================
+      // TOTAL MOVIMIENTOS
+      // ============================================
+
+      const total =
+        ventas +
+        reconexiones +
+        cortes +
+        suspensiones +
+        cancelaciones;
+
+
+      // ============================================
+      // GUARDAR
+      // ============================================
+
+      dias.push({
+
+        dia:
+          diaExcel,
+
+        ventas:
+          Math.round(
+            ventas
+          ),
+
+        reconexiones:
+          Math.round(
+            reconexiones
+          ),
+
+        cortes:
+          Math.round(
+            cortes
+          ),
+
+        suspensiones:
+          Math.round(
+            suspensiones
+          ),
+
+        cancelaciones:
+          Math.round(
+            cancelaciones
+          ),
+
+        total:
+          Math.round(
+            total
+          ),
+
+      });
+
+    }
+
+
+    // ==============================================
+    // LOG
+    // ==============================================
+
+    console.log(
+      "=========================================="
+    );
+
+    console.log(
+      "👥 CARTERA POR DÍA"
+    );
+
+    console.log(
+      "📦 DÍAS:",
+      dias.length
+    );
+
+    console.log(
+      "📊 EJEMPLO DÍA 30:",
+      dias.find(
+        (registro) =>
+          registro.dia === 30
+      )
+    );
+
+    console.log(
+      "=========================================="
+    );
+
+
+    // ==============================================
+    // DEVOLVER
+    // ==============================================
+
+    return {
+
+      dias,
+
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "❌ ERROR EN CARTERA POR DÍA:",
+      error
+    );
+
+
+    return {
+
+      dias: [],
+
+    };
+
+  }
+
+}
+
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
