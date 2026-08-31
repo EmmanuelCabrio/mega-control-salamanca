@@ -58,13 +58,15 @@ function ProductividadPorCanal() {
           );
 
 
-     if (!respuesta.ok) {
+    if (
+  !respuesta.ok
+) {
 
   throw new Error(
-    "Error HTTP " + respuesta.status
-        );
+    `Error HTTP ${respuesta.status}`
+  );
 
-         }
+}
 
         const datos =
           await respuesta.json();
@@ -270,10 +272,10 @@ function ProductividadPorCanal() {
 
                 return (
 
-               <tr
-                  key={
-                      registro.canal + "-" + index
-                      }
+             <tr
+                key={
+             `${registro.canal}-${index}`
+                 }
                      >
 
                     {/* ==================================
@@ -319,10 +321,10 @@ function ProductividadPorCanal() {
 
                       <strong>
 
-                        {plusRx > 0
-                          ? "+" + plusRx.toFixed(2)
-                     : plusRx.toFixed(2)
-                        }
+                      {plusRx > 0
+                         ? "+" + plusRx.toFixed(2)
+                      : plusRx.toFixed(2)
+                         }
 
                       </strong>
 
