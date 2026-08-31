@@ -58,43 +58,52 @@ function ProductividadPorCanal() {
           );
 
 
-    if (
-  !respuesta.ok
-) {
+        // ============================================
+        // VALIDAR RESPUESTA HTTP
+        // ============================================
 
-  throw new Error(
-    `Error HTTP ${respuesta.status}`
-  );
+        if (
+          !respuesta.ok
+        ) {
 
-}
+          throw new Error(
+            `Error HTTP ${respuesta.status}`
+          );
+
+        }
+
+
+        // ============================================
+        // LEER DATOS
+        // ============================================
 
         const datos =
-  await respuesta.json();
+          await respuesta.json();
 
-console.log(
-  "🔥🔥 DATOS PRODUCTIVIDAD COMPLETOS:",
-  datos
-);
 
-console.log(
-  "🔥🔥 REGISTROS PRODUCTIVIDAD:",
-  datos.registros
-);
+        // ============================================
+        // VALIDAR RESPUESTA DEL BACKEND
+        // ============================================
 
-if (
-  !datos.correcto
-) {
+        if (
+          !datos.correcto
+        ) {
 
-  throw new Error(
-    datos.mensaje ||
-    "No se pudo cargar la información"
-  );
+          throw new Error(
+            datos.mensaje ||
+            "No se pudo cargar la información"
+          );
 
-}
+        }
 
-setRegistros(
-  datos.registros || []
-);
+
+        // ============================================
+        // GUARDAR REGISTROS
+        // ============================================
+
+        setRegistros(
+          datos.registros || []
+        );
 
 
       } catch (error) {
@@ -262,29 +271,36 @@ setRegistros(
             {registros.map(
               (registro, index) => {
 
+                // ==================================
+                // DATOS REALES DEL BACKEND
+                // ==================================
+
                 const productividad =
                   Number(
-                    registro.productividad ?? 0
+                    registro.productividadVenta ?? 0
                   );
+
 
                 const productividadRx =
                   Number(
-                    registro.productividadRx ?? 0
+                    registro.productividadVentaRx ?? 0
                   );
+
 
                 const plusRx =
                   Number(
-                    registro.diferencia ?? 0
+                    registro.plusRx ?? 0
                   );
 
 
                 return (
 
-             <tr
-                key={
-             `${registro.canal}-${index}`
-                 }
-                     >
+                  <tr
+                    key={
+                      `${registro.canal}-${index}`
+                    }
+                  >
+
 
                     {/* ==================================
                         CANAL
@@ -329,14 +345,16 @@ setRegistros(
 
                       <strong>
 
-                      {plusRx > 0
-                         ? "+" + plusRx.toFixed(2)
-                      : plusRx.toFixed(2)
-                         }
+                        {
+                          plusRx > 0
+                            ? `+${plusRx.toFixed(2)}`
+                            : plusRx.toFixed(2)
+                        }
 
                       </strong>
 
                     </td>
+
 
                   </tr>
 
