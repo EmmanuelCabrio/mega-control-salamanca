@@ -63,9 +63,9 @@ function ProductividadPorCanal() {
           !respuesta.ok
         ) {
 
-          throw new Error(
-            `Error HTTP ${respuesta.status}`
-          );
+       throw new Error(
+          `Error HTTP ${respuesta.status}`
+        );
 
         }
 
