@@ -1263,50 +1263,7 @@ app.get(
 
 
 
-// ==================================================
-// 👥 CARTERA POR DÍA
-// ==================================================
 
-app.get(
-  "/api/cartera-por-dia",
-  autenticarToken,
-  async (req, res) => {
-
-    try {
-
-      const datos =
-        await leerExcel();
-
-      return res.json({
-
-        correcto: true,
-
-        dias:
-          datos.carteraPorDia?.dias || [],
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        "❌ Error en /api/cartera-por-dia:"
-      );
-
-      console.error(error);
-
-      return res.status(500).json({
-
-        correcto: false,
-
-        mensaje:
-          "No se pudo cargar la cartera por día",
-
-      });
-
-    }
-
-  }
-);
 
 
 // ==================================================
