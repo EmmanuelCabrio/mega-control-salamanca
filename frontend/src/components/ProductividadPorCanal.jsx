@@ -69,29 +69,32 @@ function ProductividadPorCanal() {
 }
 
         const datos =
-          await respuesta.json();
-        console.log(
+  await respuesta.json();
 
-          
-  "📊 PRODUCTIVIDAD POR CANAL - RESPUESTA:",
+console.log(
+  "🔥🔥 DATOS PRODUCTIVIDAD COMPLETOS:",
   datos
 );
 
-        if (
-          !datos.correcto
-        ) {
+console.log(
+  "🔥🔥 REGISTROS PRODUCTIVIDAD:",
+  datos.registros
+);
 
-          throw new Error(
-            datos.mensaje ||
-            "No se pudo cargar la información"
-          );
+if (
+  !datos.correcto
+) {
 
-        }
+  throw new Error(
+    datos.mensaje ||
+    "No se pudo cargar la información"
+  );
 
+}
 
-        setRegistros(
-          datos.registros || []
-        );
+setRegistros(
+  datos.registros || []
+);
 
 
       } catch (error) {
