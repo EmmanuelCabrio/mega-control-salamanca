@@ -271,11 +271,11 @@ function ProductividadPorCanal() {
 
                 return (
 
-                  <tr
-                    key={
-                      `${registro.canal}-${index}`
-                    }
-                  >
+               <tr
+                  key={
+                      registro.canal + "-" + index
+                      }
+                     >
 
                     {/* ==================================
                         CANAL
