@@ -11,6 +11,7 @@ const {
   leerVentaVsMesAnterior,
   leerPlantilla,
   leerProductividadPorCanal,
+  leerCarteraPorDia,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
@@ -1261,7 +1262,61 @@ app.get(
   }
 );
 
+// ==================================================
+// 👥 CARTERA POR DÍA
+// ==================================================
 
+app.get(
+  "/api/cartera-por-dia",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      console.log(
+        "👥 CONSULTANDO CARTERA POR DÍA..."
+      );
+
+
+      const datos =
+        leerCarteraPorDia();
+
+
+      return res.json({
+
+        correcto: true,
+
+        dias:
+          datos.dias || [],
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/cartera-por-dia:"
+      );
+
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar la cartera por día",
+
+      });
+
+    }
+
+  }
+);
 
 
 
