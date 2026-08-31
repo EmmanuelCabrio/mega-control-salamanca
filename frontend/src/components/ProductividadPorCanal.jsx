@@ -59,15 +59,13 @@ function ProductividadPorCanal() {
           );
 
 
-      if (
-  !respuesta.ok
-            ) {
+     if (!respuesta.ok) {
 
-            throw new Error(
-        `Error HTTP ${respuesta.status}`
-                );
+  throw new Error(
+    "Error HTTP " + respuesta.status
+        );
 
-            }
+         }
 
         const datos =
           await respuesta.json();
