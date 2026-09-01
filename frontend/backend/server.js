@@ -510,23 +510,42 @@ app.get(
 
           )
 
-          .map(
-            (item) => ({
+        .map(
+  (item) => ({
 
-              supervisor:
-                item.supervisor,
+    supervisor:
+      item.supervisor,
 
-              productividad:
-                Number(
-                  item.productividad || 0
-                ),
+    productividad:
+      Number(
+        item.productividad || 0
+      ),
 
-              posicion:
-                item.posicion,
+    posicion:
+      item.posicion,
 
-            })
-          );
+    movil:
+      Number(
+        item.movil || 0
+      ),
 
+    netflix:
+      Number(
+        item.netflix || 0
+      ),
+
+    disney:
+      Number(
+        item.disney || 0
+      ),
+
+    max:
+      Number(
+        item.max || 0
+      ),
+
+  })
+);
 
       return res.json({
 
