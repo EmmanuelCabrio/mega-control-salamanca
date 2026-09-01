@@ -1316,6 +1316,50 @@ if (mostrarFocosRojosIniciales) {
       : 0;
 
 
+  // ==================================================
+// AVANCE DE SERVICIOS DEL SUPERVISOR
+// ==================================================
+
+const avanceServiciosSupervisor =
+  rankingSupervisores.find(
+    (registro) =>
+      String(
+        registro.supervisor || ""
+      )
+        .trim()
+        .toUpperCase() ===
+      String(
+        supervisorSeleccionado || ""
+      )
+        .trim()
+        .toUpperCase()
+  ) || null;
+
+
+const movilMes =
+  Number(
+    avanceServiciosSupervisor?.movil ?? 0
+  );
+
+
+const netflixMes =
+  Number(
+    avanceServiciosSupervisor?.netflix ?? 0
+  );
+
+
+const disneyMes =
+  Number(
+    avanceServiciosSupervisor?.disney ?? 0
+  );
+
+
+const maxMes =
+  Number(
+    avanceServiciosSupervisor?.max ?? 0
+  );
+
+
   
   // ==================================================
   // VISTA PENETRACIÓN
@@ -1602,55 +1646,127 @@ if (
             KPI — VENTAS DEL MES
         ========================================== */}
 
-        <KPICard
+       <KPICard
 
-          icono="📈"
+  icono="📈"
 
-          titulo="Ventas del mes"
+  titulo="Venta vs Ppto"
 
-          valor={
-            `${ventasMes} / ${presupuesto}`
-          }
+  valor={
+    `${ventasMes} / ${presupuesto}`
+  }
 
-          detalle={
+  detalle={
 
-            <>
+    <>
 
-              <strong>
-                🎯 Avance vs presupuesto
-              </strong>
-
-
-              <br />
+      <strong>
+        🎯 Avance vs presupuesto
+      </strong>
 
 
-              <span className="avance-kpi">
-
-                {porcentajePpto.toFixed(1)}%
-
-              </span>
+      <br />
 
 
-              <br />
+      <span className="avance-kpi">
+
+        {porcentajePpto.toFixed(1)}%
+
+      </span>
 
 
-              <span className="faltante-kpi">
+      <br />
 
-                {ventasFaltantes > 0
 
-                  ? `🔴 Faltan ${ventasFaltantes} ventas`
+      <span className="faltante-kpi">
 
-                  : "🟢 ¡Presupuesto alcanzado!"
+        {ventasFaltantes > 0
 
-                }
+          ? `🔴 Faltan ${ventasFaltantes} ventas`
 
-              </span>
+          : "🟢 ¡Presupuesto alcanzado!"
 
-            </>
+        }
 
-          }
+      </span>
 
-        />
+
+      {/* ========================================
+          AVANCE DE SERVICIOS
+      ======================================== */}
+
+      <div className="kpi-servicios-separador" />
+
+
+      <div className="kpi-servicios-titulo">
+
+        📦 Avance de servicios del mes
+
+      </div>
+
+
+      <div className="kpi-servicios-grid">
+
+
+        <div className="kpi-servicio">
+
+          <span>
+            📱 MÓVIL
+          </span>
+
+          <strong>
+            {movilMes}
+          </strong>
+
+        </div>
+
+
+        <div className="kpi-servicio">
+
+          <span>
+            🎬 NETFLIX
+          </span>
+
+          <strong>
+            {netflixMes}
+          </strong>
+
+        </div>
+
+
+        <div className="kpi-servicio">
+
+          <span>
+            ✨ Disney+
+          </span>
+
+          <strong>
+            {disneyMes}
+          </strong>
+
+        </div>
+
+
+        <div className="kpi-servicio">
+
+          <span>
+            🎞️ MAX
+          </span>
+
+          <strong>
+            {maxMes}
+          </strong>
+
+        </div>
+
+
+      </div>
+
+    </>
+
+  }
+
+/>
 
 
         {/* ==========================================
