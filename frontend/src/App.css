@@ -6764,3 +6764,88 @@ body {
   }
 
 }
+
+/* ==================================================
+   📦 AVANCE DE SERVICIOS — KPI VENTA VS PPTO
+================================================== */
+
+.kpi-servicios-separador {
+  width: 100%;
+  height: 1px;
+
+  margin: 16px 0 12px;
+
+  background: #e2e8f0;
+}
+
+
+.kpi-servicios-titulo {
+  margin-bottom: 12px;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  color: #475569;
+
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+
+.kpi-servicios-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+
+  width: 100%;
+}
+
+
+.kpi-servicio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 0;
+
+  padding: 10px 8px;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+
+.kpi-servicio span {
+  font-size: 10px;
+  font-weight: 800;
+
+  color: #64748b;
+
+  white-space: nowrap;
+}
+
+
+.kpi-servicio strong {
+  margin-top: 4px;
+
+  font-size: 20px;
+  font-weight: 900;
+
+  color: #0f172a;
+}
+
+
+@media (max-width: 700px) {
+
+  .kpi-servicios-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
