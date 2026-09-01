@@ -1528,12 +1528,29 @@ function leerRegistros(
 }
 
 // ==================================================
-// RANKING DE SUPERVISORES
+// RANKING DE SUPERVISORES + AVANCE DE SERVICIOS
+// ==================================================
+//
+// Hoja: VENTA DIARIA POR SUPERVISOR
+//
+// RANKING:
+// C = Supervisor
+// E = Productividad
+// Desde fila 19
+//
+// AVANCE SERVICIOS:
+// C3:C15 = Supervisor
+// AN = Móvil
+// AO = Netflix
+// AP = Disney+
+// AQ = MAX
+//
 // ==================================================
 
 function leerRankingSupervisores(
   hoja
 ) {
+
   const datos =
     XLSX.utils.sheet_to_json(
       hoja,
@@ -1543,19 +1560,209 @@ function leerRankingSupervisores(
       }
     );
 
+
+  // ==================================================
+  // MAPA DE AVANCE DE SERVICIOS
+  // ==================================================
+
+  const mapaServicios =
+    new Map();
+
+
+  // C = índice 2
+  const COLUMNA_SUPERVISOR_SERVICIOS = 2;
+
+  // AN = índice 39
+  const COLUMNA_MOVIL = 39;
+
+  // AO = índice 40
+  const COLUMNA_NETFLIX = 40;
+
+  // AP = índice 41
+  const COLUMNA_DISNEY = 41;
+
+  // AQ = índice 42
+  const COLUMNA_MAX = 42;
+
+
+  // Excel filas 3 a 15
+  // JS índices 2 a 14
+
+  for (
+    let i = 2;
+    i <= 14;
+    i++
+  ) {
+
+    const fila =
+      datos[i] || [];
+
+
+    const supervisor =
+      limpiarTexto(
+        fila[
+          COLUMNA_SUPERVISOR_SERVICIOS
+        ]
+      );
+
+
+    if (
+      esValorInvalido(
+        supervisor
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    if (
+      supervisor === "SUPERVISOR" ||
+      supervisor === "TOTAL"
+    ) {
+
+      continue;
+
+    }
+
+
+    let movil =
+      Number(
+        fila[
+          COLUMNA_MOVIL
+        ]
+      );
+
+
+    let netflix =
+      Number(
+        fila[
+          COLUMNA_NETFLIX
+        ]
+      );
+
+
+    let disney =
+      Number(
+        fila[
+          COLUMNA_DISNEY
+        ]
+      );
+
+
+    let max =
+      Number(
+        fila[
+          COLUMNA_MAX
+        ]
+      );
+
+
+    if (
+      !Number.isFinite(
+        movil
+      )
+    ) {
+
+      movil = 0;
+
+    }
+
+
+    if (
+      !Number.isFinite(
+        netflix
+      )
+    ) {
+
+      netflix = 0;
+
+    }
+
+
+    if (
+      !Number.isFinite(
+        disney
+      )
+    ) {
+
+      disney = 0;
+
+    }
+
+
+    if (
+      !Number.isFinite(
+        max
+      )
+    ) {
+
+      max = 0;
+
+    }
+
+
+    mapaServicios.set(
+      normalizarNombre(
+        supervisor
+      ),
+      {
+
+        movil:
+          Math.round(
+            movil
+          ),
+
+        netflix:
+          Math.round(
+            netflix
+          ),
+
+        disney:
+          Math.round(
+            disney
+          ),
+
+        max:
+          Math.round(
+            max
+          ),
+
+      }
+    );
+
+  }
+
+
+  // ==================================================
+  // RANKING
+  // ==================================================
+
   const ranking = [];
 
+
+  // Fila 19 en Excel
   const FILA_INICIO = 18;
+
+
+  // C = índice 2
   const COLUMNA_SUPERVISOR = 2;
+
+
+  // E = índice 4
   const COLUMNA_PRODUCTIVIDAD = 4;
+
 
   for (
     let i = FILA_INICIO;
     i < datos.length;
     i++
   ) {
+
     const fila =
       datos[i];
+
 
     const supervisor =
       limpiarTexto(
@@ -1564,6 +1771,7 @@ function leerRankingSupervisores(
         ]
       );
 
+
     const productividad =
       Number(
         fila[
@@ -1571,41 +1779,88 @@ function leerRankingSupervisores(
         ]
       );
 
+
     if (
       esValorInvalido(
         supervisor
       )
     ) {
+
       continue;
+
     }
+
 
     if (
       supervisor ===
       "SUPERVISOR"
     ) {
+
       continue;
+
     }
+
 
     if (
       supervisor ===
       "MORALES PEREZ BENJAMIN"
     ) {
+
       continue;
+
     }
+
 
     if (
       !Number.isFinite(
         productividad
       )
     ) {
+
       continue;
+
     }
 
+
+    const servicios =
+      mapaServicios.get(
+        normalizarNombre(
+          supervisor
+        )
+      ) || {
+        movil: 0,
+        netflix: 0,
+        disney: 0,
+        max: 0,
+      };
+
+
     ranking.push({
+
       supervisor,
+
       productividad,
+
+      movil:
+        servicios.movil,
+
+      netflix:
+        servicios.netflix,
+
+      disney:
+        servicios.disney,
+
+      max:
+        servicios.max,
+
     });
+
   }
+
+
+  // ==================================================
+  // ELIMINAR DUPLICADOS
+  // ==================================================
 
   const rankingUnico =
     Array.from(
@@ -1619,6 +1874,11 @@ function leerRankingSupervisores(
       ).values()
     );
 
+
+  // ==================================================
+  // ORDENAR MAYOR → MENOR
+  // ==================================================
+
   rankingUnico.sort(
     (
       supervisorA,
@@ -1628,25 +1888,35 @@ function leerRankingSupervisores(
       supervisorA.productividad
   );
 
+
+  // ==================================================
+  // ASIGNAR POSICIÓN
+  // ==================================================
+
   const resultado =
     rankingUnico.map(
       (
         registro,
         index
       ) => ({
+
         ...registro,
 
         posicion:
           index + 1,
+
       })
     );
 
+
   console.log(
-    "🏆 RANKING SUPERVISORES:",
+    "🏆 RANKING SUPERVISORES + SERVICIOS:",
     resultado
   );
 
+
   return resultado;
+
 }
 
 // ==================================================
