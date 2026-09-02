@@ -100,11 +100,11 @@ function PanelDireccion({
           <div>
 
             <h2>
-              Centro de control comercial
+              Resumen Operativo
             </h2>
 
             <p>
-              Indicadores estratégicos de Dirección.
+              Aquí es donde empieza el rumbo de tu día
             </p>
 
           </div>
