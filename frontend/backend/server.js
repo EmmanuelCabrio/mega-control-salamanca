@@ -12,6 +12,7 @@ const {
   leerPlantilla,
   leerProductividadPorCanal,
   leerCarteraPorDia,
+  leerProyeccion,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
@@ -1329,6 +1330,85 @@ app.get(
 
         mensaje:
           "No se pudo cargar la cartera por día",
+
+      });
+
+    }
+
+  }
+);
+
+// ==================================================
+// 📊 PROYECCIÓN DE CIERRE — DIRECCIÓN
+// ==================================================
+
+app.get(
+  "/api/proyeccion",
+  autenticarToken,
+  (req, res) => {
+
+    // ==============================================
+    // ACCESO EXCLUSIVO PARA DIRECCIÓN
+    // ==============================================
+
+    if (req.rol !== "DIRECCIÓN") {
+
+      return res.status(403).json({
+
+        correcto: false,
+
+        mensaje:
+          "Acceso exclusivo de Dirección",
+
+      });
+
+    }
+
+    try {
+
+      // ============================================
+      // LEER LA TABLA DEL EXCEL
+      // ============================================
+
+      const datos = leerProyeccion();
+
+      // ============================================
+      // ENVIAR ENCABEZADOS E INDICADORES AL PANEL
+      // ============================================
+
+      return res.json({
+
+        correcto: true,
+
+        encabezados:
+          datos.encabezados,
+
+        filas:
+          datos.filas,
+
+      });
+
+    } catch (error) {
+
+      // ============================================
+      // REGISTRAR EL ERROR EN RENDER
+      // ============================================
+
+      console.error(
+        "❌ Error en /api/proyeccion:",
+        error
+      );
+
+      // ============================================
+      // INFORMAR AL PANEL QUE FALLÓ LA CONSULTA
+      // ============================================
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar la proyección",
 
       });
 
