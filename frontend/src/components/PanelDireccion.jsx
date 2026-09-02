@@ -13,6 +13,9 @@ import CarteraPorDia
 from "./CarteraPorDia";
 
 
+import ProyeccionDireccion
+  from "./ProyeccionDireccion";
+
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
 // ==================================================
@@ -120,6 +123,8 @@ function PanelDireccion({
       <ProductividadPorCanal />
 
       <CarteraPorDia />
+
+      <ProyeccionDireccion />
 
 
     </div>
