@@ -3747,8 +3747,185 @@ module.exports = {
 
   leerCarteraPorDia,
 
+  leerProyeccion,
+
   descargarExcelDesdeSupabase,
 
   
 
 };
+
+
+// ==================================================
+// 📊 PROYECCIÓN PARA DIRECCIÓN
+// ==================================================
+//
+// HOJA: PROYECCION
+//
+// ENCABEZADOS: N8:X8
+// INDICADORES: N9:X68
+//
+// Conserva:
+// - Orden de sucursales e indicadores.
+// - Celdas vacías y filas separadoras.
+// - Ceros, porcentajes y formato numérico del Excel.
+//
+// ==================================================
+
+function leerProyeccion() {
+
+  // ================================================
+  // UTILIZAR LA CARGA ACTUAL DEL EXCEL
+  // ================================================
+
+  const workbook = cargarExcel();
+
+  // ================================================
+  // LOCALIZAR LA HOJA
+  // ================================================
+
+  const nombreHoja = workbook.SheetNames.find(
+    (nombre) =>
+      String(nombre)
+        .trim()
+        .toUpperCase() === "PROYECCION"
+  );
+
+  if (!nombreHoja) {
+
+    throw new Error(
+      'No se encontró la hoja "PROYECCION"'
+    );
+
+  }
+
+  const hoja = workbook.Sheets[nombreHoja];
+
+  // ================================================
+  // LEER UNA CELDA
+  // ================================================
+
+  function leerCelda(fila, columna) {
+
+    // Excel cuenta las filas desde 1.
+    // JavaScript cuenta las posiciones desde 0.
+    const direccion = XLSX.utils.encode_cell({
+      r: fila - 1,
+      c: columna,
+    });
+
+    // Tu cargarExcel() utiliza dense: true.
+    // También admitimos hojas por dirección de celda.
+    const celda = Array.isArray(hoja)
+      ? hoja[fila - 1]?.[columna]
+      : hoja[direccion];
+
+    return {
+
+      direccion,
+
+      // Valor original: conserva también el cero.
+      valor: celda?.v ?? null,
+
+      // Texto mostrado por Excel.
+      // Si la celda no existe, permanece vacía.
+      texto:
+        celda == null
+          ? ""
+          : String(
+              celda.w ??
+              XLSX.utils.format_cell(celda)
+            ),
+
+    };
+
+  }
+
+  // ================================================
+  // LEER UNA FILA COMPLETA: COLUMNAS N HASTA X
+  // ================================================
+
+  function leerFila(fila) {
+
+    // N corresponde al índice 13.
+    // Son 11 columnas, hasta X.
+    return Array.from(
+      { length: 11 },
+      (_, indice) =>
+        leerCelda(fila, indice + 13)
+    );
+
+  }
+
+  // ================================================
+  // ENCABEZADOS: FILA 8
+  // ================================================
+
+  const encabezados = leerFila(8);
+
+  // ================================================
+  // INDICADORES: FILAS 9 HASTA 68
+  // ================================================
+
+  const filas = Array.from(
+    { length: 60 },
+    (_, indice) => {
+
+      const numero = indice + 9;
+
+      const celdas = leerFila(numero);
+
+      return {
+
+        numero,
+
+        celdas,
+
+        // Una fila vacía se conserva como separación.
+        separador: celdas.every(
+          (celda) =>
+            celda.texto.trim() === ""
+        ),
+
+      };
+
+    }
+  );
+
+  // ================================================
+  // VALIDAR QUE EL RANGO CONTENGA INFORMACIÓN
+  // ================================================
+
+  const todasLasFilas = [
+    encabezados,
+    ...filas.map(
+      (fila) => fila.celdas
+    ),
+  ];
+
+  const rangoVacio = todasLasFilas.every(
+    (fila) =>
+      fila.every(
+        (celda) =>
+          celda.texto.trim() === ""
+      )
+  );
+
+  if (rangoVacio) {
+
+    throw new Error(
+      "El rango PROYECCION!N8:X68 está vacío"
+    );
+
+  }
+
+  // ================================================
+  // ENTREGAR LA TABLA
+  // ================================================
+
+  return {
+    encabezados,
+    filas,
+  };
+
+}
