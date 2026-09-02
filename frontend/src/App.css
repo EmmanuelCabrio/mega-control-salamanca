@@ -6849,3 +6849,310 @@ body {
   }
 
 }
+
+
+/* ==================================================
+   PROYECCIÓN DE CIERRE — DIRECCIÓN
+================================================== */
+
+.proyeccion-direccion {
+  width: 100%;
+  min-width: 0;
+  margin: 28px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  background: #ffffff;
+  color: #183048;
+
+  border: 1px solid #dce5ee;
+  border-radius: 20px;
+
+  box-shadow: 0 12px 36px rgba(16, 45, 70, 0.08);
+}
+
+/* ==================================================
+   ENCABEZADO
+================================================== */
+
+.proyeccion-direccion .proyeccion-direccion__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 26px 28px;
+
+  background: linear-gradient(
+    115deg,
+    #102c46,
+    #1a4864
+  );
+
+  color: #ffffff;
+}
+
+.proyeccion-direccion__eyebrow {
+  color: #9cdcd7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.proyeccion-direccion .proyeccion-direccion__header h2 {
+  margin: 8px 0;
+  color: #ffffff;
+  font-size: 25px;
+  line-height: 1.2;
+}
+
+.proyeccion-direccion .proyeccion-direccion__header p {
+  margin: 0;
+  color: #cfdeea;
+  font-size: 13px;
+}
+
+.proyeccion-direccion__badge {
+  padding: 9px 13px;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 30px;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+/* ==================================================
+   AYUDA Y DESPLAZAMIENTO
+================================================== */
+
+.proyeccion-direccion__ayuda {
+  margin: 0;
+  padding: 12px 24px;
+
+  background: #f5f8fb;
+  color: #526779;
+  font-size: 12px;
+}
+
+.proyeccion-direccion__scroll {
+  width: 100%;
+  max-height: 75vh;
+
+  overflow: auto;
+  isolation: isolate;
+
+  scrollbar-width: thin;
+  scrollbar-color: #8ca5b8 #edf2f7;
+}
+
+.proyeccion-direccion__scroll:focus-visible {
+  outline: 3px solid #008d93;
+  outline-offset: -3px;
+}
+
+/* ==================================================
+   TABLA
+================================================== */
+
+.proyeccion-direccion .proyeccion-direccion__tabla {
+  width: 100%;
+  min-width: 1510px;
+  margin: 0;
+
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.proyeccion-direccion__tabla th,
+.proyeccion-direccion__tabla td {
+  box-sizing: border-box;
+  padding: 11px 10px;
+
+  border: 0;
+  border-right: 1px solid #edf1f5;
+  border-bottom: 1px solid #e5ecf2;
+
+  background: #ffffff;
+  color: #183048;
+
+  text-align: right;
+  vertical-align: middle;
+  line-height: 1.4;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Encabezados fijos al bajar por la tabla */
+
+.proyeccion-direccion__tabla thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+
+  height: 64px;
+
+  background: #e9eff5;
+  color: #25445f;
+
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Indicadores fijos al desplazarse hacia la derecha */
+
+.proyeccion-direccion__tabla th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+
+  width: 230px;
+
+  font-weight: 600;
+  text-align: left;
+
+  box-shadow: 2px 0 0 #dbe5ed;
+}
+
+/* La esquina permanece sobre ambos encabezados */
+
+.proyeccion-direccion__tabla thead th:first-child {
+  z-index: 4;
+}
+
+/* Filas alternadas para facilitar la lectura */
+
+.proyeccion-direccion__tabla tbody tr:nth-child(even) > * {
+  background: #f8fafc;
+}
+
+/* ==================================================
+   CONSOLIDADO SALAMANCA CL
+   Segunda columna de la tabla: columna O del Excel
+================================================== */
+
+.proyeccion-direccion__tabla thead tr > :nth-child(2) {
+  background: #d1e9e5;
+  color: #155852;
+  border-right: 2px solid #bbdad6;
+}
+
+.proyeccion-direccion__tabla tbody tr > :nth-child(2) {
+  background: #eaf5f4;
+  color: #155852;
+  font-weight: 700;
+  border-right: 2px solid #bbdad6;
+}
+
+/* ==================================================
+   FILAS DE RESULTADOS
+================================================== */
+
+.proyeccion-direccion__tabla tbody .proyeccion-direccion__resultado > * {
+  background: #eaf0f6;
+  font-weight: 700;
+  border-bottom-color: #d3dfe9;
+}
+
+.proyeccion-direccion__tabla tbody .proyeccion-direccion__resultado > :nth-child(2) {
+  background: #dbeeea;
+}
+
+/* Resaltar la fila que se está consultando */
+
+.proyeccion-direccion__tabla tbody tr:not(.proyeccion-direccion__separador):hover > * {
+  background: #e3edf5;
+}
+
+/* ==================================================
+   SEPARACIONES DEL EXCEL
+================================================== */
+
+.proyeccion-direccion__tabla tbody .proyeccion-direccion__separador > * {
+  height: 14px;
+  padding: 0;
+
+  border: 0;
+  background: #f0f4f8;
+}
+
+/* ==================================================
+   CARGA Y ERRORES
+================================================== */
+
+.proyeccion-direccion__estado {
+  margin: 0;
+  padding: 24px;
+  color: #526779;
+}
+
+.proyeccion-direccion__estado button {
+  padding: 10px 18px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: #194965;
+  color: #ffffff;
+
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.proyeccion-direccion__estado button:hover {
+  background: #102c46;
+}
+
+.proyeccion-direccion__estado button:focus-visible {
+  outline: 3px solid #008d93;
+  outline-offset: 3px;
+}
+
+/* Descripción accesible para lectores de pantalla */
+
+.proyeccion-direccion__sr {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* ==================================================
+   AJUSTES PARA CELULAR
+================================================== */
+
+@media (max-width: 640px) {
+
+  .proyeccion-direccion .proyeccion-direccion__header {
+    padding: 20px 16px;
+  }
+
+  .proyeccion-direccion .proyeccion-direccion__header h2 {
+    font-size: 22px;
+  }
+
+  .proyeccion-direccion__badge {
+    display: none;
+  }
+
+  .proyeccion-direccion__tabla th:first-child {
+    width: 174px;
+  }
+
+  .proyeccion-direccion__ayuda {
+    padding: 12px 16px;
+  }
+
+}
