@@ -3728,6 +3728,208 @@ const carteraPorDia =
 }
 
 // ==================================================
+// 🔄 ACTUALIZAR EXCEL Y CACHÉ DESDE SUPABASE
+// ==================================================
+
+// Evita descargar varias veces si llegan
+// solicitudes simultáneas.
+let actualizacionEnCurso = null;
+
+function actualizarDatosDesdeSupabase() {
+
+  if (actualizacionEnCurso) {
+    return actualizacionEnCurso;
+  }
+
+  actualizacionEnCurso = (async () => {
+
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const clave = process.env.SUPABASE_SECRET_KEY;
+
+    if (!supabaseUrl || !clave) {
+      throw new Error(
+        "Supabase no está configurado"
+      );
+    }
+
+    // Mismo bucket y archivo que utiliza
+    // actualmente tu descarga al arrancar.
+    const bucket = encodeURIComponent(
+      "Nombre: mega-data"
+    );
+
+    const archivo = encodeURIComponent(
+      "SEGUIMIENTO 2.0.xlsx"
+    );
+
+    const url =
+      `${supabaseUrl}/storage/v1/object/authenticated/${bucket}/${archivo}?actualizacion=${Date.now()}`;
+
+    // Limitar el tiempo de descarga a 60 segundos.
+    const controlador = new AbortController();
+
+    const limite = setTimeout(
+      () => controlador.abort(),
+      60000
+    );
+
+    let buffer;
+
+    // ==============================================
+    // DESCARGAR SIN BORRAR LOS DATOS ACTUALES
+    // ==============================================
+
+    try {
+
+      const respuesta = await fetch(url, {
+
+        method: "GET",
+
+        signal: controlador.signal,
+
+        headers: {
+
+          apikey: clave,
+
+          Authorization:
+            `Bearer ${clave}`,
+
+          "Cache-Control": "no-cache",
+
+        },
+
+      });
+
+      if (!respuesta.ok) {
+        throw new Error(
+          `Descarga de Excel: HTTP ${respuesta.status}`
+        );
+      }
+
+      buffer = Buffer.from(
+        await respuesta.arrayBuffer()
+      );
+
+    } finally {
+
+      clearTimeout(limite);
+
+    }
+
+    // ==============================================
+    // ABRIR EL ARCHIVO NUEVO ANTES DE REEMPLAZAR
+    // ==============================================
+
+    const nuevoWorkbook = XLSX.read(buffer, {
+
+      type: "buffer",
+      dense: true,
+      cellHTML: false,
+      cellFormula: false,
+      cellStyles: false,
+      cellNF: false,
+
+    });
+
+    // ==============================================
+    // VALIDAR LAS PESTAÑAS QUE USA EL SISTEMA
+    // ==============================================
+
+    const hojasNecesarias = [
+
+      "PRODUCTIVIDAD",
+      "BD SIN VENTA",
+      "VENTA VS PPTO",
+      "BD PLAN DE TRABAJO",
+      "PLAN DE TRABAJO",
+      "BD AVANCE SEMANAL",
+      "VENTA DIARIA POR SUPERVISOR",
+      "USERS",
+      "PLANTILLA",
+      "VS MES ANTERIOR",
+      "KPI´S VENTAS",
+      "CARTERA POR DÍA",
+      "PROYECCION",
+
+    ];
+
+    for (const nombre of hojasNecesarias) {
+
+      const encontrada =
+        nuevoWorkbook.SheetNames.find(
+          (hoja) =>
+            hoja.trim().toUpperCase() === nombre
+        );
+
+      if (
+        !encontrada ||
+        !nuevoWorkbook.Sheets[encontrada]?.["!ref"]
+      ) {
+
+        throw new Error(
+          `Falta información en la hoja "${nombre}"`
+        );
+
+      }
+
+    }
+
+    // ==============================================
+    // GUARDAR PRIMERO EN UN ARCHIVO TEMPORAL
+    // ==============================================
+
+    const temporal =
+      `${RUTA_EXCEL_SUPABASE}.${crypto.randomUUID()}.tmp`;
+
+    try {
+
+      fs.writeFileSync(
+        temporal,
+        buffer
+      );
+
+      // Sustituir el archivo cuando terminó
+      // de descargarse y abrirse correctamente.
+      fs.renameSync(
+        temporal,
+        RUTA_EXCEL_SUPABASE
+      );
+
+    } finally {
+
+      if (fs.existsSync(temporal)) {
+        fs.unlinkSync(temporal);
+      }
+
+    }
+
+    // ==============================================
+    // RENOVAR LAS TRES CACHÉS
+    // ==============================================
+
+    workbookCacheado = nuevoWorkbook;
+
+    datosCacheados = null;
+
+    usuariosCacheados = null;
+
+    return {
+      actualizadoEn: new Date().toISOString(),
+    };
+
+  })().finally(() => {
+
+    // Permitir la siguiente actualización,
+    // tanto si terminó bien como si falló.
+    actualizacionEnCurso = null;
+
+  });
+
+  return actualizacionEnCurso;
+
+}
+
+// ==================================================
 // EXPORTACIONES
 // ==================================================
 
@@ -3748,6 +3950,8 @@ module.exports = {
   leerCarteraPorDia,
 
   leerProyeccion,
+
+  actualizarDatosDesdeSupabase,
 
   descargarExcelDesdeSupabase,
 
