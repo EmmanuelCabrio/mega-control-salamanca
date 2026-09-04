@@ -339,174 +339,199 @@ async function subirExcel(
   }
 
 
-  // ================================================
-  // PANEL
-  // ================================================
 
-  return (
+// ================================================
+// PANEL
+// ================================================
 
-    <div
-  style={{
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "12px",
-    alignItems: "center",
-  }}
->
+return (
 
-  {/* ============================================
-      SELECTOR OCULTO DEL EXCEL
-  ============================================ */}
+  <div className="panel-direccion">
 
-  <input
-    ref={selectorExcel}
-    type="file"
+    <header className="panel-direccion-header">
 
-    accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      {/* INFORMACIÓN DEL ENCABEZADO */}
 
-    onChange={subirExcel}
+      <div>
 
-    style={{
-      display: "none",
-    }}
-  />
-
-
-  {/* ============================================
-      REEMPLAZAR EXCEL
-  ============================================ */}
-
-  <button
-    type="button"
-
-    onClick={() =>
-      selectorExcel.current?.click()
-    }
-
-    disabled={
-      actualizando ||
-      subiendo
-    }
-
-    aria-busy={subiendo}
-
-    style={{
-      padding: "12px 18px",
-
-      border:
-        "1px solid #059669",
-
-      borderRadius: "12px",
-
-      background:
-        subiendo
-          ? "#64748b"
-          : "#047857",
-
-      color: "#ffffff",
-
-      font: "inherit",
-
-      fontWeight: 700,
-
-      cursor:
-        actualizando ||
-        subiendo
-          ? "wait"
-          : "pointer",
-
-      opacity:
-        actualizando ||
-        subiendo
-          ? 0.8
-          : 1,
-    }}
-  >
-
-    {subiendo
-      ? "⏳ Subiendo Excel..."
-      : "📤 Reemplazar Excel"}
-
-  </button>
-
-
-  {/* ============================================
-      ACTUALIZAR DATOS DESDE SUPABASE
-  ============================================ */}
-
-  <button
-    type="button"
-
-    onClick={actualizarDatos}
-
-    disabled={
-      actualizando ||
-      subiendo
-    }
-
-    aria-busy={actualizando}
-
-    style={{
-      padding: "12px 18px",
-
-      border:
-        "1px solid #2563eb",
-
-      borderRadius: "12px",
-
-      background:
-        actualizando
-          ? "#64748b"
-          : "#1d4ed8",
-
-      color: "#ffffff",
-
-      font: "inherit",
-
-      fontWeight: 700,
-
-      cursor:
-        actualizando ||
-        subiendo
-          ? "wait"
-          : "pointer",
-
-      opacity:
-        actualizando ||
-        subiendo
-          ? 0.8
-          : 1,
-    }}
-  >
-
-    {actualizando
-      ? "⏳ Actualizando datos..."
-      : "🔄 Actualizar datos"}
-
-  </button>
-
-
-  {/* ============================================
-      CERRAR SESIÓN
-  ============================================ */}
-
-  {onCerrarSesion && (
-
-    <button
-      type="button"
-      className="panel-direccion-logout"
-      onClick={onCerrarSesion}
-    >
-      🚪 Cerrar sesión
-    </button>
-
-  )}
-
-</div>
-
+        <div className="panel-direccion-etiqueta">
+          👑 DIRECCIÓN
         </div>
 
-      </header>
+        <h1>
+          Dashboard Dirección
+        </h1>
+
+        <p>
+          Centro de control comercial · SEGUIMIENTO 2.0
+        </p>
+
+      </div>
+
+
+      {/* CONTENEDOR DE BOTONES */}
+
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "12px",
+          alignItems: "center",
+        }}
+      >
+
+        {/* SELECTOR OCULTO DEL EXCEL */}
+
+        <input
+          ref={selectorExcel}
+          type="file"
+
+          accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+          onChange={subirExcel}
+
+          style={{
+            display: "none",
+          }}
+        />
+
+
+        {/* REEMPLAZAR EXCEL */}
+
+        <button
+          type="button"
+
+          onClick={() =>
+            selectorExcel.current?.click()
+          }
+
+          disabled={
+            actualizando ||
+            subiendo
+          }
+
+          aria-busy={subiendo}
+
+          style={{
+            padding: "12px 18px",
+
+            border:
+              "1px solid #059669",
+
+            borderRadius:
+              "12px",
+
+            background:
+              subiendo
+                ? "#64748b"
+                : "#047857",
+
+            color:
+              "#ffffff",
+
+            font:
+              "inherit",
+
+            fontWeight:
+              700,
+
+            cursor:
+              actualizando ||
+              subiendo
+                ? "wait"
+                : "pointer",
+
+            opacity:
+              actualizando ||
+              subiendo
+                ? 0.8
+                : 1,
+          }}
+        >
+
+          {subiendo
+            ? "⏳ Subiendo Excel..."
+            : "📤 Reemplazar Excel"}
+
+        </button>
+
+
+        {/* ACTUALIZAR DESDE SUPABASE */}
+
+        <button
+          type="button"
+
+          onClick={actualizarDatos}
+
+          disabled={
+            actualizando ||
+            subiendo
+          }
+
+          aria-busy={actualizando}
+
+          style={{
+            padding:
+              "12px 18px",
+
+            border:
+              "1px solid #2563eb",
+
+            borderRadius:
+              "12px",
+
+            background:
+              actualizando
+                ? "#64748b"
+                : "#1d4ed8",
+
+            color:
+              "#ffffff",
+
+            font:
+              "inherit",
+
+            fontWeight:
+              700,
+
+            cursor:
+              actualizando ||
+              subiendo
+                ? "wait"
+                : "pointer",
+
+            opacity:
+              actualizando ||
+              subiendo
+                ? 0.8
+                : 1,
+          }}
+        >
+
+          {actualizando
+            ? "⏳ Actualizando datos..."
+            : "🔄 Actualizar datos"}
+
+        </button>
+
+
+        {/* CERRAR SESIÓN */}
+
+        {onCerrarSesion && (
+
+          <button
+            type="button"
+            className="panel-direccion-logout"
+            onClick={onCerrarSesion}
+          >
+            🚪 Cerrar sesión
+          </button>
+
+        )}
+
+      </div>
+
+    </header>
 
 
       {mensaje && (
