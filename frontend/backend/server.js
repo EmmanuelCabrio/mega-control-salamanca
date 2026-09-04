@@ -13,6 +13,7 @@ const {
   leerProductividadPorCanal,
   leerCarteraPorDia,
   leerProyeccion,
+  actualizarDatosDesdeSupabase,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
@@ -1409,6 +1410,67 @@ app.get(
 
         mensaje:
           "No se pudo cargar la proyección",
+
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// 🔄 ACTUALIZAR DATOS — SOLO DIRECCIÓN
+// ==================================================
+
+app.post(
+  "/api/actualizar-datos",
+  autenticarToken,
+  async (req, res) => {
+
+    if (req.rol !== "DIRECCIÓN") {
+
+      return res.status(403).json({
+
+        correcto: false,
+
+        mensaje:
+          "Acceso exclusivo de Dirección",
+
+      });
+
+    }
+
+    try {
+
+      const resultado =
+        await actualizarDatosDesdeSupabase();
+
+      return res.json({
+
+        correcto: true,
+
+        mensaje:
+          "Excel y caché actualizados correctamente",
+
+        actualizadoEn:
+          resultado.actualizadoEn,
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error al actualizar datos:",
+        error
+      );
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo actualizar. Se conservan los datos anteriores. Revisa el Excel y vuelve a intentarlo.",
 
       });
 
