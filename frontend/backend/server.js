@@ -14,6 +14,7 @@ const {
   leerCarteraPorDia,
   leerProyeccion,
   actualizarDatosDesdeSupabase,
+  reemplazarExcelEnSupabase,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 // ==================================================
@@ -69,13 +70,10 @@ app.use(
     ],
 
     allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-    ],
-
-  })
-);
-
+  "Content-Type",
+  "Authorization",
+  "X-File-Name",
+],
 
 app.use(
   express.json()
@@ -1479,7 +1477,188 @@ app.post(
   }
 );
 
+// ==================================================
+// 📤 REEMPLAZAR EXCEL — SOLO DIRECCIÓN
+// ==================================================
 
+app.post(
+  "/api/subir-excel",
+
+  // Verificar primero la sesión.
+  autenticarToken,
+
+  // Recibir el Excel como archivo binario.
+  // El límite será de 10 MB.
+  express.raw({
+
+    type:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+    limit:
+      "10mb",
+
+  }),
+
+  async (req, res) => {
+
+    // ==============================================
+    // ACCESO EXCLUSIVO PARA DIRECCIÓN
+    // ==============================================
+
+    if (
+      req.rol !== "DIRECCIÓN"
+    ) {
+
+      return res.status(403).json({
+
+        correcto:
+          false,
+
+        mensaje:
+          "Acceso exclusivo de Dirección",
+
+      });
+
+    }
+
+
+    try {
+
+      // ============================================
+      // RECUPERAR EL NOMBRE DEL ARCHIVO
+      // ============================================
+
+      const nombreArchivo =
+        decodeURIComponent(
+          String(
+            req.headers[
+              "x-file-name"
+            ] || ""
+          )
+        );
+
+
+      // ============================================
+      // VALIDAR LA EXTENSIÓN
+      // ============================================
+
+      if (
+        !nombreArchivo
+          .toLowerCase()
+          .endsWith(".xlsx")
+      ) {
+
+        return res.status(400).json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "Selecciona un archivo con extensión .xlsx",
+
+        });
+
+      }
+
+
+      // ============================================
+      // REEMPLAZAR EXCEL Y RENOVAR CACHÉ
+      // ============================================
+
+      const resultado =
+        await reemplazarExcelEnSupabase(
+          req.body
+        );
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        mensaje:
+          "Excel reemplazado y caché actualizada correctamente",
+
+        actualizadoEn:
+          resultado.actualizadoEn,
+
+        tamanoBytes:
+          resultado.tamanoBytes,
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error al reemplazar el Excel:",
+        error
+      );
+
+
+      const ocupada =
+        error.codigo ===
+        "ACTUALIZACION_EN_CURSO";
+
+
+      return res
+        .status(
+          ocupada
+            ? 409
+            : 400
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            ocupada
+              ? "Ya existe una actualización en curso. Espera unos segundos."
+              : error.message ||
+                "No se pudo reemplazar el Excel",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// ARCHIVO MAYOR A 10 MB
+// ==================================================
+
+app.use(
+  (
+    error,
+    req,
+    res,
+    next
+  ) => {
+
+    if (
+      error?.type ===
+      "entity.too.large"
+    ) {
+
+      return res.status(413).json({
+
+        correcto:
+          false,
+
+        mensaje:
+          "El archivo supera el límite de 10 MB",
+
+      });
+
+    }
+
+    return next(error);
+
+  }
+);
 
 
 // ==================================================
