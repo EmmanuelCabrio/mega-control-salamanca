@@ -35,6 +35,9 @@ function PanelDireccion({
   const [actualizando, setActualizando] =
     useState(false);
 
+  const [subiendo, setSubiendo] =
+  useState(false);
+
   const [mensaje, setMensaje] =
     useState("");
 
@@ -47,6 +50,211 @@ function PanelDireccion({
   // Bloqueo inmediato para evitar doble clic.
   const bloqueoActualizacion =
     useRef(false);
+
+  const selectorExcel =
+  useRef(null);
+
+
+
+  // ================================================
+// SUBIR, REEMPLAZAR Y ACTIVAR UN EXCEL NUEVO
+// ================================================
+
+async function subirExcel(
+  evento
+) {
+
+  const archivo =
+    evento.target.files?.[0];
+
+
+  // Permite volver a seleccionar el mismo archivo
+  // si necesitamos intentarlo nuevamente.
+
+  evento.target.value = "";
+
+
+  if (!archivo) {
+    return;
+  }
+
+
+  // ==============================================
+  // VALIDAR EXTENSIÓN
+  // ==============================================
+
+  if (
+    !archivo.name
+      .toLowerCase()
+      .endsWith(".xlsx")
+  ) {
+
+    setHayError(true);
+
+    setMensaje(
+      "Selecciona un archivo con extensión .xlsx."
+    );
+
+    return;
+
+  }
+
+
+  // ==============================================
+  // VALIDAR TAMAÑO
+  // ==============================================
+
+  const limiteBytes =
+    10 * 1024 * 1024;
+
+
+  if (
+    archivo.size >
+    limiteBytes
+  ) {
+
+    setHayError(true);
+
+    setMensaje(
+      "El archivo supera el límite de 10 MB."
+    );
+
+    return;
+
+  }
+
+
+  // ==============================================
+  // CONFIRMAR EL REEMPLAZO
+  // ==============================================
+
+  const confirmar =
+    window.confirm(
+      `¿Reemplazar el Excel de Supabase con "${archivo.name}"?`
+    );
+
+
+  if (
+    !confirmar ||
+    bloqueoActualizacion.current
+  ) {
+
+    return;
+
+  }
+
+
+  // ==============================================
+  // BLOQUEAR MÁS OPERACIONES
+  // ==============================================
+
+  bloqueoActualizacion.current =
+    true;
+
+  setSubiendo(true);
+
+  setMensaje("");
+
+  setHayError(false);
+
+
+  try {
+
+    // ============================================
+    // ENVIAR EL ARCHIVO AL BACKEND
+    // ============================================
+
+    const respuesta =
+      await fetchProtegido(
+        "/api/subir-excel",
+        {
+
+          method:
+            "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+            "X-File-Name":
+              encodeURIComponent(
+                archivo.name
+              ),
+
+          },
+
+          body:
+            archivo,
+
+        }
+      );
+
+
+    // ============================================
+    // LEER RESPUESTA
+    // ============================================
+
+    const resultado =
+      await respuesta.json();
+
+
+    if (
+      !respuesta.ok ||
+      !resultado.correcto
+    ) {
+
+      throw new Error(
+        resultado.mensaje ||
+        "No se pudo reemplazar el Excel."
+      );
+
+    }
+
+
+    // ============================================
+    // RECARGAR TODOS LOS COMPONENTES
+    // ============================================
+
+    setVersionDatos(
+      (versionActual) =>
+        versionActual + 1
+    );
+
+
+    const hora =
+      new Date(
+        resultado.actualizadoEn
+      ).toLocaleTimeString(
+        "es-MX"
+      );
+
+
+    setMensaje(
+      `✅ Excel reemplazado y caché actualizada a las ${hora}.`
+    );
+
+
+  } catch (error) {
+
+    setHayError(true);
+
+    setMensaje(
+      error.message ||
+      "No se pudo reemplazar el Excel."
+    );
+
+
+  } finally {
+
+    bloqueoActualizacion.current =
+      false;
+
+    setSubiendo(false);
+
+  }
+
+}
 
 
   // ================================================
@@ -137,76 +345,164 @@ function PanelDireccion({
 
   return (
 
-    <div className="panel-direccion">
+    <div
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "12px",
+    alignItems: "center",
+  }}
+>
 
-      <header className="panel-direccion-header">
+  {/* ============================================
+      SELECTOR OCULTO DEL EXCEL
+  ============================================ */}
 
-        <div>
+  <input
+    ref={selectorExcel}
+    type="file"
 
-          <div className="panel-direccion-etiqueta">
-            👑 DIRECCIÓN
-          </div>
+    accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
-          <h1>
-            Dashboard Dirección
-          </h1>
+    onChange={subirExcel}
 
-          <p>
-            Centro de control comercial · SEGUIMIENTO 2.0
-          </p>
-
-        </div>
-
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "12px",
-            alignItems: "center",
-          }}
-        >
-
-          <button
-            type="button"
-            onClick={actualizarDatos}
-            disabled={actualizando}
-            aria-busy={actualizando}
-            style={{
-              padding: "12px 18px",
-              border: "1px solid #2563eb",
-              borderRadius: "12px",
-              background: actualizando
-                ? "#64748b"
-                : "#1d4ed8",
-              color: "#ffffff",
-              font: "inherit",
-              fontWeight: 700,
-              cursor: actualizando
-                ? "wait"
-                : "pointer",
-              opacity: actualizando ? 0.8 : 1,
-            }}
-          >
-
-            {actualizando
-              ? "⏳ Actualizando datos..."
-              : "🔄 Actualizar datos"}
-
-          </button>
+    style={{
+      display: "none",
+    }}
+  />
 
 
-          {onCerrarSesion && (
+  {/* ============================================
+      REEMPLAZAR EXCEL
+  ============================================ */}
 
-            <button
-              type="button"
-              className="panel-direccion-logout"
-              onClick={onCerrarSesion}
-            >
-              🚪 Cerrar sesión
-            </button>
+  <button
+    type="button"
 
-          )}
+    onClick={() =>
+      selectorExcel.current?.click()
+    }
+
+    disabled={
+      actualizando ||
+      subiendo
+    }
+
+    aria-busy={subiendo}
+
+    style={{
+      padding: "12px 18px",
+
+      border:
+        "1px solid #059669",
+
+      borderRadius: "12px",
+
+      background:
+        subiendo
+          ? "#64748b"
+          : "#047857",
+
+      color: "#ffffff",
+
+      font: "inherit",
+
+      fontWeight: 700,
+
+      cursor:
+        actualizando ||
+        subiendo
+          ? "wait"
+          : "pointer",
+
+      opacity:
+        actualizando ||
+        subiendo
+          ? 0.8
+          : 1,
+    }}
+  >
+
+    {subiendo
+      ? "⏳ Subiendo Excel..."
+      : "📤 Reemplazar Excel"}
+
+  </button>
+
+
+  {/* ============================================
+      ACTUALIZAR DATOS DESDE SUPABASE
+  ============================================ */}
+
+  <button
+    type="button"
+
+    onClick={actualizarDatos}
+
+    disabled={
+      actualizando ||
+      subiendo
+    }
+
+    aria-busy={actualizando}
+
+    style={{
+      padding: "12px 18px",
+
+      border:
+        "1px solid #2563eb",
+
+      borderRadius: "12px",
+
+      background:
+        actualizando
+          ? "#64748b"
+          : "#1d4ed8",
+
+      color: "#ffffff",
+
+      font: "inherit",
+
+      fontWeight: 700,
+
+      cursor:
+        actualizando ||
+        subiendo
+          ? "wait"
+          : "pointer",
+
+      opacity:
+        actualizando ||
+        subiendo
+          ? 0.8
+          : 1,
+    }}
+  >
+
+    {actualizando
+      ? "⏳ Actualizando datos..."
+      : "🔄 Actualizar datos"}
+
+  </button>
+
+
+  {/* ============================================
+      CERRAR SESIÓN
+  ============================================ */}
+
+  {onCerrarSesion && (
+
+    <button
+      type="button"
+      className="panel-direccion-logout"
+      onClick={onCerrarSesion}
+    >
+      🚪 Cerrar sesión
+    </button>
+
+  )}
+
+</div>
 
         </div>
 
