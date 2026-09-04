@@ -3929,6 +3929,378 @@ function actualizarDatosDesdeSupabase() {
 
 }
 
+
+// ==================================================
+// 📤 REEMPLAZAR EXCEL DIRECTAMENTE EN SUPABASE
+// ==================================================
+
+function validarExcelParaCarga(buffer) {
+
+  // ================================================
+  // COMPROBAR QUE RECIBIMOS UN ARCHIVO
+  // ================================================
+
+  if (
+    !Buffer.isBuffer(buffer) ||
+    buffer.length === 0
+  ) {
+
+    throw new Error(
+      "No se recibió un archivo Excel"
+    );
+
+  }
+
+
+  // ================================================
+  // INTENTAR ABRIR EL EXCEL
+  // ================================================
+
+  const nuevoWorkbook = XLSX.read(
+    buffer,
+    {
+
+      type: "buffer",
+      dense: true,
+      cellHTML: false,
+      cellFormula: false,
+      cellStyles: false,
+      cellNF: false,
+
+    }
+  );
+
+
+  // ================================================
+  // PESTAÑAS NECESARIAS
+  // ================================================
+
+  const hojasNecesarias = [
+
+    "PRODUCTIVIDAD",
+    "BD SIN VENTA",
+    "VENTA VS PPTO",
+    "BD PLAN DE TRABAJO",
+    "PLAN DE TRABAJO",
+    "BD AVANCE SEMANAL",
+    "VENTA DIARIA POR SUPERVISOR",
+    "USERS",
+    "PLANTILLA",
+    "VS MES ANTERIOR",
+    "KPI´S VENTAS",
+    "CARTERA POR DÍA",
+    "PROYECCION",
+
+  ];
+
+
+  // ================================================
+  // VALIDAR CADA PESTAÑA
+  // ================================================
+
+  for (
+    const nombre of hojasNecesarias
+  ) {
+
+    const encontrada =
+      nuevoWorkbook.SheetNames.find(
+        (hoja) =>
+          hoja
+            .trim()
+            .toUpperCase() === nombre
+      );
+
+
+    if (
+      !encontrada ||
+      !nuevoWorkbook
+        .Sheets[encontrada]
+        ?.["!ref"]
+    ) {
+
+      throw new Error(
+        `Falta información en la hoja "${nombre}"`
+      );
+
+    }
+
+  }
+
+
+  // ================================================
+  // VALIDAR PROYECCION!N8:X68
+  // ================================================
+
+  const nombreProyeccion =
+    nuevoWorkbook.SheetNames.find(
+      (hoja) =>
+        hoja
+          .trim()
+          .toUpperCase() ===
+        "PROYECCION"
+    );
+
+
+  const rangoProyeccion =
+    XLSX.utils.decode_range(
+      nuevoWorkbook
+        .Sheets[nombreProyeccion]
+        ["!ref"]
+    );
+
+
+  // r = fila y c = columna.
+  // JavaScript cuenta desde cero:
+  // fila 68 = índice 67
+  // columna X = índice 23
+
+  if (
+    rangoProyeccion.e.r < 67 ||
+    rangoProyeccion.e.c < 23
+  ) {
+
+    throw new Error(
+      "La hoja PROYECCION no alcanza el rango N8:X68"
+    );
+
+  }
+
+
+  return nuevoWorkbook;
+
+}
+
+
+// ==================================================
+// SUBIR Y ACTIVAR EL EXCEL
+// ==================================================
+
+function reemplazarExcelEnSupabase(
+  buffer
+) {
+
+  // ================================================
+  // EVITAR DOS OPERACIONES AL MISMO TIEMPO
+  // ================================================
+
+  if (actualizacionEnCurso) {
+
+    const error = new Error(
+      "Ya existe una actualización en curso"
+    );
+
+    error.codigo =
+      "ACTUALIZACION_EN_CURSO";
+
+    throw error;
+
+  }
+
+
+  actualizacionEnCurso =
+    (async () => {
+
+      const supabaseUrl =
+        process.env.SUPABASE_URL;
+
+      const clave =
+        process.env.SUPABASE_SECRET_KEY;
+
+
+      if (
+        !supabaseUrl ||
+        !clave
+      ) {
+
+        throw new Error(
+          "Supabase no está configurado"
+        );
+
+      }
+
+
+      // ============================================
+      // VALIDAR ANTES DE REEMPLAZAR
+      // ============================================
+
+      const nuevoWorkbook =
+        validarExcelParaCarga(
+          buffer
+        );
+
+
+      // ============================================
+      // UBICACIÓN EN SUPABASE
+      // ============================================
+
+      const bucket =
+        encodeURIComponent(
+          "Nombre: mega-data"
+        );
+
+      const archivo =
+        encodeURIComponent(
+          "SEGUIMIENTO 2.0.xlsx"
+        );
+
+      const url =
+        `${supabaseUrl}/storage/v1/object/${bucket}/${archivo}`;
+
+
+      // ============================================
+      // TIEMPO MÁXIMO: 60 SEGUNDOS
+      // ============================================
+
+      const controlador =
+        new AbortController();
+
+      const limite =
+        setTimeout(
+          () => controlador.abort(),
+          60000
+        );
+
+
+      // ============================================
+      // REEMPLAZAR EL ARCHIVO EN SUPABASE
+      // ============================================
+
+      try {
+
+        const respuesta =
+          await fetch(
+            url,
+            {
+
+              method: "POST",
+
+              signal:
+                controlador.signal,
+
+              headers: {
+
+                apikey:
+                  clave,
+
+                Authorization:
+                  `Bearer ${clave}`,
+
+                "Content-Type":
+                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+                // Autoriza el reemplazo del archivo.
+                "x-upsert":
+                  "true",
+
+              },
+
+              body:
+                buffer,
+
+            }
+          );
+
+
+        if (!respuesta.ok) {
+
+          throw new Error(
+            `Carga a Supabase: HTTP ${respuesta.status}`
+          );
+
+        }
+
+      } finally {
+
+        clearTimeout(
+          limite
+        );
+
+      }
+
+
+      // ============================================
+      // ACTUALIZAR LA COPIA TEMPORAL DE RENDER
+      // ============================================
+
+      const temporal =
+        `${RUTA_EXCEL_SUPABASE}.${crypto.randomUUID()}.tmp`;
+
+
+      try {
+
+        fs.writeFileSync(
+          temporal,
+          buffer
+        );
+
+        fs.renameSync(
+          temporal,
+          RUTA_EXCEL_SUPABASE
+        );
+
+      } finally {
+
+        if (
+          fs.existsSync(
+            temporal
+          )
+        ) {
+
+          fs.unlinkSync(
+            temporal
+          );
+
+        }
+
+      }
+
+
+      // ============================================
+      // RENOVAR TODAS LAS CACHÉS
+      // ============================================
+
+      workbookCacheado =
+        nuevoWorkbook;
+
+      datosCacheados =
+        null;
+
+      usuariosCacheados =
+        null;
+
+
+      // ============================================
+      // RESULTADO
+      // ============================================
+
+      return {
+
+        actualizadoEn:
+          new Date().toISOString(),
+
+        tamanoBytes:
+          buffer.length,
+
+        hash:
+          crypto
+            .createHash("sha256")
+            .update(buffer)
+            .digest("hex"),
+
+      };
+
+    })().finally(() => {
+
+      actualizacionEnCurso =
+        null;
+
+    });
+
+
+  return actualizacionEnCurso;
+
+}
+
 // ==================================================
 // EXPORTACIONES
 // ==================================================
@@ -3950,6 +4322,8 @@ module.exports = {
   leerCarteraPorDia,
 
   leerProyeccion,
+
+  reemplazarExcelEnSupabase,
 
   actualizarDatosDesdeSupabase,
 
