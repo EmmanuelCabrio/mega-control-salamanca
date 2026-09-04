@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import SignaturePad  from "./SignaturePad";
 
 function ChecklistFocoRojo({
   promotor,
@@ -271,169 +272,7 @@ function ChecklistFocoRojo({
     rankingDiagnostico[0]?.area ||
     "Sin áreas de oportunidad detectadas";
 
-  // =========================================================
-  // COMPONENTE FIRMA
-  // =========================================================
-
-  const SignaturePad = ({
-    canvasRef,
-    label,
-    setFirmado,
-  }) => {
-    const drawing = useRef(false);
-
-    const obtenerContexto = () => {
-      const canvas = canvasRef.current;
-
-      if (!canvas) return null;
-
-      return canvas.getContext("2d");
-    };
-
-    const obtenerPosicion = (e) => {
-      const canvas = canvasRef.current;
-
-      if (!canvas) {
-        return {
-          x: 0,
-          y: 0,
-        };
-      }
-
-      const rect = canvas.getBoundingClientRect();
-
-      let clientX;
-      let clientY;
-
-      if (e.touches && e.touches.length > 0) {
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
-      } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
-      }
-
-      return {
-        x:
-          (clientX - rect.left) *
-          (canvas.width / rect.width),
-
-        y:
-          (clientY - rect.top) *
-          (canvas.height / rect.height),
-      };
-    };
-
-    const iniciarDibujo = (e) => {
-      e.preventDefault();
-
-      const ctx = obtenerContexto();
-
-      if (!ctx) return;
-
-      const posicion = obtenerPosicion(e);
-
-      drawing.current = true;
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        posicion.x,
-        posicion.y
-      );
-    };
-
-    const dibujar = (e) => {
-      e.preventDefault();
-
-      if (!drawing.current) return;
-
-      const ctx = obtenerContexto();
-
-      if (!ctx) return;
-
-      const posicion = obtenerPosicion(e);
-
-      ctx.lineWidth = 2.5;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = "#17202a";
-
-      ctx.lineTo(
-        posicion.x,
-        posicion.y
-      );
-
-      ctx.stroke();
-
-      setFirmado(true);
-    };
-
-    const terminarDibujo = (e) => {
-      if (e) {
-        e.preventDefault();
-      }
-
-      drawing.current = false;
-    };
-
-    const limpiarFirma = () => {
-      const canvas = canvasRef.current;
-
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d");
-
-      ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
-      setFirmado(false);
-    };
-
-    return (
-      <div style={styles.signatureBox}>
-        <div style={styles.signatureTitle}>
-          {label}
-        </div>
-
-        <div style={styles.signatureInstruction}>
-          Firma dentro del recuadro
-        </div>
-
-        <div style={styles.canvasWrapper}>
-          <canvas
-            ref={canvasRef}
-            width={900}
-            height={220}
-            style={styles.signatureCanvas}
-            onMouseDown={iniciarDibujo}
-            onMouseMove={dibujar}
-            onMouseUp={terminarDibujo}
-            onMouseLeave={terminarDibujo}
-            onTouchStart={iniciarDibujo}
-            onTouchMove={dibujar}
-            onTouchEnd={terminarDibujo}
-          />
-
-          <div style={styles.signatureLine}>
-            Firma
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={limpiarFirma}
-          style={styles.clearSignatureButton}
-        >
-          🧹 Limpiar firma
-        </button>
-      </div>
-    );
-  };
+  
 
   // =========================================================
   // EXPORTAR EVIDENCIA HTML
@@ -2240,31 +2079,39 @@ ${copia.outerHTML}
 
             {/* FIRMA SUPERVISOR */}
 
-            <SignaturePad
-              canvasRef={
-                supervisorSignatureRef
-              }
-              label={`Firma del supervisor — ${
-                supervisor || "—"
+                  <SignaturePad
+                     styles={styles}
+
+                   canvasRef={
+                 supervisorSignatureRef
+               }
+
+             label={`Firma del supervisor — ${
+                   supervisor || "—"
               }`}
-              setFirmado={
-                setFirmaSupervisor
-              }
-            />
+
+                 setFirmado={
+               setFirmaSupervisor
+                }
+                />
 
             {/* FIRMA PROMOTOR */}
 
-            <SignaturePad
-              canvasRef={
-                promotorSignatureRef
-              }
-              label={`Firma del promotor — ${
+                      <SignaturePad
+                styles={styles}
+
+                canvasRef={
+                  promotorSignatureRef
+            }
+
+                label={`Firma del promotor — ${
                 vendedor
               }`}
-              setFirmado={
-                setFirmaPromotor
-              }
-            />
+
+            setFirmado={
+           setFirmaPromotor
+          }
+          />
 
           </div>
 
