@@ -1039,12 +1039,12 @@ onContinuar={() => {
 
 if (
   mostrarReconocimientoCL &&
-  top3Ranking.length > 0
+  rankingCL.length > 0
 ) {
 
   console.log(
-    "🔥 MOSTRANDO TOP 3 CL:",
-    top3Ranking
+    "🔥 MOSTRANDO TOP 10 CL:",
+    rankingCL
   );
 
   return (
@@ -1052,7 +1052,7 @@ if (
     <CLRecognition
 
       ranking={
-        top3Ranking
+        rankingCL
       }
 
       onContinuar={() => {
