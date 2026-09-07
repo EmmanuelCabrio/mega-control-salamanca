@@ -7156,3 +7156,387 @@ body {
   }
 
 }
+
+/* =========================================================
+   🏆 TOP 10 CL SALAMANCA
+========================================================= */
+
+.cl-recognition {
+
+  max-width: 850px;
+
+  min-height: 100vh;
+
+  padding-top: 18px;
+  padding-bottom: 18px;
+
+}
+
+
+/* =========================================================
+   TOP 10 — CONTENEDOR
+========================================================= */
+
+.cl-recognition-ranking {
+
+  width: 100%;
+
+  max-width: 650px;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  gap: 5px;
+
+}
+
+
+/* =========================================================
+   TOP 4 AL 10
+========================================================= */
+
+.cl-podio-resto {
+
+  min-height: 46px;
+
+  padding: 5px 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1d2940,
+      #121a2b
+    );
+
+  color: white;
+
+  border:
+    1px solid rgba(
+      255,
+      255,
+      255,
+      .12
+    );
+
+  box-shadow:
+    0 5px 15px rgba(
+      0,
+      0,
+      0,
+      .18
+    );
+
+}
+
+
+/* =========================================================
+   NÚMERO DE POSICIÓN
+========================================================= */
+
+.cl-podio-posicion {
+
+  width: 62px;
+
+  flex-shrink: 0;
+
+  text-align: center;
+
+  font-size: 21px;
+
+  line-height: 1;
+
+  font-weight: 1000;
+
+  color: #ffd84d;
+
+}
+
+
+/* =========================================================
+   INFORMACIÓN DEL 4 AL 10
+========================================================= */
+
+.cl-podio-resto
+.cl-podio-info {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto;
+
+  grid-template-rows:
+    auto auto;
+
+  align-items: center;
+
+  column-gap: 15px;
+
+}
+
+
+.cl-podio-resto
+.cl-podio-info strong {
+
+  grid-column: 1;
+  grid-row: 1 / 3;
+
+  font-size: 14px;
+
+  line-height: 1.05;
+
+}
+
+
+.cl-podio-resto
+.cl-podio-info span {
+
+  grid-column: 2;
+  grid-row: 1;
+
+  margin: 0;
+
+  font-size: 8px;
+
+  text-align: right;
+
+}
+
+
+.cl-podio-resto
+.cl-podio-info b {
+
+  grid-column: 2;
+  grid-row: 2;
+
+  font-size: 18px;
+
+  line-height: 1;
+
+  text-align: right;
+
+  color: #ffd84d;
+
+}
+
+
+/* =========================================================
+   HACER UN POCO MÁS COMPACTO EL TOP 3
+========================================================= */
+
+.cl-podio-1 {
+
+  min-height: 72px;
+
+}
+
+
+.cl-podio-2,
+.cl-podio-3 {
+
+  min-height: 60px;
+
+}
+
+
+/* =========================================================
+   TEXTO INFERIOR MÁS COMPACTO
+========================================================= */
+
+.cl-recognition-frase {
+
+  margin-top: 8px;
+
+}
+
+
+.cl-recognition-frase strong {
+
+  font-size: 14px;
+
+}
+
+
+.cl-recognition-frase p {
+
+  margin-top: 4px;
+
+  font-size: 13px;
+
+}
+
+
+/* =========================================================
+   BOTÓN
+========================================================= */
+
+.cl-recognition-continuar {
+
+  margin-top: 8px;
+
+}
+
+
+/* =========================================================
+   📱 TOP 10 — CELULAR
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .cl-recognition {
+
+    min-height: 100vh;
+
+    padding:
+      15px 10px;
+
+  }
+
+
+  .cl-recognition-trofeo {
+
+    font-size: 37px;
+
+  }
+
+
+  .cl-recognition h1 {
+
+    font-size: 38px;
+
+  }
+
+
+  .cl-recognition h2 {
+
+    font-size: 20px;
+
+  }
+
+
+  .cl-recognition h3 {
+
+    margin-bottom: 10px;
+
+    font-size: 14px;
+
+  }
+
+
+  .cl-recognition-ranking {
+
+    gap: 4px;
+
+  }
+
+
+  .cl-podio {
+
+    width: 100%;
+
+  }
+
+
+  .cl-podio-1 {
+
+    min-height: 67px;
+
+    padding:
+      7px 12px;
+
+  }
+
+
+  .cl-podio-2,
+  .cl-podio-3 {
+
+    min-height: 55px;
+
+    padding:
+      6px 12px;
+
+  }
+
+
+  .cl-podio-resto {
+
+    min-height: 42px;
+
+    padding:
+      4px 10px;
+
+  }
+
+
+  .cl-podio-medalla {
+
+    width: 46px;
+
+    font-size: 28px;
+
+  }
+
+
+  .cl-podio-posicion {
+
+    width: 46px;
+
+    font-size: 18px;
+
+  }
+
+
+  .cl-podio-info strong {
+
+    font-size: 13px;
+
+  }
+
+
+  .cl-podio-1
+  .cl-podio-info strong {
+
+    font-size: 16px;
+
+  }
+
+
+  .cl-podio-resto
+  .cl-podio-info strong {
+
+    font-size: 12px;
+
+  }
+
+
+  .cl-podio-resto
+  .cl-podio-info b {
+
+    font-size: 16px;
+
+  }
+
+
+  .cl-recognition-frase strong {
+
+    font-size: 12px;
+
+  }
+
+
+  .cl-recognition-frase p {
+
+    font-size: 11px;
+
+  }
+
+
+  .cl-recognition-continuar {
+
+    padding:
+      9px 20px;
+
+    font-size: 13px;
+
+  }
+
+}
