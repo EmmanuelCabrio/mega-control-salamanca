@@ -7,10 +7,10 @@ function CLRecognition({
 }) {
 
   // ==================================================
-  // TOP 3 CL SALAMANCA
+  // TOP 10 CL SALAMANCA
   // ==================================================
 
-  const top3 =
+  const top10 =
     [...ranking]
       .filter(
         (promotor) =>
@@ -22,11 +22,11 @@ function CLRecognition({
           Number(b.productividad ?? 0) -
           Number(a.productividad ?? 0)
       )
-      .slice(0, 3);
+      .slice(0, 10);
 
 
   // ==================================================
-  // MEDALLAS
+  // MEDALLAS TOP 3
   // ==================================================
 
   const medallas = [
@@ -64,7 +64,7 @@ function CLRecognition({
 
         <h1>
 
-          TOP 3
+          TOP 10
 
         </h1>
 
@@ -81,84 +81,117 @@ function CLRecognition({
 
         <h3>
 
-          ¡EN LA CIMA
+          ¡LOS QUE ESTÁN MARCANDO
           <br />
-          TODO SE SIENTE DIFERENTE!
+          EL RITMO DEL CLUSTER!
 
         </h3>
 
 
         {/* ==========================================
-            TOP 3
+            TOP 10
         ========================================== */}
 
         <div className="cl-recognition-ranking">
 
 
-          {top3.map(
+          {top10.map(
 
             (
               promotor,
               index
-            ) => (
+            ) => {
 
-              <div
+              const posicion =
+                index + 1;
 
-                key={
-                  `${promotor.nombre}-${index}`
-                }
-
-                className={`
-                  cl-podio
-                  cl-podio-${index + 1}
-                `}
-
-              >
+              const esTop3 =
+                posicion <= 3;
 
 
-                {/* MEDALLA */}
+              return (
 
-                <div className="cl-podio-medalla">
+                <div
 
-                  {medallas[index]}
+                  key={
+                    `${promotor.nombre}-${index}`
+                  }
+
+                  className={
+                    esTop3
+                      ? `
+                          cl-podio
+                          cl-podio-${posicion}
+                        `
+                      : `
+                          cl-podio
+                          cl-podio-resto
+                        `
+                  }
+
+                >
+
+
+                  {/* ==================================
+                      POSICIÓN / MEDALLA
+                  ================================== */}
+
+                  <div
+                    className={
+                      esTop3
+                        ? "cl-podio-medalla"
+                        : "cl-podio-posicion"
+                    }
+                  >
+
+                    {
+                      esTop3
+                        ? medallas[index]
+                        : posicion
+                    }
+
+                  </div>
+
+
+                  {/* ==================================
+                      INFORMACIÓN
+                  ================================== */}
+
+                  <div className="cl-podio-info">
+
+                    <strong>
+
+                      {promotor.nombre}
+
+                    </strong>
+
+
+                    <span>
+
+                      Productividad
+
+                    </span>
+
+
+                    <b>
+
+                      {Number(
+                        promotor.productividad ?? 0
+                      ).toFixed(2)}
+
+                    </b>
+
+                  </div>
+
 
                 </div>
 
+              );
 
-                {/* INFORMACIÓN */}
-
-                <div className="cl-podio-info">
-
-                  <strong>
-
-                    {promotor.nombre}
-
-                  </strong>
-
-
-                  <span>
-
-                    Productividad
-
-                  </span>
-
-
-                  <b>
-
-                    {Number(
-                      promotor.productividad ?? 0
-                    ).toFixed(2)}
-
-                  </b>
-
-                </div>
-
-
-              </div>
-
-            )
+            }
 
           )}
+
 
         </div>
 
@@ -171,9 +204,9 @@ function CLRecognition({
 
           <strong>
 
-            🔥 GRACIAS POR MARCAR
+            🔥 EL TOP SE GANA
             <br />
-            LA DIFERENCIA.
+            TODOS LOS DÍAS.
 
           </strong>
 
