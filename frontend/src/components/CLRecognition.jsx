@@ -81,9 +81,9 @@ function CLRecognition({
 
         <h3>
 
-          ¡LOS QUE ESTÁN MARCANDO
+          ¡EN LA CIMA
           <br />
-          EL RITMO DEL CLUSTER!
+          TODO SE SIENTE DIFERENTE!
 
         </h3>
 
@@ -204,9 +204,9 @@ function CLRecognition({
 
           <strong>
 
-            🔥 EL TOP SE GANA
+            🔥 GRACIAS POR MARCAR
             <br />
-            TODOS LOS DÍAS.
+             LA DIFERENCIA.
 
           </strong>
 
