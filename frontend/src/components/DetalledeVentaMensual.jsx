@@ -136,38 +136,42 @@ function DetalledeVentaMensual({
   // ==================================================
 
   const registrosOrdenados =
-    useMemo(
-      () => {
+  useMemo(
+    () => {
 
-        return [...registros]
-          .filter(
-            (registro) => {
+      return [...registros]
+        .filter(
+          (registro) => {
 
-              const supervisor =
-                String(
-                  registro.supervisor ?? ""
-                ).trim();
-
-              return (
-                supervisor !== "" &&
-                supervisor !== "0"
-              );
-
-            }
-          )
-          .sort(
-            (a, b) =>
-              Number(
-                b.ventas ?? 0
-              ) -
-              Number(
-                a.ventas ?? 0
+            const supervisor =
+              String(
+                registro.supervisor ?? ""
               )
-          );
+                .trim()
+                .toUpperCase();
 
-      },
-      [registros]
-    );
+            return (
+              supervisor !== "" &&
+              supervisor !== "0" &&
+              supervisor !==
+                "MORALES PEREZ BENJAMIN"
+            );
+
+          }
+        )
+        .sort(
+          (a, b) =>
+            Number(
+              b.ventas ?? 0
+            ) -
+            Number(
+              a.ventas ?? 0
+            )
+        );
+
+    },
+    [registros]
+  );
 
 
   // ==================================================
