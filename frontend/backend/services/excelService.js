@@ -3139,6 +3139,386 @@ function leerCarteraPorDia() {
 
 }
 
+
+// ==================================================
+// 📊 DETALLE DE VENTA MENSUAL POR SUPERVISOR
+// ==================================================
+//
+// Hoja: VENTA DIARIA POR SUPERVISOR
+//
+// C  = Supervisor
+// AK = Ventas acumuladas
+// AN = Móvil
+// AO = Netflix
+// AP = Disney+
+// AQ = MAX
+// AR = RX
+//
+// ==================================================
+
+function leerDetalleVentaMensual() {
+
+  try {
+
+    // ================================================
+    // CARGAR WORKBOOK
+    // ================================================
+
+    const workbook =
+      cargarExcel();
+
+
+    // ================================================
+    // LOCALIZAR HOJA
+    // ================================================
+
+    const nombreHoja =
+      workbook.SheetNames.find(
+        (nombre) =>
+          String(nombre)
+            .trim()
+            .toUpperCase() ===
+          "VENTA DIARIA POR SUPERVISOR"
+      );
+
+
+    if (!nombreHoja) {
+
+      throw new Error(
+        'No se encontró la hoja "VENTA DIARIA POR SUPERVISOR"'
+      );
+
+    }
+
+
+    const hoja =
+      workbook.Sheets[
+        nombreHoja
+      ];
+
+
+    // ================================================
+    // CONVERTIR HOJA A MATRIZ
+    // ================================================
+
+    const datos =
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+    // ================================================
+    // COLUMNAS
+    // ================================================
+
+    // C
+    const COLUMNA_SUPERVISOR = 2;
+
+    // AK
+    const COLUMNA_VENTAS = 36;
+
+    // AN
+    const COLUMNA_MOVIL = 39;
+
+    // AO
+    const COLUMNA_NETFLIX = 40;
+
+    // AP
+    const COLUMNA_DISNEY = 41;
+
+    // AQ
+    const COLUMNA_MAX = 42;
+
+    // AR
+    const COLUMNA_RX = 43;
+
+
+    // ================================================
+    // ENCONTRAR EL PRIMER BLOQUE
+    // ================================================
+
+    let filaEncabezado =
+      -1;
+
+
+    for (
+      let i = 0;
+      i < datos.length;
+      i++
+    ) {
+
+      const fila =
+        datos[i];
+
+
+      const supervisor =
+        limpiarTexto(
+          fila[
+            COLUMNA_SUPERVISOR
+          ]
+        );
+
+
+      const encabezadoVentas =
+        limpiarTexto(
+          fila[
+            COLUMNA_VENTAS
+          ]
+        );
+
+
+      if (
+        supervisor ===
+          "VENTAS POR SUPERVISOR" &&
+        encabezadoVentas ===
+          "TOTAL"
+      ) {
+
+        filaEncabezado =
+          i;
+
+        break;
+
+      }
+
+    }
+
+
+    // ================================================
+    // VALIDAR ENCABEZADO
+    // ================================================
+
+    if (
+      filaEncabezado === -1
+    ) {
+
+      throw new Error(
+        "No se encontró el bloque mensual de supervisores"
+      );
+
+    }
+
+
+    // ================================================
+    // RECORRER REGISTROS
+    // ================================================
+
+    const registros =
+      [];
+
+
+    for (
+      let i =
+        filaEncabezado + 1;
+
+      i < datos.length;
+
+      i++
+    ) {
+
+      const fila =
+        datos[i];
+
+
+      const supervisor =
+        limpiarTexto(
+          fila[
+            COLUMNA_SUPERVISOR
+          ]
+        );
+
+
+      // ==============================================
+      // TERMINAR CUANDO EMPIECE EL SIGUIENTE BLOQUE
+      // ==============================================
+
+      if (
+        supervisor ===
+        "VENTAS POR SUPERVISOR"
+      ) {
+
+        break;
+
+      }
+
+
+      // ==============================================
+      // IGNORAR FILAS VACÍAS
+      // ==============================================
+
+      if (
+        !supervisor
+      ) {
+
+        continue;
+
+      }
+
+
+      // ==============================================
+      // IGNORAR REGISTROS INVALIDOS
+      // ==============================================
+
+      if (
+        supervisor === "0" ||
+        supervisor === "SUPERVISOR" ||
+        supervisor === "TOTAL"
+      ) {
+
+        continue;
+
+      }
+
+
+      // ==============================================
+      // VALORES
+      // ==============================================
+
+      const ventas =
+        Number(
+          fila[
+            COLUMNA_VENTAS
+          ] ?? 0
+        );
+
+
+      const movil =
+        Number(
+          fila[
+            COLUMNA_MOVIL
+          ] ?? 0
+        );
+
+
+      const netflix =
+        Number(
+          fila[
+            COLUMNA_NETFLIX
+          ] ?? 0
+        );
+
+
+      const disney =
+        Number(
+          fila[
+            COLUMNA_DISNEY
+          ] ?? 0
+        );
+
+
+      const max =
+        Number(
+          fila[
+            COLUMNA_MAX
+          ] ?? 0
+        );
+
+
+      const rx =
+        Number(
+          fila[
+            COLUMNA_RX
+          ] ?? 0
+        );
+
+
+      // ==============================================
+      // AGREGAR REGISTRO
+      // ==============================================
+
+      registros.push({
+
+        supervisor,
+
+        ventas:
+          Number.isFinite(
+            ventas
+          )
+            ? ventas
+            : 0,
+
+        rx:
+          Number.isFinite(
+            rx
+          )
+            ? rx
+            : 0,
+
+        movil:
+          Number.isFinite(
+            movil
+          )
+            ? movil
+            : 0,
+
+        netflix:
+          Number.isFinite(
+            netflix
+          )
+            ? netflix
+            : 0,
+
+        disney:
+          Number.isFinite(
+            disney
+          )
+            ? disney
+            : 0,
+
+        max:
+          Number.isFinite(
+            max
+          )
+            ? max
+            : 0,
+
+      });
+
+    }
+
+
+    // ================================================
+    // ORDENAR POR VENTAS
+    // ================================================
+
+    registros.sort(
+      (a, b) =>
+        b.ventas -
+        a.ventas
+    );
+
+
+    console.log(
+      "📊 Detalle venta mensual cargado:",
+      registros.length,
+      "supervisores"
+    );
+
+
+    return registros;
+
+
+  } catch (error) {
+
+    console.error(
+      "❌ Error al leer detalle de venta mensual:"
+    );
+
+    console.error(
+      error.message
+    );
+
+
+    throw error;
+
+  }
+
+}
+
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
