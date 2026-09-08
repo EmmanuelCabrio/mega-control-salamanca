@@ -248,44 +248,69 @@ export function calcularPrioridades(
   promotores
 ) {
 
-  return promotores.map(
-    (promotor) => {
+  return promotores
 
-      const prioridad =
-        calcularPrioridad(
-          promotor
+    // ==================================================
+    // EXCLUIR REGISTROS SIN PROMOTOR VÁLIDO
+    // ==================================================
+
+    .filter(
+      (promotor) => {
+
+        const nombre =
+          String(
+            promotor?.nombre ?? ""
+          ).trim();
+
+        return (
+          nombre !== "" &&
+          nombre !== "0"
         );
 
+      }
+    )
 
-      const alerta =
-        obtenerAlerta(
-          promotor
-        );
+    // ==================================================
+    // CALCULAR PRIORIDADES
+    // ==================================================
+
+    .map(
+      (promotor) => {
+
+        const prioridad =
+          calcularPrioridad(
+            promotor
+          );
 
 
-      const detalles =
-        obtenerDetalles(
-          promotor
-        );
+        const alerta =
+          obtenerAlerta(
+            promotor
+          );
 
 
-      return {
+        const detalles =
+          obtenerDetalles(
+            promotor
+          );
 
-        ...promotor,
 
-        prioridad,
+        return {
 
-        ...alerta,
+          ...promotor,
 
-        detalles,
+          prioridad,
 
-      };
+          ...alerta,
 
-    }
-  );
+          detalles,
+
+        };
+
+      }
+    );
 
 }
-
 
 // ==================================================
 // ORDENAR POR PRIORIDAD
