@@ -23,6 +23,9 @@ import CarteraPorDia
 import ProyeccionDireccion
   from "./ProyeccionDireccion";
 
+import DetalledeVentaMensual
+  from "./DetalledeVentaMensual";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -587,6 +590,8 @@ return (
       <Fragment key={versionDatos}>
 
         <PlantillaStatus />
+
+        <DetalledeVentaMensual />
 
         <VentaVsMesAnterior />
 
