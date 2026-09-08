@@ -4703,6 +4703,8 @@ module.exports = {
 
   leerProyeccion,
 
+  leerDetalleVentaMensual,
+
   reemplazarExcelEnSupabase,
 
   actualizarDatosDesdeSupabase,
