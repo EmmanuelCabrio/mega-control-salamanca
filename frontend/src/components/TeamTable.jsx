@@ -10,21 +10,22 @@ function TeamTable({
 }) {
 
   // ==================================================
-// EQUIPO DEL SUPERVISOR
-// ==================================================
+  // EQUIPO DEL SUPERVISOR
+  // ==================================================
 
-const equipo =
-  registros.filter(
-    (promotor) =>
-      promotor.supervisor ===
-        supervisorSeleccionado &&
+  const equipo =
+    registros.filter(
+      (promotor) =>
+        promotor.supervisor ===
+          supervisorSeleccionado &&
 
-      promotor.nombre &&
+        promotor.nombre &&
 
-      String(
-        promotor.nombre
-      ).trim() !== "0"
-  );
+        String(
+          promotor.nombre
+        ).trim() !== "0"
+    );
+
 
   // ==================================================
   // ORDENAR POR PRODUCTIVIDAD
@@ -68,12 +69,16 @@ const equipo =
             </th>
 
             <th>
+              Antigüedad
+            </th>
+
+            <th>
               Ventas
             </th>
 
             <th>
-             RX
-           </th>
+              RX
+            </th>
 
             <th>
               Productividad
@@ -98,14 +103,31 @@ const equipo =
                 }
               >
 
-                {/* NOMBRE */}
+                {/* ==================================
+                    NOMBRE
+                ================================== */}
 
                 <td>
                   {promotor.nombre}
                 </td>
 
 
-                {/* VENTAS DEL MES */}
+                {/* ==================================
+                    DÍAS DE ANTIGÜEDAD
+                ================================== */}
+
+                <td>
+
+                  {Number(
+                    promotor.diasAntiguedad ?? 0
+                  ).toFixed(0)} días
+
+                </td>
+
+
+                {/* ==================================
+                    VENTAS DEL MES
+                ================================== */}
 
                 <td>
 
@@ -115,24 +137,28 @@ const equipo =
 
                 </td>
 
-                {/* RX */}
 
-                 <td>
-
-                  {Number(
-                 promotor.recuperaciones ?? 0
-                  ).toFixed(0)}
-
-                  </td>
-
-
-
-                {/* PRODUCTIVIDAD */}
+                {/* ==================================
+                    RX
+                ================================== */}
 
                 <td>
 
                   {Number(
-                    promotor.productividad
+                    promotor.recuperaciones ?? 0
+                  ).toFixed(0)}
+
+                </td>
+
+
+                {/* ==================================
+                    PRODUCTIVIDAD
+                ================================== */}
+
+                <td>
+
+                  {Number(
+                    promotor.productividad ?? 0
                   ).toFixed(2)}
 
                 </td>
