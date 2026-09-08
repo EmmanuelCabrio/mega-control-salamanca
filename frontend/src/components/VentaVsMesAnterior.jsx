@@ -1,75 +1,42 @@
-import React, {
+import {
   useEffect,
   useMemo,
-  useState
+  useState,
 } from "react";
 
 import {
-  fetchProtegido
+  fetchProtegido,
 } from "../services/authService";
 
 
 // ==================================================
-// 📊 VENTA VS MES ANTERIOR
+// 📊 DETALLE DE VENTA MENSUAL
 // ==================================================
 
-function VentaVsMesAnterior() {
-
+function DetalledeVentaMensual({
+  onSeleccionarSupervisor,
+}) {
 
   // ==================================================
-  // DATOS
+  // ESTADOS
   // ==================================================
 
   const [
     registros,
-    setRegistros
-  ] = useState([]);
-
-
-  const [
-    servicios,
-    setServicios
-  ] = useState([]);
-
-
-  const [
-    canales,
-    setCanales
-  ] = useState([]);
-
-
-  const [
-    meses,
-    setMeses
+    setRegistros,
   ] = useState([]);
 
 
   const [
     cargando,
-    setCargando
+    setCargando,
   ] = useState(true);
 
 
   const [
     error,
-    setError
+    setError,
   ] = useState("");
-
-
-  // ==================================================
-  // FILTROS
-  // ==================================================
-
-  const [
-    servicioSeleccionado,
-    setServicioSeleccionado
-  ] = useState("TODOS");
-
-
-  const [
-    canalSeleccionado,
-    setCanalSeleccionado
-  ] = useState("TODOS");
 
 
   // ==================================================
@@ -89,13 +56,15 @@ function VentaVsMesAnterior() {
 
         const respuesta =
           await fetchProtegido(
-            "/api/venta-vs-mes-anterior"
+            "/api/detalle-venta-mensual"
           );
 
 
-        if (
-          !respuesta.ok
-        ) {
+        // ============================================
+        // VALIDAR HTTP
+        // ============================================
+
+        if (!respuesta.ok) {
 
           throw new Error(
             `Error HTTP ${respuesta.status}`
@@ -104,52 +73,47 @@ function VentaVsMesAnterior() {
         }
 
 
+        // ============================================
+        // LEER RESPUESTA
+        // ============================================
+
         const datos =
           await respuesta.json();
 
 
-        if (
-          !datos.correcto
-        ) {
+        // ============================================
+        // VALIDAR BACKEND
+        // ============================================
+
+        if (!datos.correcto) {
 
           throw new Error(
             datos.mensaje ||
-            "No se pudo cargar la información"
+            "No se pudo cargar el resultado mensual"
           );
 
         }
 
+
+        // ============================================
+        // GUARDAR REGISTROS
+        // ============================================
 
         setRegistros(
           datos.registros || []
         );
 
 
-        setServicios(
-          datos.servicios || []
-        );
-
-
-        setCanales(
-          datos.canales || []
-        );
-
-
-        setMeses(
-          datos.meses || []
-        );
-
-
       } catch (error) {
 
         console.error(
-          "❌ Error Venta vs Mes Anterior:",
+          "❌ Error Detalle Venta Mensual:",
           error
         );
 
 
         setError(
-          "No se pudo cargar la información"
+          "No se pudo cargar el resultado mensual"
         );
 
 
@@ -168,238 +132,137 @@ function VentaVsMesAnterior() {
 
 
   // ==================================================
-  // MES ANTERIOR / MES ACTUAL
+  // REGISTROS ORDENADOS
   // ==================================================
 
-  const mesAnterior =
-    meses.length >= 2
-      ? meses[0]
-      : "";
+  const registrosOrdenados =
+    useMemo(
+      () => {
 
+        return [...registros]
+          .filter(
+            (registro) => {
 
-  const mesActual =
-    meses.length >= 2
-      ? meses[1]
-      : meses[0] || "";
+              const supervisor =
+                String(
+                  registro.supervisor ?? ""
+                ).trim();
 
+              return (
+                supervisor !== "" &&
+                supervisor !== "0"
+              );
 
-  // ==================================================
-  // FILTRAR REGISTROS
-  // ==================================================
-
-  const registrosFiltrados =
-    useMemo(() => {
-
-      return registros.filter(
-        (registro) => {
-
-          const coincideServicio =
-            servicioSeleccionado ===
-            "TODOS" ||
-            registro.servicio ===
-            servicioSeleccionado;
-
-
-          const coincideCanal =
-            canalSeleccionado ===
-            "TODOS" ||
-            registro.canal ===
-            canalSeleccionado;
-
-
-          return (
-            coincideServicio &&
-            coincideCanal
+            }
+          )
+          .sort(
+            (a, b) =>
+              Number(
+                b.ventas ?? 0
+              ) -
+              Number(
+                a.ventas ?? 0
+              )
           );
 
-        }
-      );
-
-    }, [
-      registros,
-      servicioSeleccionado,
-      canalSeleccionado
-    ]);
-
-
-  // ==================================================
-  // AGRUPAR PARA LA TABLA
-  // ==================================================
-
-  const tabla =
-    useMemo(() => {
-
-      const mapa =
-        new Map();
-
-
-      registrosFiltrados.forEach(
-        (registro) => {
-
-          const clave =
-
-            servicioSeleccionado ===
-            "TODOS"
-
-              ? registro.servicio
-
-              : registro.canal;
-
-
-          if (
-            !mapa.has(clave)
-          ) {
-
-            mapa.set(
-              clave,
-              {
-                nombre: clave,
-                anterior: 0,
-                actual: 0
-              }
-            );
-
-          }
-
-
-          const fila =
-            mapa.get(
-              clave
-            );
-
-
-          if (
-            registro.mes ===
-            mesAnterior
-          ) {
-
-            fila.anterior +=
-              registro.ventas;
-
-          }
-
-
-          if (
-            registro.mes ===
-            mesActual
-          ) {
-
-            fila.actual +=
-              registro.ventas;
-
-          }
-
-        }
-      );
-
-
-      return Array.from(
-        mapa.values()
-      ).map(
-        (fila) => {
-
-          const diferencia =
-            fila.actual -
-            fila.anterior;
-
-
-          const porcentaje =
-
-            fila.anterior > 0
-
-              ? (
-                  diferencia /
-                  fila.anterior
-                ) * 100
-
-              : 0;
-
-
-          return {
-
-            ...fila,
-
-            diferencia,
-
-            porcentaje
-
-          };
-
-        }
-      );
-
-    }, [
-      registrosFiltrados,
-      servicioSeleccionado,
-      mesAnterior,
-      mesActual
-    ]);
-
-
-  // ==================================================
-  // TOTALES
-  // ==================================================
-
-  const totalAnterior =
-    tabla.reduce(
-      (
-        total,
-        fila
-      ) =>
-        total +
-        fila.anterior,
-      0
+      },
+      [registros]
     );
 
 
-  const totalActual =
-    tabla.reduce(
-      (
-        total,
-        fila
-      ) =>
-        total +
-        fila.actual,
-      0
+  // ==================================================
+  // TOTALES CL
+  // ==================================================
+
+  const totales =
+    useMemo(
+      () => {
+
+        return registrosOrdenados.reduce(
+          (
+            acumulado,
+            registro
+          ) => {
+
+            acumulado.ventas +=
+              Number(
+                registro.ventas ?? 0
+              );
+
+
+            acumulado.rx +=
+              Number(
+                registro.rx ?? 0
+              );
+
+
+            acumulado.movil +=
+              Number(
+                registro.movil ?? 0
+              );
+
+
+            acumulado.netflix +=
+              Number(
+                registro.netflix ?? 0
+              );
+
+
+            acumulado.disney +=
+              Number(
+                registro.disney ?? 0
+              );
+
+
+            acumulado.max +=
+              Number(
+                registro.max ?? 0
+              );
+
+
+            return acumulado;
+
+          },
+          {
+            ventas: 0,
+            rx: 0,
+            movil: 0,
+            netflix: 0,
+            disney: 0,
+            max: 0,
+          }
+        );
+
+      },
+      [registrosOrdenados]
     );
-
-
-  const diferenciaTotal =
-    totalActual -
-    totalAnterior;
-
-
-  const porcentajeTotal =
-
-    totalAnterior > 0
-
-      ? (
-          diferenciaTotal /
-          totalAnterior
-        ) * 100
-
-      : 0;
 
 
   // ==================================================
   // CARGANDO
   // ==================================================
 
-  if (
-    cargando
-  ) {
+  if (cargando) {
 
     return (
 
-      <section className="venta-vs-mes-anterior">
+      <section className="detalle-venta-mensual">
 
-        <h2>
-          📊 Venta vs Mes Anterior
-        </h2>
+        <div className="detalle-venta-mensual-header">
 
-        <p>
-          Cargando información...
-        </p>
+          <div>
+
+            <h2>
+              📊 Resultado Comercial del Mes
+            </h2>
+
+            <p>
+              Cargando información...
+            </p>
+
+          </div>
+
+        </div>
 
       </section>
 
@@ -412,21 +275,27 @@ function VentaVsMesAnterior() {
   // ERROR
   // ==================================================
 
-  if (
-    error
-  ) {
+  if (error) {
 
     return (
 
-      <section className="venta-vs-mes-anterior">
+      <section className="detalle-venta-mensual">
 
-        <h2>
-          📊 Venta vs Mes Anterior
-        </h2>
+        <div className="detalle-venta-mensual-header">
 
-        <p>
-          🔴 {error}
-        </p>
+          <div>
+
+            <h2>
+              📊 Resultado Comercial del Mes
+            </h2>
+
+            <p className="detalle-venta-error">
+              🔴 {error}
+            </p>
+
+          </div>
+
+        </div>
 
       </section>
 
@@ -441,193 +310,111 @@ function VentaVsMesAnterior() {
 
   return (
 
-    <section className="venta-vs-mes-anterior">
+    <section className="detalle-venta-mensual">
 
 
       {/* ============================================
           ENCABEZADO
       ============================================ */}
 
-      <div>
+      <div className="detalle-venta-mensual-header">
 
-        <h2>
+        <div>
 
-          📊 Venta vs Mes Anterior
+          <h2>
+            📊 Resultado Comercial del Mes
+          </h2>
 
-        </h2>
+          <p>
+            Venta, recuperaciones y servicios adicionales
+            por supervisor
+          </p>
 
-
-        <p>
-
-          Comparativo de ventas comerciales
-
-        </p>
+        </div>
 
       </div>
 
 
       {/* ============================================
-          FILTROS
+          KPIS GENERALES
       ============================================ */}
 
-      <div className="venta-vs-mes-anterior-filtros">
+      <div className="detalle-venta-kpis">
 
 
-        {/* SERVICIO */}
+        <div className="detalle-venta-kpi">
 
-        <div>
-
-          <label>
-            Servicio
-          </label>
-
-
-          <select
-
-            value={
-              servicioSeleccionado
-            }
-
-            onChange={(evento) =>
-              setServicioSeleccionado(
-                evento.target.value
-              )
-            }
-
-          >
-
-            <option value="TODOS">
-              Todos
-            </option>
-
-
-            {servicios.map(
-              (servicio) => (
-
-                <option
-                  key={servicio}
-                  value={servicio}
-                >
-                  {servicio}
-                </option>
-
-              )
-            )}
-
-          </select>
-
-        </div>
-
-
-        {/* CANAL */}
-
-        <div>
-
-          <label>
-            Canal
-          </label>
-
-
-          <select
-
-            value={
-              canalSeleccionado
-            }
-
-            onChange={(evento) =>
-              setCanalSeleccionado(
-                evento.target.value
-              )
-            }
-
-          >
-
-            <option value="TODOS">
-              Todos
-            </option>
-
-
-            {canales.map(
-              (canal) => (
-
-                <option
-                  key={canal}
-                  value={canal}
-                >
-                  {canal}
-                </option>
-
-              )
-            )}
-
-          </select>
-
-        </div>
-
-
-      </div>
-
-
-      {/* ============================================
-          RESUMEN
-      ============================================ */}
-
-      <div className="venta-vs-mes-anterior-resumen">
-
-
-        <div>
-
-          <small>
-            {mesAnterior}
-          </small>
+          <span>
+            Ventas CL
+          </span>
 
           <strong>
-            {totalAnterior}
+            {totales.ventas}
           </strong>
 
         </div>
 
 
-        <div>
+        <div className="detalle-venta-kpi">
 
-          <small>
-            {mesActual}
-          </small>
+          <span>
+            RX CL
+          </span>
 
           <strong>
-            {totalActual}
+            {totales.rx}
           </strong>
 
         </div>
 
 
-        <div>
+        <div className="detalle-venta-kpi">
 
-          <small>
-            Diferencia
-          </small>
+          <span>
+            Móvil
+          </span>
 
           <strong>
-
-            {diferenciaTotal > 0
-              ? `+${diferenciaTotal}`
-              : diferenciaTotal}
-
+            {totales.movil}
           </strong>
 
         </div>
 
 
-        <div>
+        <div className="detalle-venta-kpi">
 
-          <small>
-            Variación
-          </small>
+          <span>
+            Netflix
+          </span>
 
           <strong>
+            {totales.netflix}
+          </strong>
 
-            {porcentajeTotal.toFixed(2)}%
+        </div>
 
+
+        <div className="detalle-venta-kpi">
+
+          <span>
+            Disney+
+          </span>
+
+          <strong>
+            {totales.disney}
+          </strong>
+
+        </div>
+
+
+        <div className="detalle-venta-kpi">
+
+          <span>
+            MAX
+          </span>
+
+          <strong>
+            {totales.max}
           </strong>
 
         </div>
@@ -640,7 +427,7 @@ function VentaVsMesAnterior() {
           TABLA
       ============================================ */}
 
-      <div className="venta-vs-mes-anterior-tabla">
+      <div className="detalle-venta-mensual-tabla">
 
         <table>
 
@@ -649,26 +436,31 @@ function VentaVsMesAnterior() {
             <tr>
 
               <th>
-                {servicioSeleccionado ===
-                "TODOS"
-                  ? "Servicio"
-                  : "Canal"}
+                Supervisor
               </th>
 
               <th>
-                {mesAnterior}
+                Ventas
               </th>
 
               <th>
-                {mesActual}
+                RX
               </th>
 
               <th>
-                Diferencia
+                Móvil
               </th>
 
               <th>
-                %
+                Netflix
+              </th>
+
+              <th>
+                Disney+
+              </th>
+
+              <th>
+                MAX
               </th>
 
             </tr>
@@ -678,96 +470,257 @@ function VentaVsMesAnterior() {
 
           <tbody>
 
-            {tabla.map(
-              (fila) => (
 
-                <tr
-                  key={
-                    fila.nombre
-                  }
-                >
+            {registrosOrdenados.map(
+              (
+                registro,
+                index
+              ) => {
 
-                  <td>
+                // ==================================
+                // NORMALIZAR VALORES
+                // ==================================
 
-                    <strong>
-                      {fila.nombre}
-                    </strong>
-
-                  </td>
-
-
-                  <td>
-                    {fila.anterior}
-                  </td>
+                const ventas =
+                  Number(
+                    registro.ventas ?? 0
+                  );
 
 
-                  <td>
-                    {fila.actual}
-                  </td>
+                const rx =
+                  Number(
+                    registro.rx ?? 0
+                  );
 
 
-                  <td>
-
-                    {fila.diferencia > 0
-                      ? `+${fila.diferencia}`
-                      : fila.diferencia}
-
-                  </td>
+                const movil =
+                  Number(
+                    registro.movil ?? 0
+                  );
 
 
-                  <td>
+                const netflix =
+                  Number(
+                    registro.netflix ?? 0
+                  );
 
-                    {fila.porcentaje.toFixed(2)}%
 
-                  </td>
+                const disney =
+                  Number(
+                    registro.disney ?? 0
+                  );
 
-                </tr>
 
-              )
+                const max =
+                  Number(
+                    registro.max ?? 0
+                  );
+
+
+                return (
+
+                  <tr
+                    key={
+                      `${registro.supervisor}-${index}`
+                    }
+                  >
+
+
+                    {/* ==============================
+                        SUPERVISOR
+                    ============================== */}
+
+                    <td>
+
+                      <button
+                        type="button"
+
+                        className="detalle-venta-supervisor"
+
+                        onClick={() => {
+
+                          if (
+                            onSeleccionarSupervisor
+                          ) {
+
+                            onSeleccionarSupervisor(
+                              registro
+                            );
+
+                          }
+
+                        }}
+                      >
+
+                        {registro.supervisor}
+
+                      </button>
+
+                    </td>
+
+
+                    {/* ==============================
+                        VENTAS
+                    ============================== */}
+
+                    <td className="detalle-venta-principal">
+
+                      {ventas}
+
+                    </td>
+
+
+                    {/* ==============================
+                        RX
+                    ============================== */}
+
+                    <td>
+
+                      {rx}
+
+                    </td>
+
+
+                    {/* ==============================
+                        MÓVIL
+                    ============================== */}
+
+                    <td>
+
+                      {movil}
+
+                    </td>
+
+
+                    {/* ==============================
+                        NETFLIX
+                    ============================== */}
+
+                    <td>
+
+                      {netflix}
+
+                    </td>
+
+
+                    {/* ==============================
+                        DISNEY+
+                    ============================== */}
+
+                    <td>
+
+                      {disney}
+
+                    </td>
+
+
+                    {/* ==============================
+                        MAX
+                    ============================== */}
+
+                    <td>
+
+                      {max}
+
+                    </td>
+
+
+                  </tr>
+
+                );
+
+              }
             )}
 
 
-            {/* TOTAL */}
+            {/* ======================================
+                TOTAL CL
+            ====================================== */}
 
-            <tr>
+            {registrosOrdenados.length > 0 && (
 
-              <td>
-                <strong>
-                  TOTAL
-                </strong>
-              </td>
+              <tr className="detalle-venta-total">
 
-              <td>
-                <strong>
-                  {totalAnterior}
-                </strong>
-              </td>
+                <td>
 
-              <td>
-                <strong>
-                  {totalActual}
-                </strong>
-              </td>
+                  <strong>
+                    TOTAL CL
+                  </strong>
 
-              <td>
-                <strong>
-                  {diferenciaTotal > 0
-                    ? `+${diferenciaTotal}`
-                    : diferenciaTotal}
-                </strong>
-              </td>
+                </td>
 
-              <td>
-                <strong>
-                  {porcentajeTotal.toFixed(2)}%
-                </strong>
-              </td>
 
-            </tr>
+                <td>
+                  {totales.ventas}
+                </td>
+
+
+                <td>
+                  {totales.rx}
+                </td>
+
+
+                <td>
+                  {totales.movil}
+                </td>
+
+
+                <td>
+                  {totales.netflix}
+                </td>
+
+
+                <td>
+                  {totales.disney}
+                </td>
+
+
+                <td>
+                  {totales.max}
+                </td>
+
+              </tr>
+
+            )}
+
+
+            {/* ======================================
+                SIN DATOS
+            ====================================== */}
+
+            {registrosOrdenados.length === 0 && (
+
+              <tr>
+
+                <td
+                  colSpan="7"
+                  className="detalle-venta-sin-datos"
+                >
+
+                  No hay información disponible.
+
+                </td>
+
+              </tr>
+
+            )}
+
 
           </tbody>
 
         </table>
+
+      </div>
+
+
+      {/* ============================================
+          AYUDA
+      ============================================ */}
+
+      <div className="detalle-venta-ayuda">
+
+        💡 Selecciona un supervisor para consultar
+        posteriormente el detalle de su equipo.
 
       </div>
 
@@ -779,4 +732,4 @@ function VentaVsMesAnterior() {
 }
 
 
-export default VentaVsMesAnterior;
+export default DetalledeVentaMensual;
