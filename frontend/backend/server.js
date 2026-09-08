@@ -13,6 +13,7 @@ const {
   leerProductividadPorCanal,
   leerCarteraPorDia,
   leerProyeccion,
+  leerDetalleVentaMensual,
   actualizarDatosDesdeSupabase,
   reemplazarExcelEnSupabase,
   descargarExcelDesdeSupabase,
@@ -1414,6 +1415,93 @@ app.get(
           "No se pudo cargar la proyección",
 
       });
+
+    }
+
+  }
+);
+
+// ==================================================
+// 📊 DETALLE DE VENTA MENSUAL — DIRECCIÓN
+// ==================================================
+
+app.get(
+  "/api/detalle-venta-mensual",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      // ============================================
+      // VALIDAR ROL
+      // ============================================
+
+      const rol =
+        normalizarRol(
+          req.rol
+        );
+
+
+      if (
+        rol !== "DIRECCIÓN"
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto: false,
+
+            mensaje:
+              "Acceso exclusivo de Dirección",
+
+          });
+
+      }
+
+
+      // ============================================
+      // LEER DATOS DEL EXCEL
+      // ============================================
+
+      const registros =
+        leerDetalleVentaMensual();
+
+
+      // ============================================
+      // RESPUESTA
+      // ============================================
+
+      return res.json({
+
+        correcto: true,
+
+        registros,
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/detalle-venta-mensual:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          correcto: false,
+
+          mensaje:
+            "No se pudo cargar el detalle de venta mensual",
+
+        });
 
     }
 
