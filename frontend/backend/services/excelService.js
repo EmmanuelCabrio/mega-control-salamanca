@@ -1334,6 +1334,9 @@ function leerRegistros(
         fila[5]
       );
 
+    const columnaG =
+  fila[6];
+
     const columnaH =
       fila[7];
 
@@ -1408,6 +1411,11 @@ function leerRegistros(
         : Number(
             columnaH
           );
+
+    const diasAntiguedad =
+  Number(
+    columnaG ?? 0
+  );
 
     if (
       !supervisorActual
@@ -1494,6 +1502,15 @@ function leerRegistros(
 
       nombre:
         nombrePromotor,
+
+      diasAntiguedad:
+  Number.isFinite(
+    diasAntiguedad
+  )
+    ? Math.round(
+        diasAntiguedad
+      )
+    : 0,
 
       productividad,
 
