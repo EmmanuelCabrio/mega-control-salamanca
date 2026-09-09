@@ -26,6 +26,9 @@ import ProyeccionDireccion
 import DetalledeVentaMensual
   from "./DetalledeVentaMensual";
 
+import ResumenVsMesAnteriorSupervisores
+  from "./ResumenVsMesAnteriorSupervisores";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -587,21 +590,23 @@ return (
       </section>
 
 
-      <Fragment key={versionDatos}>
+ <Fragment key={versionDatos}>
 
-        <PlantillaStatus />
+  <PlantillaStatus />
 
-        <DetalledeVentaMensual />
+  <DetalledeVentaMensual />
 
-        <VentaVsMesAnterior />
+  <ResumenVsMesAnteriorSupervisores />
 
-        <ProductividadPorCanal />
+  <VentaVsMesAnterior />
 
-        <CarteraPorDia />
+  <ProductividadPorCanal />
 
-        <ProyeccionDireccion />
+  <CarteraPorDia />
 
-      </Fragment>
+  <ProyeccionDireccion />
+
+</Fragment>
 
     </div>
 
