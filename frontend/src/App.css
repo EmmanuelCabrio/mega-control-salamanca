@@ -7958,3 +7958,309 @@ body {
   }
 
 }
+
+
+/* =========================================================
+   VS MISMO DÍA MES ANTERIOR
+========================================================= */
+
+.comparativa-mes-anterior {
+  width: 100%;
+  margin-top: 25px;
+  padding: 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #171717,
+      #242424
+    );
+
+  color: #ffffff;
+
+  border-radius: 22px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, 0.22);
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.comparativa-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+
+  padding-bottom: 18px;
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.35);
+}
+
+
+.comparativa-subtitulo {
+  margin-bottom: 7px;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  letter-spacing: 1px;
+
+  color: #cbd5e1;
+}
+
+
+.comparativa-encabezado h2 {
+  margin: 0;
+
+  font-size: 27px;
+  font-weight: 900;
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   RESULTADO SUPERVISOR
+========================================================= */
+
+.comparativa-resultado-supervisor {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+
+.comparativa-resultado-supervisor strong {
+  font-size: 31px;
+  font-weight: 900;
+}
+
+
+.comparativa-resultado-supervisor span {
+  margin-top: 3px;
+
+  color: #cbd5e1;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.comparativa-resumen {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 12px;
+
+  margin:
+    20px 0 16px;
+}
+
+
+.comparativa-resumen > div {
+  padding: 14px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  text-align: center;
+}
+
+
+.comparativa-resumen span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  letter-spacing: 0.5px;
+}
+
+
+.comparativa-resumen strong {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.comparativa-tabla-contenedor {
+  width: 100%;
+}
+
+
+.comparativa-tabla {
+  width: 100%;
+
+  border-collapse:
+    collapse;
+}
+
+
+.comparativa-tabla th {
+  padding:
+    14px 12px;
+
+  color:
+    #cbd5e1;
+
+  font-size:
+    13px;
+
+  font-weight:
+    900;
+
+  text-align:
+    center;
+}
+
+
+.comparativa-tabla th:first-child {
+  text-align:
+    left;
+}
+
+
+.comparativa-tabla td {
+  padding:
+    13px 12px;
+
+  color:
+    #f8fafc;
+
+  font-size:
+    15px;
+
+  font-weight:
+    700;
+
+  text-align:
+    center;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.06
+    );
+}
+
+
+.comparativa-tabla td:first-child {
+  text-align:
+    left;
+}
+
+
+/* =========================================================
+   COLORES DE RESULTADO
+========================================================= */
+
+.comparativa-positivo {
+  color:
+    #4ade80 !important;
+}
+
+
+.comparativa-negativo {
+  color:
+    #f87171 !important;
+}
+
+
+.comparativa-neutral {
+  color:
+    #e2e8f0 !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (
+  max-width: 700px
+) {
+
+  .comparativa-mes-anterior {
+    padding:
+      20px 15px;
+  }
+
+
+  .comparativa-encabezado {
+    align-items:
+      flex-start;
+  }
+
+
+  .comparativa-encabezado h2 {
+    font-size:
+      20px;
+  }
+
+
+  .comparativa-resultado-supervisor strong {
+    font-size:
+      24px;
+  }
+
+
+  .comparativa-resumen {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+
+  .comparativa-resumen strong {
+    font-size:
+      20px;
+  }
+
+
+  .comparativa-tabla th,
+  .comparativa-tabla td {
+    padding:
+      10px 5px;
+
+    font-size:
+      12px;
+  }
+
+
+  .comparativa-tabla td:first-child {
+    font-size:
+      11px;
+  }
+
+}
