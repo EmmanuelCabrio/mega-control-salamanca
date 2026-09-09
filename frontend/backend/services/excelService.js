@@ -4141,18 +4141,59 @@ async function leerExcel() {
         "VENTA VS PPTO"
       ];
 
+    // ==================================================
+// COMPARATIVA VS MES ANTERIOR
+// ==================================================
+
+const nombreHojaMesActual =
+  workbook.SheetNames.find(
+    (nombre) =>
+      String(nombre)
+        .trim()
+        .toUpperCase() ===
+      "BD ACUMULADO VENTA MES"
+  );
+
+
+const nombreHojaMesAnterior =
+  workbook.SheetNames.find(
+    (nombre) =>
+      String(nombre)
+        .trim()
+        .toUpperCase() ===
+      "ACUMULADO VENTA MES ANTERIOR"
+  );
+
+
+const hojaMesActual =
+  nombreHojaMesActual
+    ? workbook.Sheets[
+        nombreHojaMesActual
+      ]
+    : null;
+
+
+const hojaMesAnterior =
+  nombreHojaMesAnterior
+    ? workbook.Sheets[
+        nombreHojaMesAnterior
+      ]
+    : null;
+
 
     if (
-      !hojaProduccion ||
-      !hojaSinVenta ||
-      !hojaVentaVsPpto
-    ) {
+  !hojaProduccion ||
+  !hojaSinVenta ||
+  !hojaVentaVsPpto ||
+  !hojaMesActual ||
+  !hojaMesAnterior
+) {
 
-      throw new Error(
-        "No se encontraron las hojas necesarias para REGISTROS"
-      );
+  throw new Error(
+    "No se encontraron las hojas necesarias para REGISTROS"
+  );
 
-    }
+}
 
 
     const diasHabiles =
@@ -4160,14 +4201,21 @@ async function leerExcel() {
         hojaProduccion
       );
 
+    const comparativaMesAnterior =
+  leerComparativaMesAnterior(
+    hojaMesActual,
+    hojaMesAnterior
+  );
+
 
     const registros =
-      leerRegistros(
-        hojaProduccion,
-        hojaSinVenta,
-        hojaVentaVsPpto,
-        diasHabiles
-      );
+  leerRegistros(
+    hojaProduccion,
+    hojaSinVenta,
+    hojaVentaVsPpto,
+    diasHabiles,
+    comparativaMesAnterior.mapa
+  );
 
 
     // ==================================================
@@ -4804,6 +4852,8 @@ function actualizarDatosDesdeSupabase() {
       "KPI´S VENTAS",
       "CARTERA POR DÍA",
       "PROYECCION",
+      "BD ACUMULADO VENTA MES",
+      "ACUMULADO VENTA MES ANTERIOR",
 
     ];
 
@@ -4944,6 +4994,8 @@ function validarExcelParaCarga(buffer) {
     "KPI´S VENTAS",
     "CARTERA POR DÍA",
     "PROYECCION",
+    "BD ACUMULADO VENTA MES",
+    "ACUMULADO VENTA MES ANTERIOR",
 
   ];
 
