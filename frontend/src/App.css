@@ -8264,3 +8264,445 @@ body {
   }
 
 }
+
+
+/* =========================================================
+   DIRECCIÓN — VS MISMO DÍA MES ANTERIOR
+========================================================= */
+
+.resumen-vs-supervisores {
+  width: 100%;
+  margin-top: 24px;
+  padding: 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #171717,
+      #222222
+    );
+
+  border-radius: 22px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, 0.18);
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.resumen-vs-header {
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  gap: 20px;
+
+  padding-bottom:
+    18px;
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.22);
+}
+
+
+.resumen-vs-etiqueta {
+  margin-bottom: 7px;
+
+  color: #93c5fd;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  letter-spacing: 1px;
+}
+
+
+.resumen-vs-header h2 {
+  margin:
+    0 0 5px;
+
+  color:
+    #ffffff;
+
+  font-size:
+    27px;
+
+  font-weight:
+    900;
+}
+
+
+.resumen-vs-header p {
+  margin: 0;
+
+  color:
+    #94a3b8;
+
+  font-size:
+    14px;
+}
+
+
+/* =========================================================
+   RESULTADO CL DESTACADO
+========================================================= */
+
+.resumen-vs-total-destacado {
+  display: flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    flex-end;
+
+  min-width:
+    120px;
+}
+
+
+.resumen-vs-total-destacado strong {
+  font-size:
+    32px;
+
+  font-weight:
+    900;
+
+  line-height:
+    1;
+}
+
+
+.resumen-vs-total-destacado span {
+  margin-top:
+    7px;
+
+  color:
+    #cbd5e1;
+
+  font-size:
+    11px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.8px;
+}
+
+
+/* =========================================================
+   KPIS CL
+========================================================= */
+
+.resumen-vs-kpis {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap:
+    12px;
+
+  margin:
+    20px 0;
+}
+
+
+.resumen-vs-kpis > div {
+  padding:
+    15px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.06
+    );
+
+  border-radius:
+    12px;
+
+  text-align:
+    center;
+}
+
+
+.resumen-vs-kpis span {
+  display:
+    block;
+
+  margin-bottom:
+    6px;
+
+  color:
+    #93c5fd;
+
+  font-size:
+    11px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.7px;
+}
+
+
+.resumen-vs-kpis strong {
+  color:
+    #ffffff;
+
+  font-size:
+    25px;
+
+  font-weight:
+    900;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.resumen-vs-tabla-contenedor {
+  width:
+    100%;
+
+  overflow-x:
+    auto;
+}
+
+
+.resumen-vs-tabla {
+  width:
+    100%;
+
+  border-collapse:
+    collapse;
+
+  min-width:
+    680px;
+}
+
+
+.resumen-vs-tabla th {
+  padding:
+    13px 12px;
+
+  color:
+    #93c5fd;
+
+  font-size:
+    12px;
+
+  font-weight:
+    900;
+
+  text-align:
+    center;
+
+  white-space:
+    nowrap;
+}
+
+
+.resumen-vs-tabla th:first-child {
+  text-align:
+    left;
+}
+
+
+.resumen-vs-tabla td {
+  padding:
+    13px 12px;
+
+  border-top:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
+
+  color:
+    #f8fafc;
+
+  font-size:
+    14px;
+
+  font-weight:
+    700;
+
+  text-align:
+    center;
+}
+
+
+.resumen-vs-tabla td:first-child {
+  text-align:
+    left;
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.resumen-vs-tabla tbody tr:not(
+  .resumen-vs-fila-total
+):hover {
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.035
+    );
+}
+
+
+/* =========================================================
+   RESULTADOS
+========================================================= */
+
+.resumen-vs-positivo {
+  color:
+    #4ade80 !important;
+}
+
+
+.resumen-vs-negativo {
+  color:
+    #fb7185 !important;
+}
+
+
+.resumen-vs-neutral {
+  color:
+    #e2e8f0 !important;
+}
+
+
+/* =========================================================
+   TOTAL CL
+========================================================= */
+
+.resumen-vs-fila-total {
+  background:
+    rgba(
+      37,
+      99,
+      235,
+      0.14
+    );
+
+  border-top:
+    2px solid
+    #2563eb;
+}
+
+
+.resumen-vs-fila-total td {
+  font-size:
+    15px;
+
+  font-weight:
+    900;
+}
+
+
+/* =========================================================
+   ERROR / SIN DATOS
+========================================================= */
+
+.resumen-vs-error {
+  color:
+    #fb7185 !important;
+}
+
+
+.resumen-vs-sin-datos {
+  padding:
+    30px !important;
+
+  color:
+    #94a3b8 !important;
+
+  text-align:
+    center !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (
+  max-width: 700px
+) {
+
+  .resumen-vs-supervisores {
+    padding:
+      20px 15px;
+  }
+
+
+  .resumen-vs-header {
+    align-items:
+      flex-start;
+  }
+
+
+  .resumen-vs-header h2 {
+    font-size:
+      21px;
+  }
+
+
+  .resumen-vs-total-destacado strong {
+    font-size:
+      25px;
+  }
+
+
+  .resumen-vs-kpis {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+
+  .resumen-vs-kpis strong {
+    font-size:
+      21px;
+  }
+
+
+  .resumen-vs-tabla th,
+  .resumen-vs-tabla td {
+    font-size:
+      12px;
+
+    padding:
+      10px 8px;
+  }
+
+}
