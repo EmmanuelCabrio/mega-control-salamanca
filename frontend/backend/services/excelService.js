@@ -1290,7 +1290,8 @@ function leerRegistros(
   hojaProduccion,
   hojaSinVenta,
   hojaVentaVsPpto,
-  diasHabiles
+  diasHabiles,
+  mapaMesAnterior
 ) {
   const datos =
     XLSX.utils.sheet_to_json(
@@ -1451,6 +1452,32 @@ function leerRegistros(
         ?.ventasMesPromotor ??
       0;
 
+
+
+    // ==================================================
+// VS MISMO DÍA MES ANTERIOR
+// ==================================================
+
+const clavePromotor =
+  normalizarNombre(
+    nombrePromotor
+  );
+
+
+const ventasMesAnteriorMismoDia =
+  Math.round(
+    Number(
+      mapaMesAnterior?.get(
+        clavePromotor
+      ) ?? 0
+    )
+  );
+
+
+const diferenciaVsMesAnterior =
+  ventasMesPromotor -
+  ventasMesAnteriorMismoDia;
+
     const claveSupervisor =
       normalizarNombre(
         supervisorActual
@@ -1519,6 +1546,10 @@ function leerRegistros(
       recuperaciones,
 
       ventasMesPromotor,
+
+      ventasMesAnteriorMismoDia,
+
+      diferenciaVsMesAnterior,
 
       presupuesto,
 
@@ -3533,6 +3564,532 @@ function leerDetalleVentaMensual() {
     throw error;
 
   }
+
+}
+
+
+// ==================================================
+// 📊 COMPARATIVA VS MISMO DÍA MES ANTERIOR
+// ==================================================
+//
+// MES ACTUAL:
+// Hoja: BD ACUMULADO VENTA MES
+//
+// MES ANTERIOR:
+// Hoja: ACUMULADO VENTA MES ANTERIOR
+//
+// N  = NEGOCIO
+// AA = NOMBRE VENDEDOR
+// AD = FECHA VENTA
+//
+// IMPORTANTE:
+// El día de corte NO se toma de la fecha del servidor.
+// Se toma de la última fecha disponible en la base
+// actual para comparar exactamente el mismo avance.
+//
+// ==================================================
+
+function leerComparativaMesAnterior(
+  hojaMesActual,
+  hojaMesAnterior
+) {
+
+  const datosActual =
+    XLSX.utils.sheet_to_json(
+      hojaMesActual,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  const datosAnterior =
+    XLSX.utils.sheet_to_json(
+      hojaMesAnterior,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  // ==================================================
+  // COLUMNAS
+  // ==================================================
+
+  const COLUMNA_NEGOCIO = 13;   // N
+
+  const COLUMNA_PROMOTOR = 26;  // AA
+
+  const COLUMNA_FECHA = 29;     // AD
+
+
+  // ==================================================
+  // CONVERTIR FECHA DE EXCEL
+  // ==================================================
+
+  function convertirFechaExcel(
+    valor
+  ) {
+
+    // ================================================
+    // SI YA ES DATE
+    // ================================================
+
+    if (
+      valor instanceof Date &&
+      !Number.isNaN(
+        valor.getTime()
+      )
+    ) {
+
+      return {
+        anio:
+          valor.getFullYear(),
+
+        mes:
+          valor.getMonth() + 1,
+
+        dia:
+          valor.getDate(),
+      };
+
+    }
+
+
+    // ================================================
+    // FECHA NUMÉRICA DE EXCEL
+    // ================================================
+
+    const numero =
+      Number(
+        valor
+      );
+
+
+    if (
+      Number.isFinite(
+        numero
+      ) &&
+      numero > 0
+    ) {
+
+      const fechaExcel =
+        XLSX.SSF.parse_date_code(
+          numero
+        );
+
+
+      if (
+        fechaExcel
+      ) {
+
+        return {
+
+          anio:
+            fechaExcel.y,
+
+          mes:
+            fechaExcel.m,
+
+          dia:
+            fechaExcel.d,
+
+        };
+
+      }
+
+    }
+
+
+    // ================================================
+    // TEXTO
+    // ================================================
+
+    const texto =
+      String(
+        valor ?? ""
+      ).trim();
+
+
+    // DD/MM/YYYY
+
+    let coincidencia =
+      texto.match(
+        /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/
+      );
+
+
+    if (
+      coincidencia
+    ) {
+
+      return {
+
+        dia:
+          Number(
+            coincidencia[1]
+          ),
+
+        mes:
+          Number(
+            coincidencia[2]
+          ),
+
+        anio:
+          Number(
+            coincidencia[3]
+          ),
+
+      };
+
+    }
+
+
+    // YYYY-MM-DD
+
+    coincidencia =
+      texto.match(
+        /^(\d{4})-(\d{1,2})-(\d{1,2})/
+      );
+
+
+    if (
+      coincidencia
+    ) {
+
+      return {
+
+        anio:
+          Number(
+            coincidencia[1]
+          ),
+
+        mes:
+          Number(
+            coincidencia[2]
+          ),
+
+        dia:
+          Number(
+            coincidencia[3]
+          ),
+
+      };
+
+    }
+
+
+    return null;
+
+  }
+
+
+  // ==================================================
+  // OBTENER ÚLTIMO DÍA REAL DE LA BASE ACTUAL
+  // ==================================================
+
+  let fechaCorteActual =
+    null;
+
+
+  for (
+    let i = 1;
+    i < datosActual.length;
+    i++
+  ) {
+
+    const fila =
+      datosActual[i];
+
+
+    const fecha =
+      convertirFechaExcel(
+        fila[
+          COLUMNA_FECHA
+        ]
+      );
+
+
+    if (
+      !fecha
+    ) {
+
+      continue;
+
+    }
+
+
+    const valorFecha =
+      (
+        fecha.anio *
+        10000
+      ) +
+      (
+        fecha.mes *
+        100
+      ) +
+      fecha.dia;
+
+
+    const valorCorte =
+      fechaCorteActual
+        ? (
+            fechaCorteActual.anio *
+            10000
+          ) +
+          (
+            fechaCorteActual.mes *
+            100
+          ) +
+          fechaCorteActual.dia
+        : 0;
+
+
+    if (
+      valorFecha >
+      valorCorte
+    ) {
+
+      fechaCorteActual =
+        fecha;
+
+    }
+
+  }
+
+
+  // ==================================================
+  // SI NO HAY FECHA ACTUAL
+  // ==================================================
+
+  if (
+    !fechaCorteActual
+  ) {
+
+    console.log(
+      "⚠️ No se encontró fecha de corte para comparativa"
+    );
+
+
+    return {
+      mapa:
+        new Map(),
+
+      fechaCorte:
+        null,
+    };
+
+  }
+
+
+  // ==================================================
+  // CALCULAR MES ANTERIOR
+  // ==================================================
+
+  let anioAnterior =
+    fechaCorteActual.anio;
+
+
+  let mesAnterior =
+    fechaCorteActual.mes - 1;
+
+
+  if (
+    mesAnterior === 0
+  ) {
+
+    mesAnterior =
+      12;
+
+    anioAnterior--;
+
+  }
+
+
+  const diaCorte =
+    fechaCorteActual.dia;
+
+
+  // ==================================================
+  // CONTAR VENTAS DEL MES ANTERIOR
+  // HASTA EL MISMO DÍA
+  // ==================================================
+
+  const mapa =
+    new Map();
+
+
+  for (
+    let i = 1;
+    i < datosAnterior.length;
+    i++
+  ) {
+
+    const fila =
+      datosAnterior[i];
+
+
+    // ================================================
+    // SOLO VENTA DE INTERNET
+    // ================================================
+
+    const negocio =
+      limpiarTexto(
+        fila[
+          COLUMNA_NEGOCIO
+        ]
+      );
+
+
+    if (
+      negocio !==
+      "INTERNET"
+    ) {
+
+      continue;
+
+    }
+
+
+    // ================================================
+    // PROMOTOR
+    // ================================================
+
+    const nombre =
+      limpiarTexto(
+        fila[
+          COLUMNA_PROMOTOR
+        ]
+      );
+
+
+    if (
+      esValorInvalido(
+        nombre
+      ) ||
+      nombre === "0" ||
+      nombre ===
+        "NOMBRE VENDEDOR"
+    ) {
+
+      continue;
+
+    }
+
+
+    // ================================================
+    // FECHA
+    // ================================================
+
+    const fecha =
+      convertirFechaExcel(
+        fila[
+          COLUMNA_FECHA
+        ]
+      );
+
+
+    if (
+      !fecha
+    ) {
+
+      continue;
+
+    }
+
+
+    // ================================================
+    // SOLO MES ANTERIOR
+    // ================================================
+
+    if (
+      fecha.anio !==
+        anioAnterior ||
+      fecha.mes !==
+        mesAnterior
+    ) {
+
+      continue;
+
+    }
+
+
+    // ================================================
+    // MISMO DÍA DE CORTE
+    // ================================================
+
+    if (
+      fecha.dia >
+      diaCorte
+    ) {
+
+      continue;
+
+    }
+
+
+    // ================================================
+    // ACUMULAR POR PROMOTOR
+    // ================================================
+
+    const clave =
+      normalizarNombre(
+        nombre
+      );
+
+
+    mapa.set(
+      clave,
+      (
+        mapa.get(
+          clave
+        ) ?? 0
+      ) + 1
+    );
+
+  }
+
+
+  // ==================================================
+  // LOG
+  // ==================================================
+
+  console.log(
+    "=========================================="
+  );
+
+  console.log(
+    "📊 COMPARATIVA VS MES ANTERIOR"
+  );
+
+  console.log(
+    `📅 Corte actual: ${fechaCorteActual.dia}/${fechaCorteActual.mes}/${fechaCorteActual.anio}`
+  );
+
+  console.log(
+    `📅 Comparando contra: ${diaCorte}/${mesAnterior}/${anioAnterior}`
+  );
+
+  console.log(
+    "👥 Promotores encontrados:",
+    mapa.size
+  );
+
+  console.log(
+    "=========================================="
+  );
+
+
+  return {
+
+    mapa,
+
+    fechaCorte:
+      fechaCorteActual,
+
+  };
 
 }
 
