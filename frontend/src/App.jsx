@@ -32,6 +32,9 @@ import {
   ordenarPorPrioridad
 } from "./utils/prioridades";
 
+import ComparativaMesAnterior
+  from "./components/ComparativaMesAnterior";
+
 
 
 
@@ -1807,6 +1810,25 @@ if (
 
 />
 
+
+
+
+
+        {/* ==========================================
+    VS MISMO DÍA MES ANTERIOR
+========================================== */}
+
+<ComparativaMesAnterior
+
+  registros={
+    registros
+  }
+
+  supervisorSeleccionado={
+    supervisorSeleccionado
+  }
+
+/>
 
         {/* ==========================================
             CONTENIDO PRINCIPAL
