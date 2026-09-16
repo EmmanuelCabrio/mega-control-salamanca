@@ -10,6 +10,9 @@ import TeamTable
 import ComparativaRecuperacionMesAnterior
   from "./ComparativaRecuperacionMesAnterior";
 
+import RecuperacionVsPresupuesto
+  from "./RecuperacionVsPresupuesto";
+
 import GestionOdc
   from "./GestionOdc";
 
@@ -121,7 +124,8 @@ function PanelRecuperacion({
           </h1>
 
           <p>
-            Comencemos por el resultado más importante de hoy.
+            Comencemos por el resultado más
+            importante de hoy.
           </p>
 
         </div>
@@ -138,6 +142,10 @@ function PanelRecuperacion({
       </header>
 
 
+      {/* =============================================
+          01 — PRODUCTIVIDAD
+      ============================================= */}
+
       <section className="panel-recuperacion-paso">
 
         <span>01</span>
@@ -145,12 +153,12 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo vas al día de hoy?
+            ¿Cómo voy?
           </h2>
 
           <p>
-            Productividad actual de cada integrante del equipo,
-            ordenada de mayor a menor.
+            Productividad actual de cada integrante
+            del equipo, ordenada de mayor a menor.
           </p>
 
         </div>
@@ -204,6 +212,10 @@ function PanelRecuperacion({
       )}
 
 
+      {/* =============================================
+          02 — COMPARACIÓN MES ANTERIOR
+      ============================================= */}
+
       <section
         className="
           panel-recuperacion-paso
@@ -216,12 +228,12 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo vas contra el mes anterior?
+            ¿Cómo voy contra el mes anterior?
           </h2>
 
           <p>
-         RX contra el mismo día
-            del mes anterior.
+            Compara las RX acumuladas contra el mismo
+            día del mes anterior.
           </p>
 
         </div>
@@ -232,10 +244,14 @@ function PanelRecuperacion({
       <ComparativaRecuperacionMesAnterior />
 
 
+      {/* =============================================
+          03 — PRESUPUESTO
+      ============================================= */}
+
       <section
         className="
           panel-recuperacion-paso
-          panel-recuperacion-paso-odc
+          panel-recuperacion-paso-presupuesto
         "
       >
 
@@ -244,11 +260,12 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo vas con la gestión de ODC?
+            ¿Cómo voy contra mi presupuesto?
           </h2>
 
           <p>
-            Cobertura de visitas y pendientes por cada sucursal.
+            Avance de recuperación, faltante y ritmo
+            diario para cumplir la meta.
           </p>
 
         </div>
@@ -256,8 +273,12 @@ function PanelRecuperacion({
       </section>
 
 
-      <GestionOdc />
+      <RecuperacionVsPresupuesto />
 
+
+      {/* =============================================
+          04 — RECUPERACIÓN Y CORTES
+      ============================================= */}
 
       <section
         className="
@@ -271,12 +292,12 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo vas con la recuperación y los cortes?
+            ¿Cómo va la recuperación y los cortes?
           </h2>
 
           <p>
-            Resultado con esfuerzo, sin esfuerzo y comparación
-            contra el mes anterior.
+            Resultado con esfuerzo, sin esfuerzo y
+            comparación contra el mes anterior.
           </p>
 
         </div>
@@ -286,35 +307,73 @@ function PanelRecuperacion({
 
       <RecuperacionYCortes />
 
+
+      {/* =============================================
+          05 — GESTIÓN DE ODC
+      ============================================= */}
+
       <section
-  className="
-    panel-recuperacion-paso
-    panel-recuperacion-paso-analisis
-  "
->
+        className="
+          panel-recuperacion-paso
+          panel-recuperacion-paso-odc
+        "
+      >
 
-  <span>05</span>
+        <span>05</span>
 
-  <div>
+        <div>
 
-    <h2>
-      ¿Dónde se concentran los cortes?
-    </h2>
+          <h2>
+            ¿Cómo va la gestión de ODC?
+          </h2>
 
-    <p>
-      Analiza colonias por sucursal y número
-      de visitas realizadas.
-    </p>
+          <p>
+            Cobertura de visitas y pendientes por
+            cada sucursal.
+          </p>
 
-  </div>
+        </div>
 
-</section>
+      </section>
 
 
-<AnalisisSabanaRecuperacion />
+      <GestionOdc />
+
+
+      {/* =============================================
+          06 — ANÁLISIS POR COLONIA
+      ============================================= */}
+
+      <section
+        className="
+          panel-recuperacion-paso
+          panel-recuperacion-paso-analisis
+        "
+      >
+
+        <span>06</span>
+
+        <div>
+
+          <h2>
+            ¿Dónde se concentran los cortes?
+          </h2>
+
+          <p>
+            Analiza colonias por sucursal y número
+            de visitas realizadas.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <AnalisisSabanaRecuperacion />
 
     </main>
   );
+
 }
 
 
