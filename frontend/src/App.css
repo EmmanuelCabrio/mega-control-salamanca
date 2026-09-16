@@ -11003,3 +11003,497 @@ span.tiene-datos {
   }
 
 }
+
+/* =========================================================
+   RECUPERACIÓN VS PRESUPUESTO
+========================================================= */
+
+.panel-recuperacion-paso-presupuesto {
+  margin-top: 28px;
+}
+
+
+.panel-recuperacion-paso-presupuesto > span {
+  background: #6d28d9;
+}
+
+
+.presupuesto-rx,
+.presupuesto-rx-estado {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+
+.presupuesto-rx {
+  overflow: hidden;
+  border: 1px solid #ddd6fe;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 38px
+    rgba(15, 23, 42, 0.1);
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.presupuesto-rx-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #4c1d95,
+      #7c3aed
+    );
+}
+
+
+.presupuesto-rx-header
+> div:first-child
+> span {
+  color: #ddd6fe;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+
+.presupuesto-rx-header h2 {
+  margin: 6px 0;
+  font-size:
+    clamp(
+      22px,
+      3vw,
+      30px
+    );
+}
+
+
+.presupuesto-rx-header p {
+  margin: 0;
+  color: #ede9fe;
+}
+
+
+/* =========================================================
+   META DIARIA
+========================================================= */
+
+.presupuesto-rx-meta-diaria {
+  min-width: 185px;
+  padding: 13px 18px;
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  text-align: center;
+  background:
+    rgba(255, 255, 255, 0.13);
+}
+
+
+.presupuesto-rx-meta-diaria strong,
+.presupuesto-rx-meta-diaria span,
+.presupuesto-rx-meta-diaria small {
+  display: block;
+}
+
+
+.presupuesto-rx-meta-diaria strong {
+  font-size: 31px;
+  line-height: 1;
+}
+
+
+.presupuesto-rx-meta-diaria span {
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+
+.presupuesto-rx-meta-diaria small {
+  margin-top: 4px;
+  color: #ddd6fe;
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.presupuesto-rx-cards {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 14px;
+  padding: 22px 24px;
+  background: #f8fafc;
+}
+
+
+.presupuesto-rx-card {
+  padding: 18px;
+  border:
+    1px solid #e2e8f0;
+  border-radius: 15px;
+  background: #ffffff;
+}
+
+
+.presupuesto-rx-card-esfuerzo {
+  border-top:
+    4px solid #2563eb;
+}
+
+
+.presupuesto-rx-card-sin-esfuerzo {
+  border-top:
+    4px solid #7c3aed;
+}
+
+
+.presupuesto-rx-card-total {
+  border-top:
+    4px solid #16a34a;
+}
+
+
+.presupuesto-rx-card
+> span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+
+.presupuesto-rx-card
+> strong {
+  display: block;
+  margin: 8px 0 2px;
+  color: #0f172a;
+  font-size: 30px;
+}
+
+
+.presupuesto-rx-card
+> small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+
+.presupuesto-rx-card
+> div:last-child {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top:
+    1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+
+.presupuesto-rx-card
+> div:last-child
+b {
+  color: #dc2626;
+}
+
+
+/* =========================================================
+   BARRA DE AVANCE
+========================================================= */
+
+.presupuesto-rx-barra {
+  display: grid;
+  grid-template-columns:
+    1fr 62px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 13px;
+}
+
+
+.presupuesto-rx-barra
+> span {
+  overflow: hidden;
+  height: 11px;
+  border-radius: 50px;
+  background: #e2e8f0;
+}
+
+
+.presupuesto-rx-barra
+> span
+i {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #8b5cf6,
+      #6d28d9
+    );
+}
+
+
+.presupuesto-rx-barra
+> strong {
+  color: #5b21b6;
+  font-size: 12px;
+  text-align: right;
+}
+
+
+/* =========================================================
+   TÍTULO DE TABLA
+========================================================= */
+
+.presupuesto-rx-tabla-titulo {
+  padding: 22px 24px 14px;
+  border-top:
+    1px solid #e2e8f0;
+}
+
+
+.presupuesto-rx-tabla-titulo span {
+  color: #6d28d9;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+
+.presupuesto-rx-tabla-titulo h3 {
+  margin: 4px 0 0;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.presupuesto-rx-tabla-contenedor {
+  overflow-x: auto;
+  padding: 0 24px 26px;
+}
+
+
+.presupuesto-rx-tabla {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+
+.presupuesto-rx-tabla th {
+  padding: 12px 10px;
+  color: #ffffff;
+  background: #5b21b6;
+  font-size: 11px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+
+.presupuesto-rx-tabla
+th:first-child {
+  border-radius:
+    10px 0 0;
+  text-align: left;
+}
+
+
+.presupuesto-rx-tabla
+th:last-child {
+  border-radius:
+    0 10px 0 0;
+}
+
+
+.presupuesto-rx-tabla td {
+  padding: 11px 10px;
+  border-bottom:
+    1px solid #e2e8f0;
+  color: #334155;
+  font-size: 13px;
+  text-align: center;
+}
+
+
+.presupuesto-rx-tabla
+tbody
+td:first-child {
+  text-align: left;
+  font-weight: 900;
+}
+
+
+.presupuesto-rx-tabla
+tbody
+tr:nth-child(even) {
+  background: #f5f3ff;
+}
+
+
+.presupuesto-rx-tabla
+.presupuesto-rx-barra {
+  min-width: 155px;
+  margin-top: 0;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.presupuesto-rx-tabla
+tfoot
+td {
+  border-bottom: 0;
+  color: #ffffff;
+  background: #0f172a;
+  font-weight: 900;
+}
+
+
+.presupuesto-rx-tabla
+tfoot
+td:first-child {
+  border-radius:
+    0 0 0 10px;
+  text-align: left;
+}
+
+
+.presupuesto-rx-tabla
+tfoot
+td:last-child {
+  border-radius:
+    0 0 10px;
+}
+
+
+/* =========================================================
+   NIVELES DE AVANCE
+========================================================= */
+
+.presupuesto-rx-cumplido
+td:first-child {
+  border-left:
+    4px solid #16a34a;
+}
+
+
+.presupuesto-rx-cerca
+td:first-child {
+  border-left:
+    4px solid #84cc16;
+}
+
+
+.presupuesto-rx-medio
+td:first-child {
+  border-left:
+    4px solid #eab308;
+}
+
+
+.presupuesto-rx-rezagado
+td:first-child {
+  border-left:
+    4px solid #dc2626;
+}
+
+
+/* =========================================================
+   CARGA Y ERROR
+========================================================= */
+
+.presupuesto-rx-estado {
+  padding: 38px 24px;
+  border:
+    1px solid #ddd6fe;
+  border-radius: 18px;
+  color: #475569;
+  background: #ffffff;
+  font-weight: 800;
+  text-align: center;
+}
+
+
+.presupuesto-rx-error {
+  color: #991b1b;
+}
+
+
+.presupuesto-rx-error button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  color: #ffffff;
+  background: #b91c1c;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   TABLET Y CELULAR
+========================================================= */
+
+@media (max-width: 800px) {
+
+  .presupuesto-rx-cards {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+
+  .presupuesto-rx-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 21px 18px;
+  }
+
+
+  .presupuesto-rx-meta-diaria {
+    width: 100%;
+  }
+
+
+  .presupuesto-rx-tabla-titulo {
+    padding: 19px 16px 13px;
+  }
+
+
+  .presupuesto-rx-tabla-contenedor {
+    padding: 0 16px 20px;
+  }
+
+}
