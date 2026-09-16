@@ -1,42 +1,57 @@
 import {
   useCallback,
   useEffect,
-  useState
+  useState,
 } from "react";
 
 import {
-  fetchProtegido
+  fetchProtegido,
 } from "../services/authService";
 
 
-const formatearNumero = (valor) =>
-  Math.round(
-    Number(valor || 0)
-  ).toLocaleString(
-    "es-MX"
-  );
+const formatearNumero =
+  (valor) =>
+    Math.round(
+      Number(valor || 0)
+    ).toLocaleString(
+      "es-MX"
+    );
 
 
-const obtenerClaseAvance = (avance) => {
+const formatearDecimal =
+  (valor) =>
+    Number(valor || 0).toLocaleString(
+      "es-MX",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    );
 
-  const valor =
-    Number(avance || 0);
 
-  if (valor >= 100) {
-    return "presupuesto-rx-cumplido";
-  }
+const obtenerClaseAvance =
+  (avance) => {
 
-  if (valor >= 75) {
-    return "presupuesto-rx-cerca";
-  }
+    const valor =
+      Number(avance || 0);
 
-  if (valor >= 50) {
-    return "presupuesto-rx-medio";
-  }
 
-  return "presupuesto-rx-rezagado";
+    if (valor >= 100) {
+      return "presupuesto-rx-cumplido";
+    }
 
-};
+    if (valor >= 75) {
+      return "presupuesto-rx-cerca";
+    }
+
+    if (valor >= 50) {
+      return "presupuesto-rx-medio";
+    }
+
+
+    return "presupuesto-rx-rezagado";
+
+  };
 
 
 function BarraAvance({
@@ -46,11 +61,11 @@ function BarraAvance({
   const porcentaje =
     Number(avance || 0);
 
+
   return (
     <div className="presupuesto-rx-barra">
 
       <span>
-
         <i
           style={{
             width:
@@ -63,7 +78,6 @@ function BarraAvance({
               )}%`,
           }}
         />
-
       </span>
 
       <strong>
@@ -76,51 +90,27 @@ function BarraAvance({
 }
 
 
-function TarjetaPresupuesto({
+function TarjetaResumen({
   titulo,
-  metrica,
+  valor,
+  detalle,
   clase,
 }) {
 
   return (
-    <article
-      className={`presupuesto-rx-card ${clase}`}
-    >
+    <article className={`presupuesto-rx-card ${clase}`}>
 
       <span>
         {titulo}
       </span>
 
       <strong>
-        {formatearNumero(
-          metrica.actual
-        )}
+        {valor}
       </strong>
 
       <small>
-        Presupuesto:{" "}
-        {formatearNumero(
-          metrica.presupuesto
-        )}
+        {detalle}
       </small>
-
-      <BarraAvance
-        avance={metrica.avance}
-      />
-
-      <div>
-
-        <span>
-          Faltan
-        </span>
-
-        <b>
-          {formatearNumero(
-            metrica.faltante
-          )}
-        </b>
-
-      </div>
 
     </article>
   );
@@ -157,6 +147,7 @@ function RecuperacionVsPresupuesto() {
           const resultado =
             await respuesta.json();
 
+
           if (
             !respuesta.ok ||
             !resultado.correcto
@@ -169,7 +160,10 @@ function RecuperacionVsPresupuesto() {
 
           }
 
-          setDatos(resultado);
+
+          setDatos(
+            resultado
+          );
 
         } catch (errorCarga) {
 
@@ -218,12 +212,7 @@ function RecuperacionVsPresupuesto() {
   if (error) {
 
     return (
-      <section
-        className="
-          presupuesto-rx-estado
-          presupuesto-rx-error
-        "
-      >
+      <section className="presupuesto-rx-estado presupuesto-rx-error">
 
         <p>
           {error}
@@ -263,12 +252,11 @@ function RecuperacionVsPresupuesto() {
           </span>
 
           <h2>
-            Recuperación vs presupuesto
+            RX con esfuerzo vs presupuesto
           </h2>
 
           <p>
-            Avance de RX con esfuerzo, sin esfuerzo
-            y total por sucursal.
+            Avance de recuperación con esfuerzo por sucursal.
           </p>
 
         </div>
@@ -287,7 +275,9 @@ function RecuperacionVsPresupuesto() {
           </span>
 
           <small>
-            {datos.diasRestantes} días restantes
+            Ritmo exacto: {formatearDecimal(
+              resumen.ritmoNecesario
+            )} · {datos.diasRestantes} días restantes
           </small>
 
         </div>
@@ -297,22 +287,53 @@ function RecuperacionVsPresupuesto() {
 
       <div className="presupuesto-rx-cards">
 
-        <TarjetaPresupuesto
-          titulo="Con esfuerzo"
-          metrica={resumen.conEsfuerzo}
-          clase="presupuesto-rx-card-esfuerzo"
+        <TarjetaResumen
+          titulo="RX con esfuerzo actuales"
+          valor={formatearNumero(
+            resumen.actual
+          )}
+          detalle="Acumulado del mes"
+          clase="presupuesto-rx-card-actual"
         />
 
-        <TarjetaPresupuesto
-          titulo="Sin esfuerzo"
-          metrica={resumen.sinEsfuerzo}
-          clase="presupuesto-rx-card-sin-esfuerzo"
+        <TarjetaResumen
+          titulo="Presupuesto"
+          valor={formatearNumero(
+            resumen.presupuesto
+          )}
+          detalle="RX con esfuerzo esperadas"
+          clase="presupuesto-rx-card-presupuesto"
         />
 
-        <TarjetaPresupuesto
-          titulo="Recuperación total"
-          metrica={resumen.total}
-          clase="presupuesto-rx-card-total"
+        <TarjetaResumen
+          titulo="Faltante"
+          valor={formatearNumero(
+            resumen.faltante
+          )}
+          detalle="RX necesarias para cumplir"
+          clase="presupuesto-rx-card-faltante"
+        />
+
+        <TarjetaResumen
+          titulo="Avance"
+          valor={`${Number(
+            resumen.avance || 0
+          ).toFixed(2)}%`}
+          detalle="Cumplimiento del presupuesto"
+          clase="presupuesto-rx-card-avance"
+        />
+
+      </div>
+
+
+      <div className="presupuesto-rx-avance-general">
+
+        <span>
+          Avance general del clúster
+        </span>
+
+        <BarraAvance
+          avance={resumen.avance}
         />
 
       </div>
@@ -325,7 +346,7 @@ function RecuperacionVsPresupuesto() {
         </span>
 
         <h3>
-          Avance y faltante para cumplir
+          Avance y ritmo necesario para cumplir
         </h3>
 
       </div>
@@ -336,16 +357,14 @@ function RecuperacionVsPresupuesto() {
         <table className="presupuesto-rx-tabla">
 
           <thead>
-
             <tr>
               <th>Sucursal</th>
               <th>RX actuales</th>
               <th>Presupuesto</th>
               <th>Faltante</th>
               <th>Avance</th>
-              <th>Meta diaria</th>
+              <th>Ritmo diario</th>
             </tr>
-
           </thead>
 
           <tbody>
@@ -356,7 +375,7 @@ function RecuperacionVsPresupuesto() {
                 <tr
                   key={registro.sucursal}
                   className={obtenerClaseAvance(
-                    registro.total.avance
+                    registro.avance
                   )}
                 >
 
@@ -366,39 +385,41 @@ function RecuperacionVsPresupuesto() {
 
                   <td>
                     {formatearNumero(
-                      registro.total.actual
+                      registro.actual
                     )}
                   </td>
 
                   <td>
                     {formatearNumero(
-                      registro.total.presupuesto
+                      registro.presupuesto
                     )}
                   </td>
 
                   <td>
                     {formatearNumero(
-                      registro.total.faltante
+                      registro.faltante
                     )}
                   </td>
 
                   <td>
-
                     <BarraAvance
-                      avance={
-                        registro.total.avance
-                      }
+                      avance={registro.avance}
                     />
-
                   </td>
 
-                  <td>
+                  <td className="presupuesto-rx-ritmo">
 
                     <strong>
                       {formatearNumero(
                         registro.metaDiaria
-                      )}
+                      )} RX/día
                     </strong>
+
+                    <small>
+                      {formatearDecimal(
+                        registro.ritmoNecesario
+                      )} exacto
+                    </small>
 
                   </td>
 
@@ -419,30 +440,32 @@ function RecuperacionVsPresupuesto() {
 
               <td>
                 {formatearNumero(
-                  resumen.total.actual
+                  resumen.actual
                 )}
               </td>
 
               <td>
                 {formatearNumero(
-                  resumen.total.presupuesto
+                  resumen.presupuesto
                 )}
               </td>
 
               <td>
                 {formatearNumero(
-                  resumen.total.faltante
+                  resumen.faltante
                 )}
               </td>
 
               <td>
-                {resumen.total.avance.toFixed(2)}%
+                {Number(
+                  resumen.avance || 0
+                ).toFixed(2)}%
               </td>
 
               <td>
                 {formatearNumero(
                   resumen.metaDiaria
-                )}
+                )} RX/día
               </td>
 
             </tr>
