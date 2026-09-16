@@ -1,12 +1,15 @@
 import {
   ordenarPorProductividad,
-  obtenerNivelProductividad
+  obtenerNivelProductividad,
+  obtenerNivelProductividadRecuperacion
 } from "../utils/prioridades";
 
 
 function TeamTable({
   registros,
-  supervisorSeleccionado
+  supervisorSeleccionado,
+  modoRecuperacion = false,
+  titulo = "👥 Equipo"
 }) {
 
   // ==================================================
@@ -43,10 +46,18 @@ function TeamTable({
 
   return (
 
-    <div className="team-table equipo-completo">
+    <div
+      className={
+        `team-table equipo-completo${
+          modoRecuperacion
+            ? " team-table-recuperacion"
+            : ""
+        }`
+      }
+    >
 
       <h2>
-        👥 Equipo
+        {titulo}
       </h2>
 
 
@@ -56,6 +67,38 @@ function TeamTable({
           {supervisorSeleccionado}
         </strong>
       </p>
+
+
+      {modoRecuperacion && (
+
+        <div
+          className="productividad-recuperacion-leyenda"
+          aria-label="Niveles de productividad"
+        >
+
+          <span className="leyenda-rojo">
+            ≤ 1 Rojo
+          </span>
+
+          <span className="leyenda-naranja">
+            1.01–2.99 Naranja
+          </span>
+
+          <span className="leyenda-amarillo">
+            3–3.99 Amarillo
+          </span>
+
+          <span className="leyenda-verde-claro">
+            4–4.99 Verde claro
+          </span>
+
+          <span className="leyenda-verde-oscuro">
+            ≥ 5 Verde oscuro
+          </span>
+
+        </div>
+
+      )}
 
 
       <table>
@@ -91,15 +134,32 @@ function TeamTable({
 
         <tbody>
 
-          {lista.map(
+          {lista.length === 0 ? (
+
+            <tr>
+
+              <td
+                colSpan="5"
+                className="team-table-sin-registros"
+              >
+                No hay integrantes para mostrar.
+              </td>
+
+            </tr>
+
+          ) : lista.map(
             (promotor, index) => (
 
               <tr
                 key={`${promotor.nombre}-${index}`}
                 className={
-                  obtenerNivelProductividad(
-                    promotor.productividad
-                  )
+                  modoRecuperacion
+                    ? obtenerNivelProductividadRecuperacion(
+                        promotor.productividad
+                      )
+                    : obtenerNivelProductividad(
+                        promotor.productividad
+                      )
                 }
               >
 
