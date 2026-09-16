@@ -5958,8 +5958,8 @@ body {
 
 .plantilla-status {
   width: 100%;
-  max-width: 1200px;
-  margin: 24px auto 0;
+  max-width: none;
+  margin: 24px 0 0;
 
   background: #ffffff;
 
@@ -12363,11 +12363,9 @@ td:first-child {
 
 .resumen-rx-direccion,
 .resumen-rx-direccion-estado {
-  width: min(
-    1200px,
-    100%
-  );
-  margin: 24px auto;
+  width: 100%;
+  max-width: none;
+  margin: 24px 0;
 }
 
 
