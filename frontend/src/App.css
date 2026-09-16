@@ -11626,3 +11626,448 @@ td:first-child {
   }
 
 }
+
+
+
+/* =========================================================
+   VISITAS POR TIPO DE GESTIÓN
+========================================================= */
+
+.panel-recuperacion-paso-gestion-motivo {
+  margin-top: 28px;
+}
+
+
+.panel-recuperacion-paso-gestion-motivo > span {
+  background: #4338ca;
+}
+
+
+.gestion-motivo,
+.gestion-motivo-estado {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+
+.gestion-motivo {
+  overflow: hidden;
+
+  border:
+    1px solid #c7d2fe;
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 14px 38px
+    rgba(15, 23, 42, 0.1);
+}
+
+
+/* ENCABEZADO */
+
+.gestion-motivo-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding: 24px 26px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #312e81,
+      #4f46e5
+    );
+}
+
+
+.gestion-motivo-header > div > span {
+  color: #c7d2fe;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+}
+
+
+.gestion-motivo-header h2 {
+  margin: 6px 0;
+
+  font-size:
+    clamp(
+      22px,
+      3vw,
+      30px
+    );
+}
+
+
+.gestion-motivo-header p {
+  margin: 0;
+
+  color: #e0e7ff;
+}
+
+
+.gestion-motivo-header > strong {
+  min-width: 170px;
+
+  padding: 13px 18px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.35);
+
+  border-radius: 14px;
+
+  font-size: 30px;
+
+  text-align: center;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+}
+
+
+.gestion-motivo-header > strong small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #e0e7ff;
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+}
+
+
+/* RESUMEN CON VISITA Y SIN VISITA */
+
+.gestion-motivo-resumen {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 14px;
+
+  padding: 20px 24px;
+
+  background: #f8fafc;
+}
+
+
+.gestion-motivo-resumen article {
+  padding: 16px 18px;
+
+  border:
+    1px solid #e2e8f0;
+
+  border-top:
+    4px solid #16a34a;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+}
+
+
+.gestion-motivo-resumen article:last-child {
+  border-top-color: #dc2626;
+}
+
+
+.gestion-motivo-resumen span,
+.gestion-motivo-resumen strong,
+.gestion-motivo-resumen small {
+  display: block;
+}
+
+
+.gestion-motivo-resumen span {
+  color: #64748b;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.07em;
+
+  text-transform: uppercase;
+}
+
+
+.gestion-motivo-resumen strong {
+  margin: 7px 0 2px;
+
+  color: #0f172a;
+
+  font-size: 27px;
+}
+
+
+.gestion-motivo-resumen small {
+  color: #64748b;
+
+  font-size: 12px;
+}
+
+
+/* TABLA */
+
+.gestion-motivo-tabla-contenedor {
+  overflow-x: auto;
+
+  padding:
+    0 24px 26px;
+}
+
+
+.gestion-motivo-tabla {
+  width: 100%;
+
+  min-width: 720px;
+
+  border-collapse: separate;
+
+  border-spacing: 0;
+}
+
+
+.gestion-motivo-tabla th {
+  padding: 12px 14px;
+
+  color: #ffffff;
+
+  background: #3730a3;
+
+  font-size: 11px;
+
+  text-align: left;
+
+  text-transform: uppercase;
+}
+
+
+.gestion-motivo-tabla th:first-child {
+  border-radius:
+    10px 0 0;
+}
+
+
+.gestion-motivo-tabla th:nth-child(2) {
+  text-align: center;
+}
+
+
+.gestion-motivo-tabla th:last-child {
+  border-radius:
+    0 10px 0 0;
+}
+
+
+.gestion-motivo-tabla td {
+  padding: 11px 14px;
+
+  border-bottom:
+    1px solid #e2e8f0;
+
+  color: #334155;
+
+  font-size: 13px;
+}
+
+
+.gestion-motivo-tabla tbody tr:nth-child(even) {
+  background: #eef2ff;
+}
+
+
+.gestion-motivo-tabla tbody tr:hover {
+  background: #e0e7ff;
+}
+
+
+.gestion-motivo-tabla td:first-child {
+  font-weight: 800;
+}
+
+
+.gestion-motivo-tabla td:nth-child(2) {
+  text-align: center;
+}
+
+
+/* RESALTAR SIN VISITA */
+
+.gestion-motivo-tabla
+.gestion-motivo-sin-visita {
+  background: #fef2f2;
+}
+
+
+/* BARRA DE PARTICIPACIÓN */
+
+.gestion-motivo-participacion {
+  display: grid;
+
+  grid-template-columns:
+    1fr 70px;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.gestion-motivo-participacion > span {
+  overflow: hidden;
+
+  height: 11px;
+
+  border-radius: 50px;
+
+  background: #e2e8f0;
+}
+
+
+.gestion-motivo-participacion > span i {
+  display: block;
+
+  height: 100%;
+
+  min-width: 2px;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #818cf8,
+      #4338ca
+    );
+}
+
+
+.gestion-motivo-participacion > strong {
+  color: #3730a3;
+
+  text-align: right;
+}
+
+
+/* TOTAL */
+
+.gestion-motivo-tabla tfoot td {
+  border-bottom: 0;
+
+  color: #ffffff;
+
+  background: #0f172a;
+
+  font-weight: 900;
+}
+
+
+.gestion-motivo-tabla tfoot td:first-child {
+  border-radius:
+    0 0 0 10px;
+}
+
+
+.gestion-motivo-tabla tfoot td:last-child {
+  border-radius:
+    0 0 10px;
+}
+
+
+/* CARGA Y ERROR */
+
+.gestion-motivo-estado {
+  padding: 38px 24px;
+
+  border:
+    1px solid #c7d2fe;
+
+  border-radius: 18px;
+
+  color: #475569;
+
+  background: #ffffff;
+
+  font-weight: 800;
+
+  text-align: center;
+}
+
+
+.gestion-motivo-error {
+  color: #991b1b;
+}
+
+
+.gestion-motivo-error button {
+  margin-top: 12px;
+
+  padding: 10px 16px;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  background: #b91c1c;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+/* CELULAR */
+
+@media (max-width: 700px) {
+
+  .gestion-motivo-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    padding: 21px 18px;
+  }
+
+
+  .gestion-motivo-header > strong {
+    width: 100%;
+  }
+
+
+  .gestion-motivo-resumen {
+    grid-template-columns: 1fr;
+
+    padding: 16px;
+  }
+
+
+  .gestion-motivo-tabla-contenedor {
+    padding:
+      0 16px 20px;
+  }
+
+}
