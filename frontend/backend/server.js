@@ -15,6 +15,7 @@ const {
   leerProyeccion,
   leerDetalleVentaMensual,
   leerComparativaRecuperacionMesAnterior,
+  leerGestionOdc,
   actualizarDatosDesdeSupabase,
   reemplazarExcelEnSupabase,
   descargarExcelDesdeSupabase,
@@ -738,9 +739,12 @@ app.get(
     ) {
 
       return res.status(403).json({
+
         correcto: false,
+
         mensaje:
           "Acceso exclusivo del equipo de Recuperación",
+
       });
 
     }
@@ -755,8 +759,11 @@ app.get(
 
 
       return res.json({
+
         correcto: true,
+
         ...comparativa,
+
       });
 
     } catch (error) {
@@ -771,9 +778,12 @@ app.get(
 
 
       return res.status(500).json({
+
         correcto: false,
+
         mensaje:
           "No se pudo cargar la comparativa de Recuperación",
+
       });
 
     }
@@ -783,11 +793,11 @@ app.get(
 
 
 // ==================================================
-// 🔄 RECUPERACIÓN VS MISMO DÍA DEL MES ANTERIOR
+// GESTIÓN DE ÓRDENES DE COBRANZA
 // ==================================================
 
 app.get(
-  "/api/recuperacion/comparativa-mes-anterior",
+  "/api/recuperacion/gestion-odc",
   autenticarToken,
   async (req, res) => {
 
@@ -811,24 +821,22 @@ app.get(
 
     try {
 
-      const comparativa =
-        leerComparativaRecuperacionMesAnterior(
-          req.supervisor
-        );
+      const gestion =
+        leerGestionOdc();
 
 
       return res.json({
 
         correcto: true,
 
-        ...comparativa,
+        ...gestion,
 
       });
 
     } catch (error) {
 
       console.error(
-        "❌ Error en comparativa de Recuperación:"
+        "❌ Error en Gestión de ODC:"
       );
 
       console.error(
@@ -841,7 +849,7 @@ app.get(
         correcto: false,
 
         mensaje:
-          "No se pudo cargar la comparativa de Recuperación",
+          "No se pudo cargar la Gestión de ODC",
 
       });
 
