@@ -14,6 +14,7 @@ const {
   leerCarteraPorDia,
   leerProyeccion,
   leerDetalleVentaMensual,
+  leerComparativaRecuperacionMesAnterior,
   actualizarDatosDesdeSupabase,
   reemplazarExcelEnSupabase,
   descargarExcelDesdeSupabase,
@@ -713,6 +714,66 @@ app.get(
         mensaje:
           "No se pudieron cargar los registros",
 
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// 🔄 RECUPERACIÓN VS MISMO DÍA DEL MES ANTERIOR
+// ==================================================
+
+app.get(
+  "/api/recuperacion/comparativa-mes-anterior",
+  autenticarToken,
+  async (req, res) => {
+
+    if (
+      normalizarRol(
+        req.rol
+      ) !== "RECUPERACION"
+    ) {
+
+      return res.status(403).json({
+        correcto: false,
+        mensaje:
+          "Acceso exclusivo del equipo de Recuperación",
+      });
+
+    }
+
+
+    try {
+
+      const comparativa =
+        leerComparativaRecuperacionMesAnterior(
+          req.supervisor
+        );
+
+
+      return res.json({
+        correcto: true,
+        ...comparativa,
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en comparativa de Recuperación:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+        correcto: false,
+        mensaje:
+          "No se pudo cargar la comparativa de Recuperación",
       });
 
     }
