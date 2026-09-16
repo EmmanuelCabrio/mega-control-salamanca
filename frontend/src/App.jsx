@@ -37,7 +37,8 @@ import {
 import ComparativaMesAnterior
   from "./components/ComparativaMesAnterior";
 
-
+import RecuperacionesVsMesAnterior
+  from "./components/RecuperacionesVsMesAnterior";
 
 
 
@@ -1980,16 +1981,11 @@ if (
 ========================================== */}
 
 <ComparativaMesAnterior
-
-  registros={
-    registros
-  }
-
-  supervisorSeleccionado={
-    supervisorSeleccionado
-  }
-
+  registros={registros}
+  supervisorSeleccionado={supervisorSeleccionado}
 />
+
+<RecuperacionesVsMesAnterior />
 
         {/* ==========================================
             CONTENIDO PRINCIPAL
