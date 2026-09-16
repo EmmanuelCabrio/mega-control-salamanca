@@ -6551,6 +6551,397 @@ function leerAnalisisSabanaRecuperacion() {
 }
 
 // ==================================================
+// RECUPERACIÓN VS PRESUPUESTO
+// ==================================================
+
+function leerRecuperacionVsPresupuesto() {
+
+  const workbook =
+    cargarExcel();
+
+
+  // Toma las RX reales del bloque que ya validamos.
+  const recuperacionActual =
+    leerRecuperacionYCortes();
+
+
+  const nombreHoja =
+    workbook.SheetNames.find(
+      (nombre) =>
+        limpiarTexto(nombre) ===
+        "PROYECCION"
+    );
+
+
+  if (!nombreHoja) {
+
+    throw new Error(
+      'No se encontró la hoja "PROYECCION"'
+    );
+
+  }
+
+
+  const datos =
+    XLSX.utils.sheet_to_json(
+      workbook.Sheets[nombreHoja],
+      {
+        header: 1,
+        defval: "",
+        raw: true,
+      }
+    );
+
+
+  // ==================================================
+  // LOCALIZAR ENCABEZADOS DE SUCURSALES
+  // ==================================================
+
+  const filaSucursales =
+    datos.findIndex(
+      (fila) =>
+        normalizarNombre(
+          fila[14]
+        ) === "SALAMANCA CL" &&
+        normalizarNombre(
+          fila[15]
+        ) === "CD SALAMANCA"
+    );
+
+
+  // ==================================================
+  // BUSCAR FILAS POR ETIQUETA
+  // ==================================================
+
+  const buscarFila =
+    (etiqueta) =>
+      datos.findIndex(
+        (fila) =>
+          normalizarNombre(
+            fila[13]
+          ) ===
+          normalizarNombre(
+            etiqueta
+          )
+      );
+
+
+  const filaDiasRestantes =
+    buscarFila(
+      "DÍAS POR TRANSCURRIR"
+    );
+
+
+  const filaPresupuestoConEsfuerzo =
+    buscarFila(
+      "RX CON ESF PPTO"
+    );
+
+
+  const filaPresupuestoSinEsfuerzo =
+    buscarFila(
+      "RX SIN ESF PPTO"
+    );
+
+
+  if (
+    filaSucursales < 0 ||
+    filaDiasRestantes < 0 ||
+    filaPresupuestoConEsfuerzo < 0 ||
+    filaPresupuestoSinEsfuerzo < 0
+  ) {
+
+    throw new Error(
+      "No se encontró el bloque de presupuesto de Recuperación"
+    );
+
+  }
+
+
+  // ==================================================
+  // CONVERTIR NÚMEROS
+  // ==================================================
+
+  const numero =
+    (valor) => {
+
+      const resultado =
+        Number(valor);
+
+
+      return Number.isFinite(
+        resultado
+      )
+        ? resultado
+        : 0;
+
+    };
+
+
+  // ==================================================
+  // DÍAS RESTANTES DEL MES
+  // ==================================================
+
+  const diasRestantes =
+    Math.max(
+      0,
+      Math.trunc(
+        numero(
+          datos[
+            filaDiasRestantes
+          ]?.[14]
+        )
+      )
+    );
+
+
+  // ==================================================
+  // CREAR MÉTRICA
+  // ==================================================
+
+  const crearMetrica =
+    (
+      actual,
+      presupuesto
+    ) => {
+
+      const valorActual =
+        numero(actual);
+
+      const valorPresupuesto =
+        numero(presupuesto);
+
+      const diferencia =
+        valorActual -
+        valorPresupuesto;
+
+      const faltante =
+        Math.max(
+          valorPresupuesto -
+            valorActual,
+          0
+        );
+
+
+      return {
+
+        actual:
+          valorActual,
+
+        presupuesto:
+          valorPresupuesto,
+
+        diferencia,
+
+        faltante,
+
+        avance:
+          valorPresupuesto > 0
+            ? (
+                valorActual /
+                valorPresupuesto
+              ) * 100
+            : 0,
+
+      };
+
+    };
+
+
+  // ==================================================
+  // CREAR REGISTRO POR SUCURSAL
+  // ==================================================
+
+  const crearRegistro =
+    (
+      sucursal,
+      actualConEsfuerzo,
+      actualSinEsfuerzo,
+      presupuestoConEsfuerzo,
+      presupuestoSinEsfuerzo
+    ) => {
+
+      const conEsfuerzo =
+        crearMetrica(
+          actualConEsfuerzo,
+          presupuestoConEsfuerzo
+        );
+
+
+      const sinEsfuerzo =
+        crearMetrica(
+          actualSinEsfuerzo,
+          presupuestoSinEsfuerzo
+        );
+
+
+      const total =
+        crearMetrica(
+          conEsfuerzo.actual +
+            sinEsfuerzo.actual,
+
+          conEsfuerzo.presupuesto +
+            sinEsfuerzo.presupuesto
+        );
+
+
+      return {
+
+        sucursal,
+
+        conEsfuerzo,
+
+        sinEsfuerzo,
+
+        total,
+
+        metaDiaria:
+          diasRestantes > 0
+            ? Math.ceil(
+                total.faltante /
+                diasRestantes
+              )
+            : total.faltante,
+
+      };
+
+    };
+
+
+  // ==================================================
+  // MAPA DE RX ACTUALES
+  // ==================================================
+
+  const mapaActual =
+    new Map(
+      recuperacionActual.sucursales.map(
+        (registro) => [
+
+          normalizarNombre(
+            registro.sucursal
+          ),
+
+          registro,
+
+        ]
+      )
+    );
+
+
+  // ==================================================
+  // DETALLE POR SUCURSAL
+  // ==================================================
+
+  const sucursales = [];
+
+
+  // P hasta X en Excel.
+  for (
+    let columna = 15;
+    columna <= 23;
+    columna++
+  ) {
+
+    const sucursal =
+      String(
+        datos[
+          filaSucursales
+        ]?.[columna] ?? ""
+      ).trim();
+
+
+    const actual =
+      mapaActual.get(
+        normalizarNombre(
+          sucursal
+        )
+      );
+
+
+    if (
+      !sucursal ||
+      !actual
+    ) {
+
+      continue;
+
+    }
+
+
+    sucursales.push(
+      crearRegistro(
+
+        actual.sucursal,
+
+        actual
+          .conEsfuerzo
+          .actual,
+
+        actual
+          .sinEsfuerzo
+          .actual,
+
+        datos[
+          filaPresupuestoConEsfuerzo
+        ]?.[columna],
+
+        datos[
+          filaPresupuestoSinEsfuerzo
+        ]?.[columna]
+
+      )
+    );
+
+  }
+
+
+  // ==================================================
+  // TOTAL DEL CLÚSTER
+  // ==================================================
+
+  const resumen =
+    crearRegistro(
+
+      "SALAMANCA CL",
+
+      recuperacionActual
+        .resumen
+        .conEsfuerzo
+        .actual,
+
+      recuperacionActual
+        .resumen
+        .sinEsfuerzo
+        .actual,
+
+      datos[
+        filaPresupuestoConEsfuerzo
+      ]?.[14],
+
+      datos[
+        filaPresupuestoSinEsfuerzo
+      ]?.[14]
+
+    );
+
+
+  // ==================================================
+  // RESPUESTA
+  // ==================================================
+
+  return {
+
+    diasRestantes,
+
+    resumen,
+
+    sucursales,
+
+  };
+
+}
+
+// ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
 
@@ -7799,6 +8190,8 @@ module.exports = {
   leerGestionOdc,
 
   leerRecuperacionYCortes,
+
+  leerRecuperacionVsPresupuesto,
 
   leerAnalisisSabanaRecuperacion,
 
