@@ -5745,6 +5745,248 @@ function leerGestionOdc() {
   };
 
 }
+
+
+// ==================================================
+// RECUPERACIÓN CON/SIN ESFUERZO Y CORTES
+// ==================================================
+
+function leerRecuperacionYCortes() {
+
+  const workbook =
+    cargarExcel();
+
+
+  const nombreHoja =
+    workbook.SheetNames.find(
+      (nombre) =>
+        limpiarTexto(nombre) ===
+        "PANEL RECUPERACION"
+    );
+
+
+  if (!nombreHoja) {
+
+    throw new Error(
+      'No se encontró la hoja "PANEL RECUPERACION"'
+    );
+
+  }
+
+
+  const datos =
+    XLSX.utils.sheet_to_json(
+      workbook.Sheets[nombreHoja],
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  const filaEncabezados =
+    datos.findIndex(
+      (fila) =>
+        limpiarTexto(fila[10]) ===
+          "SUCURSAL" &&
+        limpiarTexto(fila[11]) ===
+          "CONESF"
+    );
+
+
+  if (filaEncabezados < 0) {
+
+    throw new Error(
+      "No se encontró el bloque de Recuperación y Cortes"
+    );
+
+  }
+
+
+  const numero =
+    (valor) => {
+
+      const resultado =
+        Number(valor);
+
+
+      return Number.isFinite(resultado)
+        ? resultado
+        : 0;
+
+    };
+
+
+  const porcentaje =
+    (valor) => {
+
+      const resultado =
+        numero(valor);
+
+
+      return Math.abs(resultado) <= 1
+        ? resultado * 100
+        : resultado;
+
+    };
+
+
+  const convertirFila =
+    (fila) => ({
+
+      sucursal:
+        String(
+          fila[10] ?? ""
+        ).trim(),
+
+      conEsfuerzo: {
+
+        actual:
+          numero(fila[11]),
+
+        anterior:
+          numero(fila[12]),
+
+        diferencia:
+          numero(fila[13]),
+
+        porcentajeActual:
+          porcentaje(fila[17]),
+
+        porcentajeAnterior:
+          porcentaje(fila[18]),
+
+        diferenciaPorcentaje:
+          porcentaje(fila[19]),
+
+      },
+
+      sinEsfuerzo: {
+
+        actual:
+          numero(fila[14]),
+
+        anterior:
+          numero(fila[15]),
+
+        diferencia:
+          numero(fila[16]),
+
+        porcentajeActual:
+          porcentaje(fila[20]),
+
+        porcentajeAnterior:
+          porcentaje(fila[21]),
+
+        diferenciaPorcentaje:
+          porcentaje(fila[22]),
+
+      },
+
+      total: {
+
+        actual:
+          numero(fila[23]),
+
+        anterior:
+          numero(fila[24]),
+
+        diferencia:
+          numero(fila[25]),
+
+        porcentajeActual:
+          porcentaje(fila[26]),
+
+        porcentajeAnterior:
+          porcentaje(fila[27]),
+
+        diferenciaPorcentaje:
+          porcentaje(fila[28]),
+
+      },
+
+      cortes: {
+
+        actual:
+          numero(fila[29]),
+
+        anterior:
+          numero(fila[30]),
+
+        diferencia:
+          numero(fila[31]),
+
+      },
+
+    });
+
+
+  const sucursales = [];
+
+  let resumen =
+    null;
+
+
+  for (
+    let indice = filaEncabezados + 1;
+    indice < datos.length;
+    indice++
+  ) {
+
+    const registro =
+      convertirFila(
+        datos[indice]
+      );
+
+
+    if (!registro.sucursal) {
+
+      continue;
+
+    }
+
+
+    if (
+      limpiarTexto(
+        registro.sucursal
+      ) === "TOTAL"
+    ) {
+
+      resumen =
+        registro;
+
+      break;
+
+    }
+
+
+    sucursales.push(
+      registro
+    );
+
+  }
+
+
+  if (
+    !resumen ||
+    sucursales.length === 0
+  ) {
+
+    throw new Error(
+      "El bloque de Recuperación y Cortes está incompleto"
+    );
+
+  }
+
+
+  return {
+    resumen,
+    sucursales,
+  };
+
+}
+
+
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
@@ -6992,6 +7234,8 @@ module.exports = {
   leerComparativaRecuperacionMesAnterior,
 
   leerGestionOdc,
+
+  leerRecuperacionYCortes,
 
   reemplazarExcelEnSupabase,
 
