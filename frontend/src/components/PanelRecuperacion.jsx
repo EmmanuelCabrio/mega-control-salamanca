@@ -16,6 +16,9 @@ import GestionOdc
 import RecuperacionYCortes
   from "./RecuperacionYCortes";
 
+import AnalisisSabanaRecuperacion
+  from "./AnalisisSabanaRecuperacion";
+
 import {
   fetchProtegido
 } from "../services/authService";
@@ -282,6 +285,33 @@ function PanelRecuperacion({
 
 
       <RecuperacionYCortes />
+
+      <section
+  className="
+    panel-recuperacion-paso
+    panel-recuperacion-paso-analisis
+  "
+>
+
+  <span>05</span>
+
+  <div>
+
+    <h2>
+      ¿Dónde se concentran los cortes?
+    </h2>
+
+    <p>
+      Analiza colonias por sucursal y número
+      de visitas realizadas.
+    </p>
+
+  </div>
+
+</section>
+
+
+<AnalisisSabanaRecuperacion />
 
     </main>
   );
