@@ -576,7 +576,7 @@ function AnalisisSabanaRecuperacion() {
 
                 </span>
 
-                <b>
+                   <b>
                   {formatearNumero(
                     registro.cortesFiltrados
                   )}
@@ -589,125 +589,6 @@ function AnalisisSabanaRecuperacion() {
 
         </div>
 
-
-        <div className="analisis-sabana-tabla-contenedor">
-
-          <table className="analisis-sabana-tabla">
-
-            <thead>
-
-              <tr>
-                <th>#</th>
-                <th>Sucursal</th>
-                <th>Colonia</th>
-                <th>Cortes</th>
-                <th>Participación</th>
-                <th>Visitas 0–6</th>
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {analisis.colonias.map(
-                (registro, indice) => (
-
-                  <tr
-                    key={
-                      `${registro.sucursal}-${registro.colonia}`
-                    }
-                  >
-
-                    <td>
-                      {indice + 1}
-                    </td>
-
-                    <td>
-                      {registro.sucursal}
-                    </td>
-
-                    <td>
-
-                      <strong>
-                        {registro.colonia}
-                      </strong>
-
-                    </td>
-
-                    <td>
-
-                      <strong>
-                        {formatearNumero(
-                          registro
-                            .cortesFiltrados
-                        )}
-                      </strong>
-
-                    </td>
-
-                    <td>
-                      {analisis.totalCortes > 0
-                        ? `${(
-                            registro
-                              .cortesFiltrados /
-                            analisis
-                              .totalCortes *
-                            100
-                          ).toFixed(2)}%`
-                        : "0.00%"}
-                    </td>
-
-                    <td>
-
-                      <div className="analisis-sabana-visitas">
-
-                        {(
-                          datos
-                            ?.visitasDisponibles ||
-                          []
-                        ).map(
-                          (visitas) => (
-
-                            <span
-                              key={visitas}
-                              className={
-                                Number(
-                                  registro
-                                    .porVisitas?.[
-                                      visitas
-                                    ] || 0
-                                ) > 0
-                                  ? "tiene-datos"
-                                  : ""
-                              }
-                            >
-                              {visitas}:{" "}
-                              {formatearNumero(
-                                registro
-                                  .porVisitas?.[
-                                    visitas
-                                  ] || 0
-                              )}
-                            </span>
-
-                          )
-                        )}
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                )
-              )}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
       </div>
 
     </section>
@@ -717,3 +598,4 @@ function AnalisisSabanaRecuperacion() {
 
 
 export default AnalisisSabanaRecuperacion;
+
