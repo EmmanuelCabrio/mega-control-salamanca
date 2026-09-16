@@ -12071,3 +12071,109 @@ td:first-child {
   }
 
 }
+
+
+/* =========================================================
+   BOTÓN PANEL DE RECUPERACIÓN — DIRECCIÓN
+========================================================= */
+
+.panel-direccion-recuperacion {
+  border:
+    1px solid #7c3aed;
+
+  border-radius: 10px;
+
+  padding: 10px 16px;
+
+  color: #ffffff;
+
+  background: #6d28d9;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.panel-direccion-recuperacion:hover {
+  background: #5b21b6;
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* =========================================================
+   ACCIONES DEL PANEL DE RECUPERACIÓN
+========================================================= */
+
+.panel-recuperacion-acciones {
+  display: flex;
+
+  flex: 0 0 auto;
+
+  flex-wrap: wrap;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+}
+
+
+.panel-recuperacion-regresar {
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.45);
+
+  border-radius: 11px;
+
+  padding: 11px 16px;
+
+  color: #ffffff;
+
+  background: #2563eb;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.panel-recuperacion-regresar:hover {
+  background: #1d4ed8;
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* CELULAR */
+
+@media (max-width: 700px) {
+
+  .panel-recuperacion-acciones {
+    width: 100%;
+
+    flex-direction: column;
+  }
+
+
+  .panel-recuperacion-regresar,
+  .panel-recuperacion-salir {
+    width: 100%;
+  }
+
+
+  .panel-direccion-recuperacion {
+    width: 100%;
+  }
+
+}
