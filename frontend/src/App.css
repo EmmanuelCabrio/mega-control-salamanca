@@ -4915,10 +4915,11 @@ body {
 ================================================== */
 
 .panel-direccion-header {
-
-  max-width: 1200px;
-
-  margin: 0 auto 25px;
+  width: 100%;
+   
+  max-width: none;
+   
+  margin: 0 0 25px;
 
   display: flex;
 
