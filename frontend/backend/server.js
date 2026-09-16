@@ -24,6 +24,8 @@ const {
   reemplazarExcelEnSupabase,
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
+
+
 // ==================================================
 // CONFIGURACIÓN
 // ==================================================
@@ -91,6 +93,7 @@ app.use(
   express.json()
 );
 
+
 // ==================================================
 // FUNCIONES AUXILIARES
 // ==================================================
@@ -107,6 +110,7 @@ function normalizarSupervisor(
 
 }
 
+
 // ==================================================
 // NORMALIZAR ROL
 // ==================================================
@@ -120,6 +124,28 @@ function normalizarRol(
   )
     .trim()
     .toUpperCase();
+
+}
+
+
+// ==================================================
+// ACCESO AL PANEL DE RECUPERACIÓN
+// ==================================================
+
+function puedeAccederRecuperacion(
+  rol
+) {
+
+  const rolNormalizado =
+    normalizarRol(
+      rol
+    );
+
+
+  return (
+    rolNormalizado === "RECUPERACION" ||
+    rolNormalizado === "DIRECCIÓN"
+  );
 
 }
 
@@ -170,27 +196,27 @@ function autenticarToken(
       );
 
 
-  const rol =
-  normalizarRol(
-    datos.rol
-  );
+    const rol =
+      normalizarRol(
+        datos.rol
+      );
 
 
-if (
-  !datos.supervisor &&
-  rol !== "DIRECCIÓN"
-) {
+    if (
+      !datos.supervisor &&
+      rol !== "DIRECCIÓN"
+    ) {
 
-  return res.status(401).json({
+      return res.status(401).json({
 
-    correcto: false,
+        correcto: false,
 
-    mensaje:
-      "Token inválido",
+        mensaje:
+          "Token inválido",
 
-  });
+      });
 
-}
+    }
 
 
     req.supervisor =
@@ -203,7 +229,7 @@ if (
       datos.usuario || "";
 
     req.rol =
-  rol;
+      rol;
 
 
     next();
@@ -277,7 +303,7 @@ app.post(
 
       }
 
-      
+
       const resultado =
         validarUsuario(
           usuario,
@@ -295,46 +321,45 @@ app.post(
 
       }
 
-     await leerExcel();
+
+      await leerExcel();
+
+
       const supervisor =
         normalizarSupervisor(
           resultado.supervisor
         );
 
 
-      // ==========================================
-      // CREAR TOKEN
-      // ==========================================
+      const token =
+        jwt.sign(
 
-    const token =
-  jwt.sign(
+          {
 
-    {
+            usuario:
+              String(usuario)
+                .trim()
+                .toUpperCase(),
 
-      usuario:
-        String(usuario)
-          .trim()
-          .toUpperCase(),
+            supervisor,
 
-      supervisor,
+            rol:
+              normalizarRol(
+                resultado.rol
+              ),
 
-      rol:
-        normalizarRol(
-          resultado.rol
-        ),
+          },
 
-    },
+          JWT_SECRET,
 
-    JWT_SECRET,
+          {
 
-    {
+            expiresIn:
+              "12h",
 
-      expiresIn:
-        "12h",
+          }
 
-    }
-
-  );
+        );
 
 
       return res.json({
@@ -353,7 +378,6 @@ app.post(
             resultado.rol
           ),
 
-
       });
 
     } catch (error) {
@@ -362,7 +386,9 @@ app.post(
         "❌ Error en /auth/login:"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       return res.status(500).json({
@@ -370,7 +396,7 @@ app.post(
         correcto: false,
 
         mensaje:
-          "Error interno del ",
+          "Error interno del servidor",
 
       });
 
@@ -410,7 +436,9 @@ app.get(
         "❌ Error en /api/penetracion:"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       return res.status(500).json({
@@ -442,21 +470,16 @@ app.get(
       const datos =
         await leerExcel();
 
-
       const supervisor =
         req.supervisor;
-
 
       const registros =
         (datos.avanceSemanal || [])
           .filter(
-
             (item) =>
-
               normalizarSupervisor(
                 item.supervisor
               ) === supervisor
-
           );
 
 
@@ -476,7 +499,9 @@ app.get(
         "❌ Error en /api/avance-semanal:"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       return res.status(500).json({
@@ -513,52 +538,50 @@ app.get(
         (datos.rankingSupervisores || [])
 
           .filter(
-
             (item) =>
-
               normalizarSupervisor(
                 item.supervisor
               ) !==
               "MORALES PEREZ BENJAMIN"
-
           )
 
-        .map(
-  (item) => ({
+          .map(
+            (item) => ({
 
-    supervisor:
-      item.supervisor,
+              supervisor:
+                item.supervisor,
 
-    productividad:
-      Number(
-        item.productividad || 0
-      ),
+              productividad:
+                Number(
+                  item.productividad || 0
+                ),
 
-    posicion:
-      item.posicion,
+              posicion:
+                item.posicion,
 
-    movil:
-      Number(
-        item.movil || 0
-      ),
+              movil:
+                Number(
+                  item.movil || 0
+                ),
 
-    netflix:
-      Number(
-        item.netflix || 0
-      ),
+              netflix:
+                Number(
+                  item.netflix || 0
+                ),
 
-    disney:
-      Number(
-        item.disney || 0
-      ),
+              disney:
+                Number(
+                  item.disney || 0
+                ),
 
-    max:
-      Number(
-        item.max || 0
-      ),
+              max:
+                Number(
+                  item.max || 0
+                ),
 
-  })
-);
+            })
+          );
+
 
       return res.json({
 
@@ -574,7 +597,9 @@ app.get(
         "❌ Error en /api/ranking-supervisores:"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       return res.status(500).json({
@@ -607,24 +632,13 @@ app.get(
         await leerExcel();
 
 
-      // ==========================================
-      // ROL DEL USUARIO
-      // ==========================================
-
       const rol =
         normalizarRol(
           req.rol
         );
 
 
-      // ==========================================
-      // 👔 DIRECCIÓN
-      // ==========================================
-      // Dirección necesita TODOS los registros
-      // para poder detectar el foco más crítico
-      // de cada supervisor.
-      // ==========================================
-
+      // Dirección recibe todos los registros.
       if (
         rol === "DIRECCIÓN"
       ) {
@@ -652,13 +666,6 @@ app.get(
       }
 
 
-      // ==========================================
-      // 👨‍💼 SUPERVISOR
-      // ==========================================
-      // Los supervisores solamente reciben
-      // los registros de su propio equipo.
-      // ==========================================
-
       const supervisor =
         req.supervisor;
 
@@ -666,14 +673,10 @@ app.get(
       const registros =
         (datos.registros || [])
           .filter(
-
             (registro) =>
-
               normalizarSupervisor(
                 registro.supervisor
-              ) ===
-              supervisor
-
+              ) === supervisor
           );
 
 
@@ -681,7 +684,6 @@ app.get(
         "👨‍💼 SUPERVISOR:",
         supervisor
       );
-
 
       console.log(
         "👥 REGISTROS DE SU EQUIPO:",
@@ -728,75 +730,6 @@ app.get(
 
 
 // ==================================================
-// 🔄 RECUPERACIÓN VS MISMO DÍA DEL MES ANTERIOR
-// ==================================================
-
-app.get(
-  "/api/recuperacion/comparativa-mes-anterior",
-  autenticarToken,
-  async (req, res) => {
-
-    if (
-      normalizarRol(
-        req.rol
-      ) !== "RECUPERACION"
-    ) {
-
-      return res.status(403).json({
-
-        correcto: false,
-
-        mensaje:
-          "Acceso exclusivo del equipo de Recuperación",
-
-      });
-
-    }
-
-
-    try {
-
-      const comparativa =
-        leerComparativaRecuperacionMesAnterior(
-          req.supervisor
-        );
-
-
-      return res.json({
-
-        correcto: true,
-
-        ...comparativa,
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        "❌ Error en comparativa de Recuperación:"
-      );
-
-      console.error(
-        error
-      );
-
-
-      return res.status(500).json({
-
-        correcto: false,
-
-        mensaje:
-          "No se pudo cargar la comparativa de Recuperación",
-
-      });
-
-    }
-
-  }
-);
-
-
-// ==================================================
 // GESTIÓN DE ÓRDENES DE COBRANZA
 // ==================================================
 
@@ -806,9 +739,9 @@ app.get(
   async (req, res) => {
 
     if (
-      normalizarRol(
+      !puedeAccederRecuperacion(
         req.rol
-      ) !== "RECUPERACION"
+      )
     ) {
 
       return res.status(403).json({
@@ -862,6 +795,7 @@ app.get(
   }
 );
 
+
 // ==================================================
 // RECUPERACIÓN CON/SIN ESFUERZO Y CORTES
 // ==================================================
@@ -872,15 +806,18 @@ app.get(
   async (req, res) => {
 
     if (
-      normalizarRol(
+      !puedeAccederRecuperacion(
         req.rol
-      ) !== "RECUPERACION"
+      )
     ) {
 
       return res.status(403).json({
+
         correcto: false,
+
         mensaje:
           "Acceso exclusivo del equipo de Recuperación",
+
       });
 
     }
@@ -893,8 +830,11 @@ app.get(
 
 
       return res.json({
+
         correcto: true,
+
         ...panorama,
+
       });
 
     } catch (error) {
@@ -909,15 +849,19 @@ app.get(
 
 
       return res.status(500).json({
+
         correcto: false,
+
         mensaje:
           "No se pudo cargar Recuperación y Cortes",
+
       });
 
     }
 
   }
 );
+
 
 // ==================================================
 // RECUPERACIÓN VS PRESUPUESTO
@@ -929,15 +873,18 @@ app.get(
   async (req, res) => {
 
     if (
-      normalizarRol(
+      !puedeAccederRecuperacion(
         req.rol
-      ) !== "RECUPERACION"
+      )
     ) {
 
       return res.status(403).json({
+
         correcto: false,
+
         mensaje:
           "Acceso exclusivo del equipo de Recuperación",
+
       });
 
     }
@@ -950,8 +897,11 @@ app.get(
 
 
       return res.json({
+
         correcto: true,
+
         ...presupuesto,
+
       });
 
     } catch (error) {
@@ -966,9 +916,12 @@ app.get(
 
 
       return res.status(500).json({
+
         correcto: false,
+
         mensaje:
           "No se pudo cargar Recuperación vs Presupuesto",
+
       });
 
     }
@@ -987,16 +940,18 @@ app.get(
   async (req, res) => {
 
     if (
-      normalizarRol(
+      !puedeAccederRecuperacion(
         req.rol
-      ) !== "RECUPERACION"
+      )
     ) {
 
       return res.status(403).json({
+
         correcto: false,
 
         mensaje:
           "Acceso exclusivo del equipo de Recuperación",
+
       });
 
     }
@@ -1009,9 +964,11 @@ app.get(
 
 
       return res.json({
+
         correcto: true,
 
         ...gestion,
+
       });
 
     } catch (error) {
@@ -1026,16 +983,19 @@ app.get(
 
 
       return res.status(500).json({
+
         correcto: false,
 
         mensaje:
           "No se pudo cargar la gestión por motivo",
+
       });
 
     }
 
   }
 );
+
 
 // ==================================================
 // ANÁLISIS DE SÁBANA DE RECUPERACIÓN
@@ -1047,15 +1007,18 @@ app.get(
   async (req, res) => {
 
     if (
-      normalizarRol(
+      !puedeAccederRecuperacion(
         req.rol
-      ) !== "RECUPERACION"
+      )
     ) {
 
       return res.status(403).json({
+
         correcto: false,
+
         mensaje:
           "Acceso exclusivo del equipo de Recuperación",
+
       });
 
     }
@@ -1068,8 +1031,11 @@ app.get(
 
 
       return res.json({
+
         correcto: true,
+
         ...analisis,
+
       });
 
     } catch (error) {
@@ -1084,15 +1050,96 @@ app.get(
 
 
       return res.status(500).json({
+
         correcto: false,
+
         mensaje:
           "No se pudo cargar el análisis de la Sábana de Recuperación",
+
       });
 
     }
 
   }
 );
+
+
+// ==================================================
+// RECUPERACIÓN VS MISMO DÍA DEL MES ANTERIOR
+// ==================================================
+
+app.get(
+  "/api/recuperacion/comparativa-mes-anterior",
+  autenticarToken,
+  async (req, res) => {
+
+    if (
+      !puedeAccederRecuperacion(
+        req.rol
+      )
+    ) {
+
+      return res.status(403).json({
+
+        correcto: false,
+
+        mensaje:
+          "Acceso exclusivo del equipo de Recuperación",
+
+      });
+
+    }
+
+
+    try {
+
+      const supervisorRecuperacion =
+        normalizarRol(
+          req.rol
+        ) === "DIRECCIÓN"
+          ? "MORALES PEREZ BENJAMIN"
+          : req.supervisor;
+
+
+      const comparativa =
+        leerComparativaRecuperacionMesAnterior(
+          supervisorRecuperacion
+        );
+
+
+      return res.json({
+
+        correcto: true,
+
+        ...comparativa,
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en comparativa de Recuperación:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar la comparativa de Recuperación",
+
+      });
+
+    }
+
+  }
+);
+
 
 // ==================================================
 // TOP 3 CL SALAMANCA
@@ -1113,34 +1160,26 @@ app.get(
         (datos.registros || [])
 
           .filter(
-
             (registro) =>
-
               normalizarSupervisor(
                 registro.supervisor
               ) !==
               "MORALES PEREZ BENJAMIN"
-
           )
 
           .sort(
-
             (a, b) =>
-
               Number(
                 b.productividad || 0
               ) -
-
               Number(
                 a.productividad || 0
               )
-
           )
 
           .slice(0, 3)
 
           .map(
-
             (registro, index) => ({
 
               posicion:
@@ -1155,7 +1194,6 @@ app.get(
                 ),
 
             })
-
           );
 
 
@@ -1173,7 +1211,9 @@ app.get(
         "❌ Error en /api/top3-cl:"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       return res.status(500).json({
@@ -1205,21 +1245,16 @@ app.get(
       const datos =
         await leerExcel();
 
-
       const supervisor =
         req.supervisor;
-
 
       const registros =
         (datos.planTrabajo || [])
           .filter(
-
             (registro) =>
-
               normalizarSupervisor(
                 registro.supervisor
               ) === supervisor
-
           );
 
 
@@ -1237,7 +1272,9 @@ app.get(
         "❌ Error en /api/plan-trabajo:"
       );
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       return res.status(500).json({
@@ -1254,8 +1291,9 @@ app.get(
   }
 );
 
+
 // ==================================================
-// 🏆 TOP 3 CL SALAMANCA
+// RANKING CL SALAMANCA
 // ==================================================
 
 app.get(
@@ -1269,27 +1307,16 @@ app.get(
         await leerExcel();
 
 
-      // ==========================================
-      // FILTRAR Y EXCLUIR A BENJAMÍN
-      // ==========================================
-
       const registros =
         (datos.registros || [])
           .filter(
             (registro) =>
-              String(
+              normalizarSupervisor(
                 registro.supervisor
-              )
-                .trim()
-                .toUpperCase() !==
+              ) !==
               "MORALES PEREZ BENJAMIN"
           );
 
-
-      // ==========================================
-      // ORDENAR PRODUCTIVIDAD
-      // MAYOR → MENOR
-      // ==========================================
 
       const ranking =
         [...registros]
@@ -1304,10 +1331,6 @@ app.get(
           )
           .slice(0, 3);
 
-
-      // ==========================================
-      // DEVOLVER SOLO LO NECESARIO
-      // ==========================================
 
       return res.json({
 
@@ -1333,11 +1356,13 @@ app.get(
 
       });
 
-
     } catch (error) {
 
       console.error(
-        "❌ Error en /api/ranking-cl:",
+        "❌ Error en /api/ranking-cl:"
+      );
+
+      console.error(
         error
       );
 
@@ -1357,9 +1382,8 @@ app.get(
 );
 
 
-
 // ==================================================
-// 🏆 RANKING COMPLETO CL SALAMANCA
+// RANKING COMPLETO CL SALAMANCA
 // ==================================================
 
 app.get(
@@ -1373,27 +1397,16 @@ app.get(
         await leerExcel();
 
 
-      // ==========================================
-      // FILTRAR PROMOTORES QUE NO PERTENECEN AL CL
-      // ==========================================
-
       const registros =
         (datos.registros || [])
           .filter(
             (registro) =>
-              String(
+              normalizarSupervisor(
                 registro.supervisor
-              )
-                .trim()
-                .toUpperCase() !==
+              ) !==
               "MORALES PEREZ BENJAMIN"
           );
 
-
-      // ==========================================
-      // ORDENAR POR PRODUCTIVIDAD
-      // MAYOR → MENOR
-      // ==========================================
 
       const ranking =
         [...registros]
@@ -1407,10 +1420,6 @@ app.get(
               )
           );
 
-
-      // ==========================================
-      // DEVOLVER SOLO DATOS NECESARIOS
-      // ==========================================
 
       return res.json({
 
@@ -1452,7 +1461,10 @@ app.get(
     } catch (error) {
 
       console.error(
-        "❌ Error en /api/ranking-cl-completo:",
+        "❌ Error en /api/ranking-cl-completo:"
+      );
+
+      console.error(
         error
       );
 
@@ -1473,7 +1485,7 @@ app.get(
 
 
 // ==================================================
-// 📊 VENTA VS MES ANTERIOR
+// VENTA VS MES ANTERIOR
 // ==================================================
 
 app.get(
@@ -1510,7 +1522,6 @@ app.get(
 
       });
 
-
     } catch (error) {
 
       console.error(
@@ -1538,7 +1549,7 @@ app.get(
 
 
 // ==================================================
-// 👥 STATUS DE PLANTILLA
+// STATUS DE PLANTILLA
 // ==================================================
 
 app.get(
@@ -1580,7 +1591,6 @@ app.get(
 
       });
 
-
     } catch (error) {
 
       console.error(
@@ -1606,8 +1616,9 @@ app.get(
   }
 );
 
+
 // ==================================================
-// 📊 PRODUCTIVIDAD POR CANAL
+// PRODUCTIVIDAD POR CANAL
 // ==================================================
 
 app.get(
@@ -1635,7 +1646,6 @@ app.get(
 
       });
 
-
     } catch (error) {
 
       console.error(
@@ -1661,8 +1671,9 @@ app.get(
   }
 );
 
+
 // ==================================================
-// 👥 CARTERA POR DÍA
+// CARTERA POR DÍA
 // ==================================================
 
 app.get(
@@ -1690,13 +1701,11 @@ app.get(
 
       });
 
-
     } catch (error) {
 
       console.error(
         "❌ Error en /api/cartera-por-dia:"
       );
-
 
       console.error(
         error
@@ -1717,8 +1726,9 @@ app.get(
   }
 );
 
+
 // ==================================================
-// 📊 PROYECCIÓN DE CIERRE — DIRECCIÓN
+// PROYECCIÓN DE CIERRE — DIRECCIÓN
 // ==================================================
 
 app.get(
@@ -1726,11 +1736,9 @@ app.get(
   autenticarToken,
   (req, res) => {
 
-    // ==============================================
-    // ACCESO EXCLUSIVO PARA DIRECCIÓN
-    // ==============================================
-
-    if (req.rol !== "DIRECCIÓN") {
+    if (
+      req.rol !== "DIRECCIÓN"
+    ) {
 
       return res.status(403).json({
 
@@ -1743,17 +1751,12 @@ app.get(
 
     }
 
+
     try {
 
-      // ============================================
-      // LEER LA TABLA DEL EXCEL
-      // ============================================
+      const datos =
+        leerProyeccion();
 
-      const datos = leerProyeccion();
-
-      // ============================================
-      // ENVIAR ENCABEZADOS E INDICADORES AL PANEL
-      // ============================================
 
       return res.json({
 
@@ -1769,18 +1772,14 @@ app.get(
 
     } catch (error) {
 
-      // ============================================
-      // REGISTRAR EL ERROR EN RENDER
-      // ============================================
+      console.error(
+        "❌ Error en /api/proyeccion:"
+      );
 
       console.error(
-        "❌ Error en /api/proyeccion:",
         error
       );
 
-      // ============================================
-      // INFORMAR AL PANEL QUE FALLÓ LA CONSULTA
-      // ============================================
 
       return res.status(500).json({
 
@@ -1796,8 +1795,9 @@ app.get(
   }
 );
 
+
 // ==================================================
-// 📊 DETALLE DE VENTA MENSUAL — DIRECCIÓN
+// DETALLE DE VENTA MENSUAL — DIRECCIÓN
 // ==================================================
 
 app.get(
@@ -1806,10 +1806,6 @@ app.get(
   async (req, res) => {
 
     try {
-
-      // ============================================
-      // VALIDAR ROL
-      // ============================================
 
       const rol =
         normalizarRol(
@@ -1835,17 +1831,9 @@ app.get(
       }
 
 
-      // ============================================
-      // LEER DATOS DEL EXCEL
-      // ============================================
-
       const registros =
         leerDetalleVentaMensual();
 
-
-      // ============================================
-      // RESPUESTA
-      // ============================================
 
       return res.json({
 
@@ -1854,7 +1842,6 @@ app.get(
         registros,
 
       });
-
 
     } catch (error) {
 
@@ -1885,7 +1872,7 @@ app.get(
 
 
 // ==================================================
-// 🔄 ACTUALIZAR DATOS — SOLO DIRECCIÓN
+// ACTUALIZAR DATOS — SOLO DIRECCIÓN
 // ==================================================
 
 app.post(
@@ -1893,7 +1880,9 @@ app.post(
   autenticarToken,
   async (req, res) => {
 
-    if (req.rol !== "DIRECCIÓN") {
+    if (
+      req.rol !== "DIRECCIÓN"
+    ) {
 
       return res.status(403).json({
 
@@ -1906,10 +1895,12 @@ app.post(
 
     }
 
+
     try {
 
       const resultado =
         await actualizarDatosDesdeSupabase();
+
 
       return res.json({
 
@@ -1926,9 +1917,13 @@ app.post(
     } catch (error) {
 
       console.error(
-        "❌ Error al actualizar datos:",
+        "❌ Error al actualizar datos:"
+      );
+
+      console.error(
         error
       );
+
 
       return res.status(500).json({
 
@@ -1944,18 +1939,16 @@ app.post(
   }
 );
 
+
 // ==================================================
-// 📤 REEMPLAZAR EXCEL — SOLO DIRECCIÓN
+// REEMPLAZAR EXCEL — SOLO DIRECCIÓN
 // ==================================================
 
 app.post(
   "/api/subir-excel",
 
-  // Verificar primero la sesión.
   autenticarToken,
 
-  // Recibir el Excel como archivo binario.
-  // El límite será de 10 MB.
   express.raw({
 
     type:
@@ -1967,10 +1960,6 @@ app.post(
   }),
 
   async (req, res) => {
-
-    // ==============================================
-    // ACCESO EXCLUSIVO PARA DIRECCIÓN
-    // ==============================================
 
     if (
       req.rol !== "DIRECCIÓN"
@@ -1991,10 +1980,6 @@ app.post(
 
     try {
 
-      // ============================================
-      // RECUPERAR EL NOMBRE DEL ARCHIVO
-      // ============================================
-
       const nombreArchivo =
         decodeURIComponent(
           String(
@@ -2004,10 +1989,6 @@ app.post(
           )
         );
 
-
-      // ============================================
-      // VALIDAR LA EXTENSIÓN
-      // ============================================
 
       if (
         !nombreArchivo
@@ -2027,10 +2008,6 @@ app.post(
 
       }
 
-
-      // ============================================
-      // REEMPLAZAR EXCEL Y RENOVAR CACHÉ
-      // ============================================
 
       const resultado =
         await reemplazarExcelEnSupabase(
@@ -2054,11 +2031,13 @@ app.post(
 
       });
 
-
     } catch (error) {
 
       console.error(
-        "❌ Error al reemplazar el Excel:",
+        "❌ Error al reemplazar el Excel:"
+      );
+
+      console.error(
         error
       );
 
@@ -2122,7 +2101,10 @@ app.use(
 
     }
 
-    return next(error);
+
+    return next(
+      error
+    );
 
   }
 );
@@ -2140,13 +2122,15 @@ async function iniciarServidor() {
       "☁️ Preparando datos desde Supabase..."
     );
 
+
     await descargarExcelDesdeSupabase();
 
+
     console.log(
-  "✅ Excel listo para utilizar"
-);
-    
-  
+      "✅ Excel listo para utilizar"
+    );
+
+
     app.listen(
       PORT,
       "0.0.0.0",
@@ -2189,7 +2173,9 @@ async function iniciarServidor() {
       "❌ ERROR AL INICIAR EL BACKEND:"
     );
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     process.exit(1);
 
