@@ -36,6 +36,7 @@ import ResumenVsMesAnteriorSupervisores
 
 function PanelDireccion({
   onCerrarSesion,
+  onAbrirRecuperacion,
 }) {
 
   const [actualizando, setActualizando] =
@@ -519,6 +520,20 @@ return (
             : "🔄 Actualizar datos"}
 
         </button>
+
+                {/* ABRIR PANEL DE RECUPERACIÓN */}
+
+        {onAbrirRecuperacion && (
+
+          <button
+            type="button"
+            className="panel-direccion-recuperacion"
+            onClick={onAbrirRecuperacion}
+          >
+            🔄 Panel de Recuperación
+          </button>
+
+        )}
 
 
         {/* CERRAR SESIÓN */}
