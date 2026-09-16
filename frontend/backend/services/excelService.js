@@ -6214,6 +6214,342 @@ function leerRecuperacionYCortes() {
 
 }
 
+
+
+// ==================================================
+// ANÁLISIS DE SÁBANA DE RECUPERACIÓN
+// ==================================================
+
+function leerAnalisisSabanaRecuperacion() {
+
+  const workbook =
+    cargarExcel();
+
+
+  const nombreHoja =
+    workbook.SheetNames.find(
+      (nombre) =>
+        limpiarTexto(nombre) ===
+        "SABANA DE RECUPERACION"
+    );
+
+
+  if (!nombreHoja) {
+
+    throw new Error(
+      'No se encontró la hoja "SABANA DE RECUPERACION"'
+    );
+
+  }
+
+
+  const datos =
+    XLSX.utils.sheet_to_json(
+      workbook.Sheets[nombreHoja],
+      {
+        header: 1,
+        defval: "",
+        raw: true,
+      }
+    );
+
+
+  // ==================================================
+  // LOCALIZAR ENCABEZADOS
+  // ==================================================
+
+  const filaEncabezados =
+    datos.findIndex(
+      (fila) => {
+
+        const encabezados =
+          fila.map(
+            (valor) =>
+              normalizarNombre(valor)
+          );
+
+
+        return (
+          encabezados.includes(
+            "SUCURSAL"
+          ) &&
+          encabezados.includes(
+            "COLONIA"
+          ) &&
+          encabezados.includes(
+            "NO VISITAS"
+          )
+        );
+
+      }
+    );
+
+
+  if (filaEncabezados < 0) {
+
+    throw new Error(
+      "No se encontraron los encabezados de la Sábana de Recuperación"
+    );
+
+  }
+
+
+  const encabezados =
+    datos[filaEncabezados].map(
+      (valor) =>
+        normalizarNombre(valor)
+    );
+
+
+  // ==================================================
+  // UBICAR COLUMNAS
+  // ==================================================
+
+  const columnaSucursal =
+    encabezados.indexOf(
+      "SUCURSAL"
+    );
+
+  const columnaColonia =
+    encabezados.indexOf(
+      "COLONIA"
+    );
+
+  const columnaVisitas =
+    encabezados.indexOf(
+      "NO VISITAS"
+    );
+
+
+  // ==================================================
+  // CONTENEDORES
+  // ==================================================
+
+  const mapaColonias =
+    new Map();
+
+  const sucursales =
+    new Set();
+
+  const visitasDisponibles =
+    new Set();
+
+  let totalRegistros = 0;
+
+
+  // ==================================================
+  // RECORRER SÁBANA
+  // ==================================================
+
+  for (
+    let indice = filaEncabezados + 1;
+    indice < datos.length;
+    indice++
+  ) {
+
+    const fila =
+      datos[indice];
+
+
+    const sucursal =
+      String(
+        fila[columnaSucursal] ?? ""
+      )
+        .trim()
+        .replace(/\s+/g, " ");
+
+
+    const colonia =
+      String(
+        fila[columnaColonia] ?? ""
+      )
+        .trim()
+        .replace(/\s+/g, " ");
+
+
+    const visitasNumero =
+      Number(
+        fila[columnaVisitas]
+      );
+
+
+    const visitas =
+      Number.isFinite(
+        visitasNumero
+      )
+        ? Math.max(
+            0,
+            Math.trunc(
+              visitasNumero
+            )
+          )
+        : 0;
+
+
+    if (
+      !sucursal ||
+      !colonia
+    ) {
+
+      continue;
+
+    }
+
+
+    // La llave evita mezclar colonias con el mismo
+    // nombre pertenecientes a distintas sucursales.
+
+    const llave =
+      `${normalizarNombre(
+        sucursal
+      )}|${normalizarNombre(
+        colonia
+      )}`;
+
+
+    if (
+      !mapaColonias.has(
+        llave
+      )
+    ) {
+
+      mapaColonias.set(
+        llave,
+        {
+          sucursal,
+          colonia,
+          total: 0,
+          conVisita: 0,
+          sinVisita: 0,
+          porVisitas: {},
+        }
+      );
+
+    }
+
+
+    const registro =
+      mapaColonias.get(
+        llave
+      );
+
+
+    // Cada renglón representa una ODC o corte.
+
+    registro.total += 1;
+
+
+    // Conteo por número exacto de visitas.
+
+    registro.porVisitas[
+      visitas
+    ] =
+      (
+        registro.porVisitas[
+          visitas
+        ] || 0
+      ) + 1;
+
+
+    if (visitas > 0) {
+
+      registro.conVisita += 1;
+
+    } else {
+
+      registro.sinVisita += 1;
+
+    }
+
+
+    sucursales.add(
+      sucursal
+    );
+
+    visitasDisponibles.add(
+      visitas
+    );
+
+    totalRegistros += 1;
+
+  }
+
+
+  // ==================================================
+  // CONVERTIR Y ORDENAR RESULTADOS
+  // ==================================================
+
+  const colonias =
+    Array.from(
+      mapaColonias.values()
+    )
+      .sort(
+        (
+          registroA,
+          registroB
+        ) =>
+          registroB.total -
+            registroA.total ||
+          registroA.colonia.localeCompare(
+            registroB.colonia,
+            "es"
+          )
+      );
+
+
+  if (
+    colonias.length === 0
+  ) {
+
+    throw new Error(
+      "La Sábana de Recuperación no contiene registros válidos"
+    );
+
+  }
+
+
+  // ==================================================
+  // RESPUESTA
+  // ==================================================
+
+  return {
+
+    totalRegistros,
+
+    sucursales:
+      Array.from(
+        sucursales
+      )
+        .sort(
+          (
+            sucursalA,
+            sucursalB
+          ) =>
+            sucursalA.localeCompare(
+              sucursalB,
+              "es"
+            )
+        ),
+
+    visitasDisponibles:
+      Array.from(
+        visitasDisponibles
+      )
+        .sort(
+          (
+            visitaA,
+            visitaB
+          ) =>
+            visitaA -
+            visitaB
+        ),
+
+    colonias,
+
+  };
+
+}
+
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
@@ -7463,6 +7799,8 @@ module.exports = {
   leerGestionOdc,
 
   leerRecuperacionYCortes,
+
+  leerAnalisisSabanaRecuperacion,
 
   reemplazarExcelEnSupabase,
 
