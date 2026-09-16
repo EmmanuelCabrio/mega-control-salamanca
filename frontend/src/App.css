@@ -10481,3 +10481,525 @@ body {
   }
 
 }
+
+/* =========================================================
+   ANÁLISIS DE SÁBANA DE RECUPERACIÓN
+========================================================= */
+
+.panel-recuperacion-paso-analisis {
+  margin-top: 28px;
+}
+
+
+.panel-recuperacion-paso-analisis > span {
+  background: #0f766e;
+}
+
+
+.analisis-sabana,
+.analisis-sabana-estado {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+
+.analisis-sabana {
+  overflow: hidden;
+  border: 1px solid #99f6e4;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 38px
+    rgba(15, 23, 42, 0.1);
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.analisis-sabana-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #134e4a,
+      #0f766e
+    );
+}
+
+
+.analisis-sabana-header
+> div
+> span {
+  color: #99f6e4;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+
+.analisis-sabana-header h2 {
+  margin: 6px 0;
+  font-size:
+    clamp(
+      22px,
+      3vw,
+      30px
+    );
+}
+
+
+.analisis-sabana-header p {
+  margin: 0;
+  color: #ccfbf1;
+}
+
+
+.analisis-sabana-header
+> strong {
+  min-width: 165px;
+  padding: 13px 18px;
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  font-size: 30px;
+  text-align: center;
+  background:
+    rgba(255, 255, 255, 0.12);
+}
+
+
+.analisis-sabana-header
+> strong
+small {
+  display: block;
+  margin-top: 5px;
+  color: #ccfbf1;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+.analisis-sabana-filtros {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1fr)
+    minmax(220px, 1fr)
+    auto;
+  align-items: end;
+  gap: 14px;
+  padding: 20px 24px;
+  border-bottom:
+    1px solid #e2e8f0;
+  background: #f0fdfa;
+}
+
+
+.analisis-sabana-filtros
+label
+> span {
+  display: block;
+  margin-bottom: 7px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+
+.analisis-sabana-filtros select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border:
+    1px solid #94a3b8;
+  border-radius: 10px;
+  color: #0f172a;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+
+.analisis-sabana-filtros button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  color: #ffffff;
+  background: #0f766e;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.analisis-sabana-kpis {
+  display: grid;
+  grid-template-columns:
+    1.5fr
+    repeat(3, 1fr);
+  gap: 14px;
+  padding: 22px 24px;
+  background: #f8fafc;
+}
+
+
+.analisis-sabana-kpis article {
+  min-width: 0;
+  padding: 17px;
+  border:
+    1px solid #e2e8f0;
+  border-top:
+    4px solid #14b8a6;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+
+.analisis-sabana-kpis
+article
+> span,
+.analisis-sabana-kpis
+article
+> strong,
+.analisis-sabana-kpis
+article
+> small {
+  display: block;
+}
+
+
+.analisis-sabana-kpis
+article
+> span {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+
+.analisis-sabana-kpis
+article
+> strong {
+  overflow: hidden;
+  margin: 8px 0;
+  color: #0f172a;
+  font-size: 23px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.analisis-sabana-kpis
+article
+> small {
+  color: #64748b;
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   CONTENIDO
+========================================================= */
+
+.analisis-sabana-contenido {
+  padding: 22px 24px 26px;
+}
+
+
+.analisis-sabana-subtitulo span {
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+
+.analisis-sabana-subtitulo h3 {
+  margin: 4px 0 16px;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+
+/* =========================================================
+   TOP 10
+========================================================= */
+
+.analisis-sabana-ranking {
+  margin-bottom: 28px;
+}
+
+
+.analisis-sabana-barra {
+  display: grid;
+  grid-template-columns:
+    minmax(230px, 0.8fr)
+    1.5fr
+    60px;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0;
+}
+
+
+.analisis-sabana-barra
+> div
+strong,
+.analisis-sabana-barra
+> div
+small {
+  display: block;
+}
+
+
+.analisis-sabana-barra
+> div
+strong {
+  color: #334155;
+  font-size: 13px;
+}
+
+
+.analisis-sabana-barra
+> div
+small {
+  margin-top: 2px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+
+.analisis-sabana-barra
+> span {
+  overflow: hidden;
+  height: 13px;
+  border-radius: 50px;
+  background: #e2e8f0;
+}
+
+
+.analisis-sabana-barra
+> span
+i {
+  display: block;
+  height: 100%;
+  min-width: 3px;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #14b8a6,
+      #0f766e
+    );
+}
+
+
+.analisis-sabana-barra
+> b {
+  color: #0f766e;
+  font-size: 15px;
+  text-align: right;
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.analisis-sabana-tabla-contenedor {
+  overflow-x: auto;
+  border:
+    1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+
+.analisis-sabana-tabla {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+
+.analisis-sabana-tabla th {
+  padding: 12px 10px;
+  color: #ffffff;
+  background: #115e59;
+  font-size: 11px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+
+.analisis-sabana-tabla td {
+  padding: 11px 10px;
+  border-bottom:
+    1px solid #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+}
+
+
+.analisis-sabana-tabla
+tbody
+tr:nth-child(even) {
+  background: #f0fdfa;
+}
+
+
+.analisis-sabana-tabla
+tbody
+tr:hover {
+  background: #ccfbf1;
+}
+
+
+.analisis-sabana-tabla
+td:nth-child(1),
+.analisis-sabana-tabla
+td:nth-child(4),
+.analisis-sabana-tabla
+td:nth-child(5) {
+  text-align: center;
+}
+
+
+/* =========================================================
+   DESGLOSE DE VISITAS
+========================================================= */
+
+.analisis-sabana-visitas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+
+.analisis-sabana-visitas span {
+  min-width: 42px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: #94a3b8;
+  background: #f1f5f9;
+  font-size: 9px;
+  font-weight: 800;
+  text-align: center;
+}
+
+
+.analisis-sabana-visitas
+span.tiene-datos {
+  color: #115e59;
+  background: #ccfbf1;
+}
+
+
+/* =========================================================
+   CARGA Y ERROR
+========================================================= */
+
+.analisis-sabana-estado {
+  padding: 38px 24px;
+  border:
+    1px solid #99f6e4;
+  border-radius: 18px;
+  color: #475569;
+  background: #ffffff;
+  font-weight: 800;
+  text-align: center;
+}
+
+
+.analisis-sabana-error {
+  color: #991b1b;
+}
+
+
+.analisis-sabana-error button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 9px;
+  color: #ffffff;
+  background: #b91c1c;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 950px) {
+
+  .analisis-sabana-kpis {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+}
+
+
+/* =========================================================
+   CELULAR
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .analisis-sabana-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 21px 18px;
+  }
+
+
+  .analisis-sabana-header
+  > strong {
+    width: 100%;
+  }
+
+
+  .analisis-sabana-filtros,
+  .analisis-sabana-kpis {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+
+  .analisis-sabana-contenido {
+    padding: 19px 16px 20px;
+  }
+
+
+  .analisis-sabana-barra {
+    grid-template-columns:
+      1fr 52px;
+  }
+
+
+  .analisis-sabana-barra
+  > span {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+}
