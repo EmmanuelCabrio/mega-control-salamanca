@@ -115,9 +115,13 @@ function TeamTable({
               Antigüedad
             </th>
 
-            <th>
-              Ventas
-            </th>
+           {!modoRecuperacion && (
+
+           <th>
+           Ventas
+             </th>
+
+             )}
 
             <th>
               RX
@@ -139,7 +143,11 @@ function TeamTable({
             <tr>
 
               <td
-                colSpan="5"
+                colSpan={
+               modoRecuperacion
+            ? "4"
+            : "5"
+             }
                 className="team-table-sin-registros"
               >
                 No hay integrantes para mostrar.
@@ -189,13 +197,17 @@ function TeamTable({
                     VENTAS DEL MES
                 ================================== */}
 
-                <td>
+               {!modoRecuperacion && (
+
+            <td>
 
                   {Number(
-                    promotor.ventasMesPromotor ?? 0
-                  ).toFixed(0)}
+            promotor.ventasMesPromotor ?? 0
+                 ).toFixed(0)}
 
-                </td>
+                 </td>
+
+               )}
 
 
                 {/* ==================================
