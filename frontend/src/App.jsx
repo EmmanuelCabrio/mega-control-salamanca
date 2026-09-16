@@ -25,6 +25,8 @@ import ChecklistFocoRojo
   from "./components/ChecklistFocoRojo";
 
 import PanelDireccion from "./components/PanelDireccion";
+import PanelRecuperacion
+  from "./components/PanelRecuperacion";
 
 import {
   calcularPrioridades,
@@ -53,7 +55,23 @@ function App() {
   // ==================================================
 
   const [vista, setVista] =
-    useState("supervisor");
+    useState(() => {
+
+      try {
+
+        return localStorage.getItem(
+          "mega_rol"
+        ) === "RECUPERACION"
+          ? "recuperacion"
+          : "supervisor";
+
+      } catch {
+
+        return "supervisor";
+
+      }
+
+    });
 
 
   const [registros, setRegistros] =
@@ -202,7 +220,21 @@ const [
 const [
   rolUsuario,
   setRolUsuario
-] = useState("");
+] = useState(() => {
+
+  try {
+
+    return localStorage.getItem(
+      "mega_rol"
+    ) || "";
+
+  } catch {
+
+    return "";
+
+  }
+
+});
 
 
 // ==================================================
@@ -638,7 +670,10 @@ console.log(
 
 useEffect(() => {
 
-  if (!logueado) {
+  if (
+    !logueado ||
+    rolUsuario === "RECUPERACION"
+  ) {
 
     return;
 
@@ -656,7 +691,10 @@ useEffect(() => {
 
   cargarDatos();
 
-}, [logueado]);
+}, [
+  logueado,
+  rolUsuario,
+]);
 // ==================================================
 // LOGIN
 // ==================================================
@@ -669,11 +707,80 @@ function manejarLogin(
     resultadoLogin.supervisor;
 
   const rol =
-    resultadoLogin.rol;
+    String(
+      resultadoLogin.rol ?? ""
+    )
+      .trim()
+      .toUpperCase();
 
   setRolUsuario(
   rol
 );
+
+
+  try {
+
+    localStorage.setItem(
+      "mega_rol",
+      rol
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ No se pudo guardar el rol:",
+      error
+    );
+
+  }
+
+
+  // ==========================================
+  // 🔄 RECUPERACIÓN
+  // ==========================================
+
+  if (
+    rol === "RECUPERACION"
+  ) {
+
+    setSupervisorSeleccionado(
+      supervisor
+    );
+
+
+    try {
+
+      localStorage.setItem(
+        "mega_sesion",
+        JSON.stringify(
+          supervisor
+        )
+      );
+
+    } catch (error) {
+
+      console.error(
+        "❌ No se pudo guardar la sesión:",
+        error
+      );
+
+    }
+
+
+    setLogueado(true);
+    setVista("recuperacion");
+
+    setAusencias({});
+    setFocosAtendidos([]);
+
+    setMostrarRankingInicial(false);
+    setMostrarReconocimientoCL(false);
+    setMostrarRankingSupervisoresIntermedio(false);
+    setMostrarFocosRojosIniciales(false);
+
+    return;
+
+  }
 
 
  if (
@@ -768,6 +875,14 @@ function manejarLogin(
 
     localStorage.removeItem(
       "mega_sesion"
+    );
+
+    localStorage.removeItem(
+      "mega_rol"
+    );
+
+    localStorage.removeItem(
+      "mega_token"
     );
 
 
@@ -1530,6 +1645,33 @@ if (
   }}
 
 />
+
+  );
+
+}
+
+
+// ==================================================
+// 🔄 PANEL DE RECUPERACIÓN
+// ==================================================
+
+if (
+  vista === "recuperacion"
+) {
+
+  return (
+
+    <PanelRecuperacion
+
+      supervisor={
+        supervisorSeleccionado
+      }
+
+      onCerrarSesion={
+        cerrarSesion
+      }
+
+    />
 
   );
 
