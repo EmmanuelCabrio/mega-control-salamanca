@@ -10,6 +10,9 @@ import TeamTable
 import ComparativaRecuperacionMesAnterior
   from "./ComparativaRecuperacionMesAnterior";
 
+import GestionOdc
+  from "./GestionOdc";
+
 import {
   fetchProtegido
 } from "../services/authService";
@@ -213,6 +216,28 @@ function PanelRecuperacion({
 
 
       <ComparativaRecuperacionMesAnterior />
+
+
+      <section className="panel-recuperacion-paso panel-recuperacion-paso-odc">
+
+        <span>03</span>
+
+        <div>
+
+          <h2>
+            ¿Cómo va la gestión de ODC?
+          </h2>
+
+          <p>
+            Cobertura de visitas y pendientes por cada sucursal.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <GestionOdc />
 
     </main>
   );
