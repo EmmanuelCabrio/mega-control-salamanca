@@ -17,6 +17,7 @@ const {
   leerComparativaRecuperacionMesAnterior,
   leerGestionOdc,
   leerRecuperacionYCortes,
+  leerRecuperacionVsPresupuesto,
   leerAnalisisSabanaRecuperacion,
   actualizarDatosDesdeSupabase,
   reemplazarExcelEnSupabase,
@@ -910,6 +911,63 @@ app.get(
         correcto: false,
         mensaje:
           "No se pudo cargar Recuperación y Cortes",
+      });
+
+    }
+
+  }
+);
+
+// ==================================================
+// RECUPERACIÓN VS PRESUPUESTO
+// ==================================================
+
+app.get(
+  "/api/recuperacion/presupuesto",
+  autenticarToken,
+  async (req, res) => {
+
+    if (
+      normalizarRol(
+        req.rol
+      ) !== "RECUPERACION"
+    ) {
+
+      return res.status(403).json({
+        correcto: false,
+        mensaje:
+          "Acceso exclusivo del equipo de Recuperación",
+      });
+
+    }
+
+
+    try {
+
+      const presupuesto =
+        leerRecuperacionVsPresupuesto();
+
+
+      return res.json({
+        correcto: true,
+        ...presupuesto,
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en Recuperación vs Presupuesto:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+        correcto: false,
+        mensaje:
+          "No se pudo cargar Recuperación vs Presupuesto",
       });
 
     }
