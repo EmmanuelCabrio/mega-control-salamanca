@@ -18,6 +18,39 @@ const formatearNumero =
     );
 
 
+const obtenerClase =
+  (diferencia) =>
+    Number(
+      diferencia || 0
+    ) > 0
+      ? "rx-supervisor-positivo"
+      : Number(
+          diferencia || 0
+        ) < 0
+        ? "rx-supervisor-negativo"
+        : "rx-supervisor-neutral";
+
+
+const formatearDiferencia =
+  (valor) => {
+
+    const numero =
+      Number(
+        valor || 0
+      );
+
+
+    return numero > 0
+      ? `+${formatearNumero(
+          numero
+        )}`
+      : formatearNumero(
+          numero
+        );
+
+  };
+
+
 function RecuperacionesVsMesAnterior() {
 
   const [datos, setDatos] =
@@ -152,11 +185,9 @@ function RecuperacionesVsMesAnterior() {
     );
 
   const clase =
-    diferencia > 0
-      ? "rx-supervisor-positivo"
-      : diferencia < 0
-        ? "rx-supervisor-negativo"
-        : "rx-supervisor-neutral";
+    obtenerClase(
+      diferencia
+    );
 
   const icono =
     diferencia > 0
@@ -166,13 +197,9 @@ function RecuperacionesVsMesAnterior() {
         : "=";
 
   const diferenciaTexto =
-    diferencia > 0
-      ? `+${formatearNumero(
-          diferencia
-        )}`
-      : formatearNumero(
-          diferencia
-        );
+    formatearDiferencia(
+      diferencia
+    );
 
   const variacion =
     resumen.variacionPorcentaje;
@@ -295,6 +322,143 @@ function RecuperacionesVsMesAnterior() {
           </strong>
 
         </article>
+
+      </div>
+
+
+      <div className="rx-supervisor-equipo">
+
+        <div className="rx-supervisor-equipo-titulo">
+
+          <span>
+            DETALLE DEL EQUIPO
+          </span>
+
+          <h3>
+            Recuperaciones por promotor
+          </h3>
+
+          <p>
+            Comparativo acumulado al mismo día del mes anterior.
+          </p>
+
+        </div>
+
+
+        <div className="rx-supervisor-tabla-contenedor">
+
+          <table className="rx-supervisor-tabla">
+
+            <thead>
+
+              <tr>
+                <th>Promotor</th>
+                <th>Actual</th>
+                <th>Mes anterior</th>
+                <th>Diferencia</th>
+                <th>Variación</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              {(
+                datos.integrantes ||
+                []
+              ).map(
+                (integrante) => {
+
+                  const claseIntegrante =
+                    obtenerClase(
+                      integrante.diferencia
+                    );
+
+
+                  return (
+                    <tr
+                      key={
+                        integrante.nombre
+                      }
+                    >
+
+                      <td>
+                        {integrante.nombre}
+                      </td>
+
+                      <td>
+                        {formatearNumero(
+                          integrante.actual
+                        )}
+                      </td>
+
+                      <td>
+                        {formatearNumero(
+                          integrante.anterior
+                        )}
+                      </td>
+
+                      <td
+                        className={
+                          claseIntegrante
+                        }
+                      >
+                        {formatearDiferencia(
+                          integrante.diferencia
+                        )}
+                      </td>
+
+                      <td
+                        className={
+                          claseIntegrante
+                        }
+                      >
+
+                        {integrante
+                          .variacionPorcentaje ==
+                        null
+                          ? "Sin base"
+                          : `${
+                              integrante
+                                .variacionPorcentaje >
+                              0
+                                ? "+"
+                                : ""
+                            }${Number(
+                              integrante
+                                .variacionPorcentaje
+                            ).toFixed(1)}%`}
+
+                      </td>
+
+                    </tr>
+                  );
+
+                }
+              )}
+
+
+              {!datos.integrantes?.length && (
+
+                <tr>
+
+                  <td
+                    className="rx-supervisor-sin-integrantes"
+                    colSpan="5"
+                  >
+                    No se encontraron promotores en la plantilla actual.
+                  </td>
+
+                </tr>
+
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 
