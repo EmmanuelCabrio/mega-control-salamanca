@@ -47,6 +47,9 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:3001";
 
+const SUPERVISOR_RECUPERACION =
+  "MORALES PEREZ BENJAMIN";
+
 
 function App() {
 
@@ -1650,7 +1653,6 @@ if (
 
 }
 
-
 // ==================================================
 // 🔄 PANEL DE RECUPERACIÓN
 // ==================================================
@@ -1664,7 +1666,18 @@ if (
     <PanelRecuperacion
 
       supervisor={
-        supervisorSeleccionado
+        rolUsuario === "DIRECCIÓN"
+          ? SUPERVISOR_RECUPERACION
+          : supervisorSeleccionado
+      }
+
+      onRegresarDireccion={
+        rolUsuario === "DIRECCIÓN"
+          ? () =>
+              setVista(
+                "direccion"
+              )
+          : null
       }
 
       onCerrarSesion={
@@ -1704,6 +1717,12 @@ if (
 
       onCerrarSesion={
         cerrarSesion
+      }
+
+      onAbrirRecuperacion={() =>
+        setVista(
+          "recuperacion"
+            )
       }
 
     />
