@@ -475,6 +475,284 @@ body {
 
 
 /* =========================================================
+   PANEL DE RECUPERACIÓN — PRODUCTIVIDAD
+========================================================= */
+
+.panel-recuperacion {
+  min-height: 100vh;
+  padding: 32px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(37, 99, 235, 0.12),
+      transparent 32%
+    ),
+    #f1f5f9;
+}
+
+
+.panel-recuperacion-header {
+  width: min(1180px, 100%);
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 26px 30px;
+  border-radius: 22px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #1d4ed8
+    );
+  box-shadow:
+    0 18px 45px
+    rgba(15, 23, 42, 0.18);
+}
+
+
+.panel-recuperacion-etiqueta {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #bfdbfe;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+
+.panel-recuperacion-header h1 {
+  margin: 0;
+  font-size: clamp(25px, 4vw, 38px);
+}
+
+
+.panel-recuperacion-header p {
+  margin: 7px 0 0;
+  color: #dbeafe;
+}
+
+
+.panel-recuperacion-salir {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 11px;
+  padding: 11px 16px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+.panel-recuperacion-salir:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+
+.panel-recuperacion-paso {
+  width: min(1180px, 100%);
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 10px 28px
+    rgba(15, 23, 42, 0.08);
+}
+
+
+.panel-recuperacion-paso > span {
+  display: grid;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 16px;
+  color: #ffffff;
+  background: #2563eb;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+
+.panel-recuperacion-paso h2 {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 25px;
+}
+
+
+.panel-recuperacion-paso p {
+  margin: 0;
+  color: #64748b;
+}
+
+
+.panel-recuperacion > .team-table,
+.panel-recuperacion-estado {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+
+.panel-recuperacion-estado {
+  padding: 38px 24px;
+  border-radius: 18px;
+  text-align: center;
+  color: #475569;
+  background: #ffffff;
+  font-weight: 800;
+}
+
+
+.panel-recuperacion-error {
+  color: #991b1b;
+}
+
+
+.panel-recuperacion-error button {
+  margin-top: 12px;
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 16px;
+  color: #ffffff;
+  background: #b91c1c;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+.team-table-recuperacion {
+  border-color: #bfdbfe;
+  background: #ffffff;
+  box-shadow:
+    0 14px 38px
+    rgba(15, 23, 42, 0.1);
+}
+
+
+.team-table-recuperacion > p {
+  color: #475569;
+}
+
+
+.productividad-recuperacion-leyenda {
+  margin: 18px 0 22px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+
+.productividad-recuperacion-leyenda span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+
+.leyenda-rojo,
+.nivel-recuperacion-rojo {
+  color: #7f1d1d;
+  background-color: #fecaca !important;
+}
+
+
+.leyenda-naranja,
+.nivel-recuperacion-naranja {
+  color: #9a3412;
+  background-color: #fed7aa !important;
+}
+
+
+.leyenda-amarillo,
+.nivel-recuperacion-amarillo {
+  color: #854d0e;
+  background-color: #fef08a !important;
+}
+
+
+.leyenda-verde-claro,
+.nivel-recuperacion-verde-claro {
+  color: #166534;
+  background-color: #bbf7d0 !important;
+}
+
+
+.leyenda-verde-oscuro,
+.nivel-recuperacion-verde-oscuro {
+  color: #ffffff;
+  background-color: #166534 !important;
+}
+
+
+.team-table-recuperacion tbody tr:hover {
+  filter: brightness(0.97);
+}
+
+
+.team-table-sin-registros {
+  padding: 28px !important;
+  color: #64748b;
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+
+@media (max-width: 700px) {
+
+  .panel-recuperacion {
+    padding: 16px;
+  }
+
+
+  .panel-recuperacion-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 22px 20px;
+  }
+
+
+  .panel-recuperacion-salir {
+    width: 100%;
+  }
+
+
+  .panel-recuperacion-paso {
+    align-items: flex-start;
+    padding: 17px;
+  }
+
+
+  .panel-recuperacion-paso > span {
+    flex-basis: 44px;
+    width: 44px;
+    height: 44px;
+  }
+
+
+  .panel-recuperacion-paso h2 {
+    font-size: 21px;
+  }
+
+
+  .productividad-recuperacion-leyenda {
+    justify-content: flex-start;
+  }
+
+}
+
+
+/* =========================================================
    TABLA DEL EQUIPO
 ========================================================= */
 
