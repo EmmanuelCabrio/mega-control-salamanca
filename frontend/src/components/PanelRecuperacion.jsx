@@ -16,6 +16,9 @@ import RecuperacionVsPresupuesto
 import GestionOdc
   from "./GestionOdc";
 
+import GestionPorMotivo
+  from "./GestionPorMotivo";
+
 import RecuperacionYCortes
   from "./RecuperacionYCortes";
 
@@ -340,6 +343,28 @@ function PanelRecuperacion({
       <GestionOdc />
 
 
+            <section className="panel-recuperacion-paso panel-recuperacion-paso-gestion-motivo">
+
+        <span>06</span>
+
+        <div>
+
+          <h2>
+            ¿Qué resultado están dejando las visitas?
+          </h2>
+
+          <p>
+            Distribución de suscriptores por cada tipo de gestión registrada.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <GestionPorMotivo />
+
+
       {/* =============================================
           06 — ANÁLISIS POR COLONIA
       ============================================= */}
@@ -351,7 +376,7 @@ function PanelRecuperacion({
         "
       >
 
-        <span>06</span>
+        <span>07</span>
 
         <div>
 
