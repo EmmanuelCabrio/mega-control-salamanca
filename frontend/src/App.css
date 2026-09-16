@@ -9659,3 +9659,411 @@ body {
   }
 
 }
+
+
+/* =========================================================
+   RECUPERACIÓN — GESTIÓN DE ODC
+========================================================= */
+
+.panel-recuperacion-paso-odc {
+  margin-top: 28px;
+}
+
+
+.panel-recuperacion-paso-odc > span {
+  background: #0f766e;
+}
+
+
+.gestion-odc,
+.gestion-odc-estado {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+
+.gestion-odc {
+  overflow: hidden;
+  border: 1px solid #99f6e4;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 38px
+    rgba(15, 23, 42, 0.1);
+}
+
+
+.gestion-odc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #134e4a,
+      #0f766e
+    );
+}
+
+
+.gestion-odc-header > div:first-child > span {
+  color: #99f6e4;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+
+.gestion-odc-header h2 {
+  margin: 6px 0;
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+
+.gestion-odc-header p {
+  margin: 0;
+  color: #ccfbf1;
+}
+
+
+.gestion-odc-prioridad {
+  min-width: 180px;
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.13);
+  text-align: center;
+}
+
+
+.gestion-odc-prioridad span,
+.gestion-odc-prioridad strong,
+.gestion-odc-prioridad small {
+  display: block;
+}
+
+
+.gestion-odc-prioridad span {
+  color: #fecaca;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+
+.gestion-odc-prioridad strong {
+  margin: 4px 0;
+  color: #ffffff;
+  font-size: 17px;
+}
+
+
+.gestion-odc-prioridad small {
+  color: #fee2e2;
+  font-weight: 800;
+}
+
+
+.gestion-odc-kpis {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 22px 24px;
+  background: #f8fafc;
+}
+
+
+.gestion-odc-kpis article {
+  padding: 19px;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  text-align: center;
+  background: #ffffff;
+}
+
+
+.gestion-odc-kpis span,
+.gestion-odc-kpis strong,
+.gestion-odc-kpis small {
+  display: block;
+}
+
+
+.gestion-odc-kpis span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+
+.gestion-odc-kpis strong {
+  margin: 7px 0 4px;
+  color: #0f172a;
+  font-size: 31px;
+}
+
+
+.gestion-odc-kpis small {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+.gestion-odc-kpi-total {
+  border-top: 4px solid #334155 !important;
+}
+
+
+.gestion-odc-kpi-con-visita {
+  border-top: 4px solid #16a34a !important;
+}
+
+
+.gestion-odc-kpi-sin-visita {
+  border-top: 4px solid #ef4444 !important;
+}
+
+
+.gestion-odc-kpi-con-visita strong {
+  color: #15803d;
+}
+
+
+.gestion-odc-kpi-sin-visita strong {
+  color: #dc2626;
+}
+
+
+.gestion-odc-cobertura {
+  padding: 4px 24px 24px;
+  background: #f8fafc;
+}
+
+
+.gestion-odc-cobertura-etiquetas {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+  color: #334155;
+  font-size: 13px;
+}
+
+
+.gestion-odc-cobertura-etiquetas span {
+  color: #15803d;
+  font-weight: 900;
+}
+
+
+.gestion-odc-barra {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #fecaca;
+}
+
+
+.gestion-odc-barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #16a34a,
+      #4ade80
+    );
+  transition: width 0.35s ease;
+}
+
+
+.gestion-odc-tabla-contenedor {
+  overflow-x: auto;
+  padding: 22px 24px 26px;
+}
+
+
+.gestion-odc-tabla {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+
+.gestion-odc-tabla th {
+  padding: 12px 10px;
+  color: #ffffff;
+  background: #115e59;
+  font-size: 12px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+
+.gestion-odc-tabla th:first-child {
+  border-radius: 10px 0 0;
+  text-align: left;
+}
+
+
+.gestion-odc-tabla th:last-child {
+  border-radius: 0 10px 0 0;
+}
+
+
+.gestion-odc-tabla td {
+  padding: 11px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+
+.gestion-odc-tabla tbody td:first-child {
+  text-align: left;
+  font-weight: 900;
+}
+
+
+.gestion-odc-tabla tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+
+.gestion-odc-tabla tbody tr:hover {
+  background: #f0fdfa;
+}
+
+
+.gestion-odc-tabla tfoot td {
+  border-bottom: 0;
+  color: #ffffff;
+  background: #0f172a;
+  font-weight: 900;
+}
+
+
+.gestion-odc-tabla tfoot td:first-child {
+  border-radius: 0 0 0 10px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+
+.gestion-odc-tabla tfoot td:last-child {
+  border-radius: 0 0 10px;
+}
+
+
+.gestion-odc-nivel-verde {
+  color: #14532d !important;
+  background: #86efac !important;
+}
+
+
+.gestion-odc-nivel-verde-claro {
+  color: #365314 !important;
+  background: #bef264 !important;
+}
+
+
+.gestion-odc-nivel-lima {
+  color: #3f6212 !important;
+  background: #d9f99d !important;
+}
+
+
+.gestion-odc-nivel-amarillo {
+  color: #854d0e !important;
+  background: #fde68a !important;
+}
+
+
+.gestion-odc-nivel-naranja {
+  color: #9a3412 !important;
+  background: #fdba74 !important;
+}
+
+
+.gestion-odc-nivel-rojo {
+  color: #7f1d1d !important;
+  background: #fca5a5 !important;
+}
+
+
+.gestion-odc-estado {
+  padding: 38px 24px;
+  border: 1px solid #99f6e4;
+  border-radius: 18px;
+  color: #475569;
+  background: #ffffff;
+  font-weight: 800;
+  text-align: center;
+}
+
+
+.gestion-odc-error {
+  color: #991b1b;
+}
+
+
+.gestion-odc-error button {
+  margin-top: 12px;
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 16px;
+  color: #ffffff;
+  background: #b91c1c;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+@media (max-width: 700px) {
+
+  .gestion-odc-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 21px 18px;
+  }
+
+
+  .gestion-odc-prioridad {
+    width: 100%;
+  }
+
+
+  .gestion-odc-kpis {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 16px;
+  }
+
+
+  .gestion-odc-kpis article {
+    padding: 15px;
+  }
+
+
+  .gestion-odc-cobertura {
+    padding: 2px 16px 20px;
+  }
+
+
+  .gestion-odc-tabla-contenedor {
+    padding: 18px 16px 20px;
+  }
+
+}
