@@ -18,6 +18,7 @@ const {
   leerGestionOdc,
   leerRecuperacionYCortes,
   leerRecuperacionVsPresupuesto,
+  leerVisitasPorTipoGestion,
   leerAnalisisSabanaRecuperacion,
   actualizarDatosDesdeSupabase,
   reemplazarExcelEnSupabase,
@@ -968,6 +969,67 @@ app.get(
         correcto: false,
         mensaje:
           "No se pudo cargar Recuperación vs Presupuesto",
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// VISITAS POR TIPO DE GESTIÓN
+// ==================================================
+
+app.get(
+  "/api/recuperacion/gestion-por-motivo",
+  autenticarToken,
+  async (req, res) => {
+
+    if (
+      normalizarRol(
+        req.rol
+      ) !== "RECUPERACION"
+    ) {
+
+      return res.status(403).json({
+        correcto: false,
+
+        mensaje:
+          "Acceso exclusivo del equipo de Recuperación",
+      });
+
+    }
+
+
+    try {
+
+      const gestion =
+        leerVisitasPorTipoGestion();
+
+
+      return res.json({
+        correcto: true,
+
+        ...gestion,
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en Visitas por Tipo de Gestión:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar la gestión por motivo",
       });
 
     }
