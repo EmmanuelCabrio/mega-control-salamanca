@@ -645,8 +645,6 @@ function AnalisisSabanaRecuperacion() {
 
                     </td>
 
-                   >
-
                     <td>
                       {analisis.totalCortes > 0
                         ? `${(
