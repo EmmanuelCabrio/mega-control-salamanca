@@ -4112,7 +4112,7 @@ function leerComparativaMesAnterior(
 //
 // ==================================================
 
-function leerComparativaRecuperacionMesAnterior(
+function leerComparativaRecuperacionMesAnteriorLegacy(
   supervisorSolicitado
 ) {
 
@@ -5477,6 +5477,274 @@ function leerComparativaRecuperacionMesAnterior(
 
 }
 
+
+// ==================================================
+// GESTIÓN DE ÓRDENES DE COBRANZA
+// ==================================================
+
+function leerGestionOdc() {
+
+  const workbook =
+    cargarExcel();
+
+
+  const nombreHoja =
+    workbook.SheetNames.find(
+      (nombre) =>
+        limpiarTexto(nombre) ===
+        "PANEL RECUPERACION"
+    );
+
+
+  if (!nombreHoja) {
+
+    throw new Error(
+      'No se encontró la hoja "PANEL RECUPERACION"'
+    );
+
+  }
+
+
+  const datos =
+    XLSX.utils.sheet_to_json(
+      workbook.Sheets[nombreHoja],
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  const filaEncabezados =
+    datos.findIndex(
+      (fila) =>
+        limpiarTexto(fila[2]) ===
+          "SUCURSAL" &&
+        limpiarTexto(fila[3]) ===
+          "CON VISITA"
+    );
+
+
+  if (filaEncabezados < 0) {
+
+    throw new Error(
+      "No se encontró el bloque GESTIÓN DE ODC"
+    );
+
+  }
+
+
+  const convertirNumero =
+    (valor) => {
+
+      const numero =
+        Number(
+          valor
+        );
+
+
+      return Number.isFinite(
+        numero
+      )
+        ? numero
+        : 0;
+
+    };
+
+
+  const sucursales = [];
+
+
+  let filaTotal =
+    null;
+
+
+  for (
+    let indice =
+      filaEncabezados + 1;
+
+    indice <
+      datos.length;
+
+    indice++
+  ) {
+
+    const fila =
+      datos[indice];
+
+
+    const sucursal =
+      String(
+        fila[2] ?? ""
+      ).trim();
+
+
+    if (!sucursal) {
+
+      continue;
+
+    }
+
+
+    const conVisita =
+      convertirNumero(
+        fila[3]
+      );
+
+
+    const sinVisita =
+      convertirNumero(
+        fila[4]
+      );
+
+
+    const totalOdc =
+      convertirNumero(
+        fila[5]
+      ) ||
+      conVisita +
+      sinVisita;
+
+
+    const registro = {
+
+      sucursal,
+
+      conVisita,
+
+      sinVisita,
+
+      totalOdc,
+
+      porcentajeConVisita:
+
+        totalOdc > 0
+
+          ? (
+              conVisita /
+              totalOdc
+            ) * 100
+
+          : 0,
+
+      porcentajeSinVisita:
+
+        totalOdc > 0
+
+          ? (
+              sinVisita /
+              totalOdc
+            ) * 100
+
+          : 0,
+
+    };
+
+
+    if (
+      limpiarTexto(
+        sucursal
+      ) === "TOTAL"
+    ) {
+
+      filaTotal =
+        registro;
+
+      break;
+
+    }
+
+
+    sucursales.push(
+      registro
+    );
+
+  }
+
+
+  if (
+    sucursales.length === 0
+  ) {
+
+    throw new Error(
+      "El bloque GESTIÓN DE ODC no contiene sucursales"
+    );
+
+  }
+
+
+  const resumen =
+    filaTotal ||
+    sucursales.reduce(
+
+      (
+        total,
+        sucursal
+      ) => ({
+
+        sucursal:
+          "TOTAL",
+
+        conVisita:
+          total.conVisita +
+          sucursal.conVisita,
+
+        sinVisita:
+          total.sinVisita +
+          sucursal.sinVisita,
+
+        totalOdc:
+          total.totalOdc +
+          sucursal.totalOdc,
+
+      }),
+
+      {
+
+        conVisita: 0,
+
+        sinVisita: 0,
+
+        totalOdc: 0,
+
+      }
+
+    );
+
+
+  resumen.porcentajeConVisita =
+
+    resumen.totalOdc > 0
+
+      ? (
+          resumen.conVisita /
+          resumen.totalOdc
+        ) * 100
+
+      : 0;
+
+
+  resumen.porcentajeSinVisita =
+
+    resumen.totalOdc > 0
+
+      ? (
+          resumen.sinVisita /
+          resumen.totalOdc
+        ) * 100
+
+      : 0;
+
+
+  return {
+
+    resumen,
+
+    sucursales,
+
+  };
+
+}
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
@@ -6240,6 +6508,7 @@ function actualizarDatosDesdeSupabase() {
       "ACUMULADO VENTA MES ANTERIOR",
       "BD ACUMULADO RX MES",
       "BD RX MES ANTERIOR",
+      "PANEL RECUPERACION",
 
     ];
 
@@ -6384,6 +6653,7 @@ function validarExcelParaCarga(buffer) {
     "ACUMULADO VENTA MES ANTERIOR",
     "BD ACUMULADO RX MES",
     "BD RX MES ANTERIOR",
+    "PANEL RECUPERACION",
 
   ];
 
@@ -6720,6 +6990,8 @@ module.exports = {
   leerDetalleVentaMensual,
 
   leerComparativaRecuperacionMesAnterior,
+
+  leerGestionOdc,
 
   reemplazarExcelEnSupabase,
 
