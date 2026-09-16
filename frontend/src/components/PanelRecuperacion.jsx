@@ -142,7 +142,7 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo voy?
+            ¿Cómo vas al día de hoy?
           </h2>
 
           <p>
@@ -213,11 +213,11 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo voy contra el mes anterior?
+            ¿Cómo vas contra el mes anterior?
           </h2>
 
           <p>
-            Compara las RX acumuladas contra el mismo día
+         RX contra el mismo día
             del mes anterior.
           </p>
 
@@ -241,7 +241,7 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo va la gestión de ODC?
+            ¿Cómo vas con la gestión de ODC?
           </h2>
 
           <p>
@@ -268,7 +268,7 @@ function PanelRecuperacion({
         <div>
 
           <h2>
-            ¿Cómo va la recuperación y los cortes?
+            ¿Cómo vas con la recuperación y los cortes?
           </h2>
 
           <p>
