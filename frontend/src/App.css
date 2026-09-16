@@ -11497,3 +11497,132 @@ td:first-child {
   }
 
 }
+
+/* =========================================================
+   AJUSTE — RX CON ESFUERZO VS PRESUPUESTO
+========================================================= */
+
+.presupuesto-rx-cards {
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+}
+
+
+/* TARJETAS */
+
+.presupuesto-rx-card-actual {
+  border-top:
+    4px solid #2563eb;
+}
+
+
+.presupuesto-rx-card-presupuesto {
+  border-top:
+    4px solid #7c3aed;
+}
+
+
+.presupuesto-rx-card-faltante {
+  border-top:
+    4px solid #ea580c;
+}
+
+
+.presupuesto-rx-card-avance {
+  border-top:
+    4px solid #16a34a;
+}
+
+
+/* AVANCE GENERAL */
+
+.presupuesto-rx-avance-general {
+  display: grid;
+
+  grid-template-columns:
+    210px 1fr;
+
+  align-items: center;
+
+  gap: 18px;
+
+  padding:
+    0 24px 22px;
+
+  color: #475569;
+
+  background: #f8fafc;
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+  text-transform: uppercase;
+}
+
+
+.presupuesto-rx-avance-general
+.presupuesto-rx-barra {
+  margin-top: 0;
+}
+
+
+/* RITMO NECESARIO */
+
+.presupuesto-rx-ritmo strong,
+.presupuesto-rx-ritmo small {
+  display: block;
+}
+
+
+.presupuesto-rx-ritmo strong {
+  color: #0f172a;
+}
+
+
+.presupuesto-rx-ritmo small {
+  margin-top: 3px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+}
+
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+
+  .presupuesto-rx-cards {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+}
+
+
+/* CELULAR */
+
+@media (max-width: 800px) {
+
+  .presupuesto-rx-cards {
+    grid-template-columns: 1fr;
+  }
+
+
+  .presupuesto-rx-avance-general {
+    grid-template-columns: 1fr;
+
+    gap: 7px;
+
+    padding:
+      0 16px 18px;
+  }
+
+}
