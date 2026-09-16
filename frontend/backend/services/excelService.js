@@ -4647,6 +4647,836 @@ function leerComparativaRecuperacionMesAnterior(
 
 }
 
+
+// ==================================================
+// 🔄 RECUPERACIÓN VS MISMO DÍA DEL MES ANTERIOR
+// ==================================================
+
+function leerComparativaRecuperacionMesAnterior(
+  supervisorSolicitado
+) {
+
+  const workbook =
+    cargarExcel();
+
+
+  const buscarHoja =
+    (nombreBuscado) => {
+
+      const nombre =
+        workbook.SheetNames.find(
+          (hoja) =>
+            limpiarTexto(hoja) ===
+            limpiarTexto(nombreBuscado)
+        );
+
+
+      return nombre
+        ? workbook.Sheets[nombre]
+        : null;
+
+    };
+
+
+  const hojaActual =
+    buscarHoja(
+      "BD ACUMULADO RX MES"
+    );
+
+
+  const hojaAnterior =
+    buscarHoja(
+      "BD RX MES ANTERIOR"
+    );
+
+
+  const hojaProductividad =
+    buscarHoja(
+      "PRODUCTIVIDAD"
+    );
+
+
+  if (
+    !hojaActual ||
+    !hojaAnterior ||
+    !hojaProductividad
+  ) {
+
+    throw new Error(
+      "No se encontraron las hojas necesarias para la comparativa de Recuperación"
+    );
+
+  }
+
+
+  const supervisor =
+    normalizarNombre(
+      supervisorSolicitado
+    );
+
+
+  if (!supervisor) {
+
+    throw new Error(
+      "No se recibió el supervisor para la comparativa de Recuperación"
+    );
+
+  }
+
+
+  const convertirFilas =
+    (hoja) =>
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+  const datosActual =
+    convertirFilas(
+      hojaActual
+    );
+
+
+  const datosAnterior =
+    convertirFilas(
+      hojaAnterior
+    );
+
+
+  const datosProductividad =
+    convertirFilas(
+      hojaProductividad
+    );
+
+
+  const COLUMNA_FECHA = 16;
+  const COLUMNA_SUPERVISOR = 19;
+  const COLUMNA_PROMOTOR = 14;
+
+
+  const convertirFecha =
+    (valor) => {
+
+      if (
+        valor instanceof Date &&
+        !Number.isNaN(
+          valor.getTime()
+        )
+      ) {
+
+        return {
+
+          anio:
+            valor.getFullYear(),
+
+          mes:
+            valor.getMonth() + 1,
+
+          dia:
+            valor.getDate(),
+
+        };
+
+      }
+
+
+      const numero =
+        Number(
+          valor
+        );
+
+
+      if (
+        Number.isFinite(numero) &&
+        numero > 0
+      ) {
+
+        const fechaExcel =
+          XLSX.SSF.parse_date_code(
+            numero
+          );
+
+
+        if (fechaExcel) {
+
+          return {
+
+            anio:
+              fechaExcel.y,
+
+            mes:
+              fechaExcel.m,
+
+            dia:
+              fechaExcel.d,
+
+          };
+
+        }
+
+      }
+
+
+      const texto =
+        String(
+          valor ?? ""
+        ).trim();
+
+
+      let coincidencia =
+        texto.match(
+          /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/
+        );
+
+
+      if (coincidencia) {
+
+        return {
+
+          dia:
+            Number(
+              coincidencia[1]
+            ),
+
+          mes:
+            Number(
+              coincidencia[2]
+            ),
+
+          anio:
+            Number(
+              coincidencia[3]
+            ),
+
+        };
+
+      }
+
+
+      coincidencia =
+        texto.match(
+          /^(\d{4})-(\d{1,2})-(\d{1,2})/
+        );
+
+
+      if (coincidencia) {
+
+        return {
+
+          anio:
+            Number(
+              coincidencia[1]
+            ),
+
+          mes:
+            Number(
+              coincidencia[2]
+            ),
+
+          dia:
+            Number(
+              coincidencia[3]
+            ),
+
+        };
+
+      }
+
+
+      return null;
+
+    };
+
+
+  const valorFecha =
+    (fecha) =>
+      fecha.anio * 10000 +
+      fecha.mes * 100 +
+      fecha.dia;
+
+
+  // ================================================
+  // ÚLTIMA FECHA DISPONIBLE DEL MES ACTUAL
+  // ================================================
+
+  let fechaCorte =
+    null;
+
+
+  for (
+    let indice = 1;
+    indice < datosActual.length;
+    indice++
+  ) {
+
+    const fecha =
+      convertirFecha(
+        datosActual[indice][
+          COLUMNA_FECHA
+        ]
+      );
+
+
+    if (
+      fecha &&
+      (
+        !fechaCorte ||
+        valorFecha(fecha) >
+        valorFecha(fechaCorte)
+      )
+    ) {
+
+      fechaCorte =
+        fecha;
+
+    }
+
+  }
+
+
+  if (!fechaCorte) {
+
+    throw new Error(
+      "No se encontró una fecha de corte en BD ACUMULADO RX MES"
+    );
+
+  }
+
+
+  // ================================================
+  // MES ANTERIOR
+  // ================================================
+
+  let anioAnterior =
+    fechaCorte.anio;
+
+
+  let mesAnterior =
+    fechaCorte.mes - 1;
+
+
+  if (mesAnterior === 0) {
+
+    mesAnterior = 12;
+
+    anioAnterior--;
+
+  }
+
+
+  // ================================================
+  // CONTAR RX POR DÍA Y POR INTEGRANTE
+  // ================================================
+
+  const contarRegistros =
+    (
+      datos,
+      anio,
+      mes
+    ) => {
+
+      const porDia =
+        new Map();
+
+
+      const porIntegrante =
+        new Map();
+
+
+      for (
+        let indice = 1;
+        indice < datos.length;
+        indice++
+      ) {
+
+        const fila =
+          datos[indice];
+
+
+        if (
+          normalizarNombre(
+            fila[
+              COLUMNA_SUPERVISOR
+            ]
+          ) !== supervisor
+        ) {
+
+          continue;
+
+        }
+
+
+        const fecha =
+          convertirFecha(
+            fila[
+              COLUMNA_FECHA
+            ]
+          );
+
+
+        if (
+          !fecha ||
+          fecha.anio !== anio ||
+          fecha.mes !== mes ||
+          fecha.dia > fechaCorte.dia
+        ) {
+
+          continue;
+
+        }
+
+
+        porDia.set(
+
+          fecha.dia,
+
+          (
+            porDia.get(
+              fecha.dia
+            ) || 0
+          ) + 1
+
+        );
+
+
+        const nombre =
+          limpiarTexto(
+            fila[
+              COLUMNA_PROMOTOR
+            ]
+          );
+
+
+        const clave =
+          normalizarNombre(
+            nombre
+          );
+
+
+        if (
+          clave &&
+          clave !== "0" &&
+          clave !==
+            "NOMBRE VENDEDOR"
+        ) {
+
+          const registro =
+            porIntegrante.get(
+              clave
+            ) || {
+
+              nombre,
+
+              total: 0,
+
+            };
+
+
+          registro.total++;
+
+
+          porIntegrante.set(
+            clave,
+            registro
+          );
+
+        }
+
+      }
+
+
+      return {
+
+        porDia,
+
+        porIntegrante,
+
+      };
+
+    };
+
+
+  const actual =
+    contarRegistros(
+
+      datosActual,
+
+      fechaCorte.anio,
+
+      fechaCorte.mes
+
+    );
+
+
+  const anterior =
+    contarRegistros(
+
+      datosAnterior,
+
+      anioAnterior,
+
+      mesAnterior
+
+    );
+
+
+  // ================================================
+  // COMPARATIVA DIARIA ACUMULADA
+  // ================================================
+
+  let acumuladoActual = 0;
+
+  let acumuladoAnterior = 0;
+
+
+  const detalle = [];
+
+
+  for (
+    let dia = 1;
+    dia <= fechaCorte.dia;
+    dia++
+  ) {
+
+    const rxActuales =
+      actual.porDia.get(
+        dia
+      ) || 0;
+
+
+    const rxAnteriores =
+      anterior.porDia.get(
+        dia
+      ) || 0;
+
+
+    acumuladoActual +=
+      rxActuales;
+
+
+    acumuladoAnterior +=
+      rxAnteriores;
+
+
+    detalle.push({
+
+      dia,
+
+      actual:
+        rxActuales,
+
+      anterior:
+        rxAnteriores,
+
+      diferenciaDia:
+        rxActuales -
+        rxAnteriores,
+
+      acumuladoActual,
+
+      acumuladoAnterior,
+
+      diferenciaAcumulada:
+        acumuladoActual -
+        acumuladoAnterior,
+
+    });
+
+  }
+
+
+  // ================================================
+  // PLANTILLA ACTUAL DE BENJAMÍN
+  // ================================================
+
+  const plantillaActual =
+    new Map();
+
+
+  for (
+    const fila of
+    datosProductividad
+  ) {
+
+    if (
+      normalizarNombre(
+        fila[0]
+      ) !== supervisor
+    ) {
+
+      continue;
+
+    }
+
+
+    const nombre =
+      limpiarTexto(
+        fila[5]
+      );
+
+
+    const clave =
+      normalizarNombre(
+        nombre
+      );
+
+
+    if (
+      clave &&
+      clave !== "0" &&
+      clave !== "PROMOTOR" &&
+      clave !== "SUPERVISOR"
+    ) {
+
+      plantillaActual.set(
+        clave,
+        nombre
+      );
+
+    }
+
+  }
+
+
+  // ================================================
+  // COMPARATIVA POR INTEGRANTE
+  // ================================================
+
+  const comparativaIntegrantes =
+    Array.from(
+      plantillaActual.entries()
+    )
+
+      .map(
+        (
+          [
+            clave,
+            nombre
+          ]
+        ) => {
+
+          const rxActuales =
+            actual
+              .porIntegrante
+              .get(clave)
+              ?.total || 0;
+
+
+          const rxAnteriores =
+            anterior
+              .porIntegrante
+              .get(clave)
+              ?.total || 0;
+
+
+          const diferencia =
+            rxActuales -
+            rxAnteriores;
+
+
+          return {
+
+            nombre,
+
+            actual:
+              rxActuales,
+
+            anterior:
+              rxAnteriores,
+
+            diferencia,
+
+            variacionPorcentaje:
+
+              rxAnteriores > 0
+
+                ? (
+                    diferencia /
+                    rxAnteriores
+                  ) * 100
+
+                : null,
+
+          };
+
+        }
+      )
+
+      // Mayor déficit primero.
+
+      .sort(
+        (
+          integranteA,
+          integranteB
+        ) => {
+
+          if (
+            integranteA.diferencia !==
+            integranteB.diferencia
+          ) {
+
+            return (
+              integranteA.diferencia -
+              integranteB.diferencia
+            );
+
+          }
+
+
+          return (
+            integranteB.actual -
+            integranteA.actual
+          );
+
+        }
+      );
+
+
+  const totalPlantillaActual =
+    comparativaIntegrantes.reduce(
+
+      (
+        total,
+        integrante
+      ) =>
+        total +
+        integrante.actual,
+
+      0
+
+    );
+
+
+  const totalPlantillaAnterior =
+    comparativaIntegrantes.reduce(
+
+      (
+        total,
+        integrante
+      ) =>
+        total +
+        integrante.anterior,
+
+      0
+
+    );
+
+
+  const diferencia =
+    acumuladoActual -
+    acumuladoAnterior;
+
+
+  const nombresMeses = [
+
+    "",
+
+    "Enero",
+
+    "Febrero",
+
+    "Marzo",
+
+    "Abril",
+
+    "Mayo",
+
+    "Junio",
+
+    "Julio",
+
+    "Agosto",
+
+    "Septiembre",
+
+    "Octubre",
+
+    "Noviembre",
+
+    "Diciembre",
+
+  ];
+
+
+  return {
+
+    supervisor,
+
+    fechaCorte,
+
+    mesActual: {
+
+      numero:
+        fechaCorte.mes,
+
+      anio:
+        fechaCorte.anio,
+
+      nombre:
+        nombresMeses[
+          fechaCorte.mes
+        ],
+
+    },
+
+    mesAnterior: {
+
+      numero:
+        mesAnterior,
+
+      anio:
+        anioAnterior,
+
+      nombre:
+        nombresMeses[
+          mesAnterior
+        ],
+
+    },
+
+    totalActual:
+      acumuladoActual,
+
+    totalAnteriorMismoDia:
+      acumuladoAnterior,
+
+    diferencia,
+
+    variacionPorcentaje:
+
+      acumuladoAnterior > 0
+
+        ? (
+            diferencia /
+            acumuladoAnterior
+          ) * 100
+
+        : null,
+
+    comparativaIntegrantes,
+
+    fueraPlantilla: {
+
+      actual:
+        acumuladoActual -
+        totalPlantillaActual,
+
+      anterior:
+        acumuladoAnterior -
+        totalPlantillaAnterior,
+
+    },
+
+    detalle,
+
+  };
+
+}
+
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
