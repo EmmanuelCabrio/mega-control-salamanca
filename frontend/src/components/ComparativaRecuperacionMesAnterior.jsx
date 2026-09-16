@@ -221,54 +221,68 @@ function ComparativaRecuperacionMesAnterior() {
       <div className="comparativa-rx-kpis">
 
         <article>
+
           <span>
             {datos.mesActual.nombre}
           </span>
+
           <strong>
             {Number(
               datos.totalActual || 0
             ).toLocaleString("es-MX")}
           </strong>
+
           <small>
             RX actuales
           </small>
+
         </article>
 
 
         <article>
+
           <span>
             {datos.mesAnterior.nombre}
           </span>
+
           <strong>
             {Number(
               datos.totalAnteriorMismoDia || 0
             ).toLocaleString("es-MX")}
           </strong>
+
           <small>
             RX al mismo día
           </small>
+
         </article>
 
 
         <article className={claseResultado}>
+
           <span>
             Diferencia
           </span>
+
           <strong>
             {formatearDiferencia(
               diferencia
             )}
           </strong>
+
           <small>
             RX acumuladas
           </small>
+
         </article>
 
 
         <article className={claseResultado}>
+
           <span>
             Variación
           </span>
+
           <strong>
             {variacion == null
               ? "—"
@@ -278,10 +292,208 @@ function ComparativaRecuperacionMesAnterior() {
                     : ""
                 }${variacion.toFixed(1)}%`}
           </strong>
+
           <small>
             Contra el mes anterior
           </small>
+
         </article>
+
+      </div>
+
+
+      <div className="comparativa-rx-bloque">
+
+        <div className="comparativa-rx-titulo-tabla">
+
+          <div>
+
+            <span>
+              RESULTADO INDIVIDUAL
+            </span>
+
+            <h3>
+              Comparativa por integrante
+            </h3>
+
+          </div>
+
+
+          <p>
+            Ordenada del mayor déficit a la mayor mejora.
+          </p>
+
+        </div>
+
+
+        <div className="comparativa-rx-tabla-contenedor comparativa-rx-tabla-integrantes-contenedor">
+
+          <table className="comparativa-rx-tabla comparativa-rx-tabla-integrantes">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Integrante
+                </th>
+
+                <th>
+                  {datos.mesActual.nombre}
+                </th>
+
+                <th>
+
+                  {datos.mesAnterior.nombre}
+
+                  <small>
+                    Al día {datos.fechaCorte?.dia}
+                  </small>
+
+                </th>
+
+                <th>
+                  Diferencia
+                </th>
+
+                <th>
+                  Variación
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              {(datos.comparativaIntegrantes || []).map(
+                (integrante) => {
+
+                  const clase =
+                    integrante.diferencia > 0
+                      ? "comparativa-rx-positivo"
+                      : integrante.diferencia < 0
+                        ? "comparativa-rx-negativo"
+                        : "comparativa-rx-neutral";
+
+
+                  const variacionIntegrante =
+                    integrante.variacionPorcentaje == null
+                      ? null
+                      : Number(
+                          integrante.variacionPorcentaje
+                        );
+
+
+                  return (
+
+                    <tr key={integrante.nombre}>
+
+                      <td>
+                        {integrante.nombre}
+                      </td>
+
+                      <td>
+                        {integrante.actual}
+                      </td>
+
+                      <td>
+                        {integrante.anterior}
+                      </td>
+
+                      <td className={clase}>
+
+                        {formatearDiferencia(
+                          integrante.diferencia
+                        )}
+
+                      </td>
+
+                      <td className={clase}>
+
+                        {variacionIntegrante == null
+                          ? integrante.actual > 0
+                            ? "Nuevo"
+                            : "—"
+                          : `${
+                              variacionIntegrante > 0
+                                ? "+"
+                                : ""
+                            }${variacionIntegrante.toFixed(1)}%`}
+
+                      </td>
+
+                    </tr>
+
+                  );
+
+                }
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        {(
+          Number(
+            datos.fueraPlantilla?.actual || 0
+          ) !== 0 ||
+          Number(
+            datos.fueraPlantilla?.anterior || 0
+          ) !== 0
+        ) && (
+
+          <p className="comparativa-rx-conciliacion">
+
+            Nota: el resultado general también incluye
+
+            {Number(
+              datos.fueraPlantilla?.actual || 0
+            ) > 0
+              ? ` ${datos.fueraPlantilla.actual} RX actuales`
+              : ""}
+
+            {Number(
+              datos.fueraPlantilla?.actual || 0
+            ) > 0 &&
+            Number(
+              datos.fueraPlantilla?.anterior || 0
+            ) > 0
+              ? " y"
+              : ""}
+
+            {Number(
+              datos.fueraPlantilla?.anterior || 0
+            ) > 0
+              ? ` ${datos.fueraPlantilla.anterior} RX del mes anterior`
+              : ""}
+
+            {" "}de personal que no aparece en la plantilla actual.
+
+          </p>
+
+        )}
+
+      </div>
+
+
+      <div className="comparativa-rx-titulo-tabla comparativa-rx-titulo-diario">
+
+        <div>
+
+          <span>
+            COMPORTAMIENTO POR FECHA
+          </span>
+
+          <h3>
+            Avance diario acumulado
+          </h3>
+
+        </div>
 
       </div>
 
@@ -293,27 +505,35 @@ function ComparativaRecuperacionMesAnterior() {
           <thead>
 
             <tr>
+
               <th>
                 Día
               </th>
+
               <th>
                 {datos.mesActual.nombre}
               </th>
+
               <th>
                 {datos.mesAnterior.nombre}
               </th>
+
               <th>
                 Dif. día
               </th>
+
               <th>
                 Acum. {datos.mesActual.nombre}
               </th>
+
               <th>
                 Acum. {datos.mesAnterior.nombre}
               </th>
+
               <th>
                 Dif. acumulada
               </th>
+
             </tr>
 
           </thead>
@@ -341,6 +561,7 @@ function ComparativaRecuperacionMesAnterior() {
 
 
                 return (
+
                   <tr
                     key={fila.dia}
                     className={
@@ -363,9 +584,11 @@ function ComparativaRecuperacionMesAnterior() {
                     </td>
 
                     <td className={claseDia}>
+
                       {formatearDiferencia(
                         fila.diferenciaDia
                       )}
+
                     </td>
 
                     <td>
@@ -377,12 +600,15 @@ function ComparativaRecuperacionMesAnterior() {
                     </td>
 
                     <td className={claseAcumulada}>
+
                       {formatearDiferencia(
                         fila.diferenciaAcumulada
                       )}
+
                     </td>
 
                   </tr>
+
                 );
 
               }
