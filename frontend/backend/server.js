@@ -16,6 +16,7 @@ const {
   leerDetalleVentaMensual,
   leerComparativaRecuperacionMesAnterior,
   leerGestionOdc,
+  leerRecuperacionYCortes,
   actualizarDatosDesdeSupabase,
   reemplazarExcelEnSupabase,
   descargarExcelDesdeSupabase,
@@ -851,6 +852,63 @@ app.get(
         mensaje:
           "No se pudo cargar la Gestión de ODC",
 
+      });
+
+    }
+
+  }
+);
+
+// ==================================================
+// RECUPERACIÓN CON/SIN ESFUERZO Y CORTES
+// ==================================================
+
+app.get(
+  "/api/recuperacion/recuperacion-cortes",
+  autenticarToken,
+  async (req, res) => {
+
+    if (
+      normalizarRol(
+        req.rol
+      ) !== "RECUPERACION"
+    ) {
+
+      return res.status(403).json({
+        correcto: false,
+        mensaje:
+          "Acceso exclusivo del equipo de Recuperación",
+      });
+
+    }
+
+
+    try {
+
+      const panorama =
+        leerRecuperacionYCortes();
+
+
+      return res.json({
+        correcto: true,
+        ...panorama,
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en Recuperación y Cortes:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+        correcto: false,
+        mensaje:
+          "No se pudo cargar Recuperación y Cortes",
       });
 
     }
