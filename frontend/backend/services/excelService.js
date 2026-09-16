@@ -4093,6 +4093,560 @@ function leerComparativaMesAnterior(
 
 }
 
+
+// ==================================================
+// 🔄 RECUPERACIÓN VS MISMO DÍA DEL MES ANTERIOR
+// ==================================================
+//
+// MES ACTUAL:
+// Hoja: BD ACUMULADO RX MES
+//
+// MES ANTERIOR:
+// Hoja: BD RX MES ANTERIOR
+//
+// Q = FECHA VENTA
+// T = SUPERVISOR
+//
+// La fecha de corte se obtiene de la última fecha
+// disponible en la base actual, no del servidor.
+//
+// ==================================================
+
+function leerComparativaRecuperacionMesAnterior(
+  supervisorSolicitado
+) {
+
+  const workbook =
+    cargarExcel();
+
+
+  function buscarHoja(
+    nombreBuscado
+  ) {
+
+    const nombre =
+      workbook.SheetNames.find(
+        (hoja) =>
+          limpiarTexto(
+            hoja
+          ) ===
+          limpiarTexto(
+            nombreBuscado
+          )
+      );
+
+
+    return nombre
+      ? workbook.Sheets[
+          nombre
+        ]
+      : null;
+
+  }
+
+
+  const hojaActual =
+    buscarHoja(
+      "BD ACUMULADO RX MES"
+    );
+
+
+  const hojaAnterior =
+    buscarHoja(
+      "BD RX MES ANTERIOR"
+    );
+
+
+  if (
+    !hojaActual ||
+    !hojaAnterior
+  ) {
+
+    throw new Error(
+      "No se encontraron las hojas de Recuperación necesarias para la comparativa"
+    );
+
+  }
+
+
+  const supervisor =
+    normalizarNombre(
+      supervisorSolicitado
+    );
+
+
+  if (!supervisor) {
+
+    throw new Error(
+      "No se recibió el supervisor para la comparativa de Recuperación"
+    );
+
+  }
+
+
+  const datosActual =
+    XLSX.utils.sheet_to_json(
+      hojaActual,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  const datosAnterior =
+    XLSX.utils.sheet_to_json(
+      hojaAnterior,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  const COLUMNA_FECHA = 16;
+  const COLUMNA_SUPERVISOR = 19;
+
+
+  function convertirFecha(
+    valor
+  ) {
+
+    if (
+      valor instanceof Date &&
+      !Number.isNaN(
+        valor.getTime()
+      )
+    ) {
+
+      return {
+        anio:
+          valor.getFullYear(),
+        mes:
+          valor.getMonth() + 1,
+        dia:
+          valor.getDate(),
+      };
+
+    }
+
+
+    const numero =
+      Number(
+        valor
+      );
+
+
+    if (
+      Number.isFinite(
+        numero
+      ) &&
+      numero > 0
+    ) {
+
+      const fechaExcel =
+        XLSX.SSF.parse_date_code(
+          numero
+        );
+
+
+      if (fechaExcel) {
+
+        return {
+          anio:
+            fechaExcel.y,
+          mes:
+            fechaExcel.m,
+          dia:
+            fechaExcel.d,
+        };
+
+      }
+
+    }
+
+
+    const texto =
+      String(
+        valor ?? ""
+      ).trim();
+
+
+    let coincidencia =
+      texto.match(
+        /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/
+      );
+
+
+    if (coincidencia) {
+
+      return {
+        dia:
+          Number(
+            coincidencia[1]
+          ),
+        mes:
+          Number(
+            coincidencia[2]
+          ),
+        anio:
+          Number(
+            coincidencia[3]
+          ),
+      };
+
+    }
+
+
+    coincidencia =
+      texto.match(
+        /^(\d{4})-(\d{1,2})-(\d{1,2})/
+      );
+
+
+    if (coincidencia) {
+
+      return {
+        anio:
+          Number(
+            coincidencia[1]
+          ),
+        mes:
+          Number(
+            coincidencia[2]
+          ),
+        dia:
+          Number(
+            coincidencia[3]
+          ),
+      };
+
+    }
+
+
+    return null;
+
+  }
+
+
+  function valorFecha(
+    fecha
+  ) {
+
+    return (
+      fecha.anio * 10000 +
+      fecha.mes * 100 +
+      fecha.dia
+    );
+
+  }
+
+
+  let fechaCorte =
+    null;
+
+
+  for (
+    let indice = 1;
+    indice < datosActual.length;
+    indice++
+  ) {
+
+    const fecha =
+      convertirFecha(
+        datosActual[indice][
+          COLUMNA_FECHA
+        ]
+      );
+
+
+    if (
+      fecha &&
+      (
+        !fechaCorte ||
+        valorFecha(
+          fecha
+        ) >
+        valorFecha(
+          fechaCorte
+        )
+      )
+    ) {
+
+      fechaCorte =
+        fecha;
+
+    }
+
+  }
+
+
+  if (!fechaCorte) {
+
+    throw new Error(
+      "No se encontró una fecha de corte en BD ACUMULADO RX MES"
+    );
+
+  }
+
+
+  let anioAnterior =
+    fechaCorte.anio;
+
+  let mesAnterior =
+    fechaCorte.mes - 1;
+
+
+  if (mesAnterior === 0) {
+
+    mesAnterior = 12;
+    anioAnterior--;
+
+  }
+
+
+  const actualPorDia =
+    new Map();
+
+  const anteriorPorDia =
+    new Map();
+
+
+  function acumularPorDia({
+    datos,
+    anio,
+    mes,
+    mapa,
+    limitarAlCorte,
+  }) {
+
+    for (
+      let indice = 1;
+      indice < datos.length;
+      indice++
+    ) {
+
+      const fila =
+        datos[indice];
+
+
+      if (
+        normalizarNombre(
+          fila[
+            COLUMNA_SUPERVISOR
+          ]
+        ) !== supervisor
+      ) {
+
+        continue;
+
+      }
+
+
+      const fecha =
+        convertirFecha(
+          fila[
+            COLUMNA_FECHA
+          ]
+        );
+
+
+      if (
+        !fecha ||
+        fecha.anio !== anio ||
+        fecha.mes !== mes ||
+        (
+          limitarAlCorte &&
+          fecha.dia > fechaCorte.dia
+        )
+      ) {
+
+        continue;
+
+      }
+
+
+      mapa.set(
+        fecha.dia,
+        (
+          mapa.get(
+            fecha.dia
+          ) || 0
+        ) + 1
+      );
+
+    }
+
+  }
+
+
+  acumularPorDia({
+    datos:
+      datosActual,
+    anio:
+      fechaCorte.anio,
+    mes:
+      fechaCorte.mes,
+    mapa:
+      actualPorDia,
+    limitarAlCorte:
+      true,
+  });
+
+
+  acumularPorDia({
+    datos:
+      datosAnterior,
+    anio:
+      anioAnterior,
+    mes:
+      mesAnterior,
+    mapa:
+      anteriorPorDia,
+    limitarAlCorte:
+      true,
+  });
+
+
+  let acumuladoActual = 0;
+  let acumuladoAnterior = 0;
+
+
+  const detalle =
+    [];
+
+
+  for (
+    let dia = 1;
+    dia <= fechaCorte.dia;
+    dia++
+  ) {
+
+    const actual =
+      actualPorDia.get(
+        dia
+      ) || 0;
+
+    const anterior =
+      anteriorPorDia.get(
+        dia
+      ) || 0;
+
+
+    acumuladoActual +=
+      actual;
+
+    acumuladoAnterior +=
+      anterior;
+
+
+    detalle.push({
+      dia,
+      actual,
+      anterior,
+      diferenciaDia:
+        actual - anterior,
+      acumuladoActual,
+      acumuladoAnterior,
+      diferenciaAcumulada:
+        acumuladoActual -
+        acumuladoAnterior,
+    });
+
+  }
+
+
+  const diferencia =
+    acumuladoActual -
+    acumuladoAnterior;
+
+
+  const variacionPorcentaje =
+    acumuladoAnterior > 0
+      ? (
+          diferencia /
+          acumuladoAnterior
+        ) * 100
+      : null;
+
+
+  const nombresMeses = [
+    "",
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+
+
+  console.log(
+    "=========================================="
+  );
+
+  console.log(
+    "🔄 RECUPERACIÓN VS MES ANTERIOR"
+  );
+
+  console.log(
+    "👤 Supervisor:",
+    supervisor
+  );
+
+  console.log(
+    `📅 Corte: ${fechaCorte.dia}/${fechaCorte.mes}/${fechaCorte.anio}`
+  );
+
+  console.log(
+    `📊 Actual: ${acumuladoActual} | Anterior: ${acumuladoAnterior} | Diferencia: ${diferencia}`
+  );
+
+  console.log(
+    "=========================================="
+  );
+
+
+  return {
+    supervisor,
+    fechaCorte,
+    mesActual: {
+      numero:
+        fechaCorte.mes,
+      anio:
+        fechaCorte.anio,
+      nombre:
+        nombresMeses[
+          fechaCorte.mes
+        ],
+    },
+    mesAnterior: {
+      numero:
+        mesAnterior,
+      anio:
+        anioAnterior,
+      nombre:
+        nombresMeses[
+          mesAnterior
+        ],
+    },
+    totalActual:
+      acumuladoActual,
+    totalAnteriorMismoDia:
+      acumuladoAnterior,
+    diferencia,
+    variacionPorcentaje,
+    detalle,
+  };
+
+}
+
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
@@ -4854,6 +5408,8 @@ function actualizarDatosDesdeSupabase() {
       "PROYECCION",
       "BD ACUMULADO VENTA MES",
       "ACUMULADO VENTA MES ANTERIOR",
+      "BD ACUMULADO RX MES",
+      "BD RX MES ANTERIOR",
 
     ];
 
@@ -4996,6 +5552,8 @@ function validarExcelParaCarga(buffer) {
     "PROYECCION",
     "BD ACUMULADO VENTA MES",
     "ACUMULADO VENTA MES ANTERIOR",
+    "BD ACUMULADO RX MES",
+    "BD RX MES ANTERIOR",
 
   ];
 
@@ -5330,6 +5888,8 @@ module.exports = {
   leerProyeccion,
 
   leerDetalleVentaMensual,
+
+  leerComparativaRecuperacionMesAnterior,
 
   reemplazarExcelEnSupabase,
 
