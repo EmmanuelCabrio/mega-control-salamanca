@@ -6215,6 +6215,248 @@ function leerRecuperacionYCortes() {
 }
 
 
+// ==================================================
+// VISITAS POR TIPO DE GESTIÓN
+// ==================================================
+
+function leerVisitasPorTipoGestion() {
+
+  const workbook =
+    cargarExcel();
+
+
+  const nombreHoja =
+    workbook.SheetNames.find(
+      (nombre) =>
+        limpiarTexto(nombre) ===
+        "SABANA DE RECUPERACION"
+    );
+
+
+  if (!nombreHoja) {
+
+    throw new Error(
+      'No se encontró la hoja "SABANA DE RECUPERACION"'
+    );
+
+  }
+
+
+  const datos =
+    XLSX.utils.sheet_to_json(
+      workbook.Sheets[nombreHoja],
+      {
+        header: 1,
+        defval: "",
+        raw: true,
+      }
+    );
+
+
+  const filaEncabezados =
+    datos.findIndex(
+      (fila) => {
+
+        const encabezados =
+          fila.map(
+            (valor) =>
+              normalizarNombre(valor)
+          );
+
+
+        return (
+          encabezados.includes("MOTIVOS") &&
+          encabezados.includes("NO VISITAS")
+        );
+
+      }
+    );
+
+
+  if (filaEncabezados < 0) {
+
+    throw new Error(
+      "No se encontraron las columnas MOTIVOS y No. VISITAS"
+    );
+
+  }
+
+
+  const encabezados =
+    datos[filaEncabezados].map(
+      (valor) =>
+        normalizarNombre(valor)
+    );
+
+
+  const columnaMotivo =
+    encabezados.indexOf(
+      "MOTIVOS"
+    );
+
+  const columnaVisitas =
+    encabezados.indexOf(
+      "NO VISITAS"
+    );
+
+
+  const mapaMotivos =
+    new Map();
+
+  let totalSuscriptores = 0;
+  let conVisita = 0;
+  let sinVisita = 0;
+
+
+  for (
+    let indice = filaEncabezados + 1;
+    indice < datos.length;
+    indice++
+  ) {
+
+    const fila =
+      datos[indice];
+
+    const motivo =
+      String(
+        fila[columnaMotivo] ?? ""
+      )
+        .trim()
+        .replace(/\s+/g, " ") ||
+      "Sin motivo registrado";
+
+    const visitasNumero =
+      Number(
+        fila[columnaVisitas]
+      );
+
+    const visitas =
+      Number.isFinite(visitasNumero)
+        ? Math.max(
+            0,
+            Math.trunc(
+              visitasNumero
+            )
+          )
+        : 0;
+
+    const llave =
+      normalizarNombre(
+        motivo
+      );
+
+    const registroExistente =
+      mapaMotivos.get(
+        llave
+      );
+
+
+    if (registroExistente) {
+
+      registroExistente.suscriptores += 1;
+
+    } else {
+
+      mapaMotivos.set(
+        llave,
+        {
+          motivo,
+          suscriptores: 1,
+        }
+      );
+
+    }
+
+
+    if (visitas > 0) {
+
+      conVisita += 1;
+
+    } else {
+
+      sinVisita += 1;
+
+    }
+
+
+    totalSuscriptores += 1;
+
+  }
+
+
+  const motivos =
+    Array.from(
+      mapaMotivos.values()
+    )
+      .map(
+        (registro) => ({
+          ...registro,
+
+          porcentaje:
+            totalSuscriptores > 0
+              ? (
+                  registro.suscriptores /
+                  totalSuscriptores
+                ) * 100
+              : 0,
+        })
+      )
+      .sort(
+        (registroA, registroB) =>
+          registroA.motivo.localeCompare(
+            registroB.motivo,
+            "es"
+          )
+      );
+
+
+  if (motivos.length === 0) {
+
+    throw new Error(
+      "La Sábana de Recuperación no contiene motivos de gestión"
+    );
+
+  }
+
+
+  const maximo =
+    Math.max(
+      ...motivos.map(
+        (registro) =>
+          registro.suscriptores
+      )
+    );
+
+
+  return {
+    totalSuscriptores,
+
+    conVisita,
+
+    sinVisita,
+
+    porcentajeConVisita:
+      totalSuscriptores > 0
+        ? (
+            conVisita /
+            totalSuscriptores
+          ) * 100
+        : 0,
+
+    porcentajeSinVisita:
+      totalSuscriptores > 0
+        ? (
+            sinVisita /
+            totalSuscriptores
+          ) * 100
+        : 0,
+
+    maximo,
+
+    motivos,
+  };
+
+}
 
 // ==================================================
 // ANÁLISIS DE SÁBANA DE RECUPERACIÓN
@@ -8020,7 +8262,9 @@ module.exports = {
 
   leerRecuperacionYCortes,
 
-  leerRecuperacionVsPresupuesto,
+  leerRecuperacionVsPresupuesto, 
+
+  leerVisitasPorTipoGestion,
 
   leerAnalisisSabanaRecuperacion,
 
