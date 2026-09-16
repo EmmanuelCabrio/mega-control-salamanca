@@ -33,6 +33,7 @@ import {
 function PanelRecuperacion({
   supervisor,
   onCerrarSesion,
+  onRegresarDireccion,
 }) {
 
   const [registros, setRegistros] =
@@ -134,13 +135,30 @@ function PanelRecuperacion({
         </div>
 
 
-        <button
-          type="button"
-          onClick={onCerrarSesion}
-          className="panel-recuperacion-salir"
-        >
-          🚪 Cerrar sesión
-        </button>
+             <div className="panel-recuperacion-acciones">
+
+          {onRegresarDireccion && (
+
+            <button
+              type="button"
+              onClick={onRegresarDireccion}
+              className="panel-recuperacion-regresar"
+            >
+              ← Volver a Dirección
+            </button>
+
+          )}
+
+
+          <button
+            type="button"
+            onClick={onCerrarSesion}
+            className="panel-recuperacion-salir"
+          >
+            🚪 Cerrar sesión
+          </button>
+
+        </div>
 
       </header>
 
