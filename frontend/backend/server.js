@@ -343,7 +343,9 @@ app.post(
           resultado.empleado,
 
         rol:
-            resultado.rol,
+          normalizarRol(
+            resultado.rol
+          ),
 
 
       });
