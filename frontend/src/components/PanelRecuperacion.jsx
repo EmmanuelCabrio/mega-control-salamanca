@@ -7,6 +7,9 @@ import {
 import TeamTable
   from "./TeamTable";
 
+import ComparativaRecuperacionMesAnterior
+  from "./ComparativaRecuperacionMesAnterior";
+
 import {
   fetchProtegido
 } from "../services/authService";
@@ -188,6 +191,28 @@ function PanelRecuperacion({
         />
 
       )}
+
+
+      <section className="panel-recuperacion-paso panel-recuperacion-paso-secundario">
+
+        <span>02</span>
+
+        <div>
+
+          <h2>
+            ¿Cómo voy contra el mes anterior?
+          </h2>
+
+          <p>
+            Compara las RX acumuladas contra el mismo día del mes anterior.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <ComparativaRecuperacionMesAnterior />
 
     </main>
   );
