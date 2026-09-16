@@ -6560,11 +6560,6 @@ function leerRecuperacionVsPresupuesto() {
     cargarExcel();
 
 
-  // Toma las RX reales del bloque que ya validamos.
-  const recuperacionActual =
-    leerRecuperacionYCortes();
-
-
   const nombreHoja =
     workbook.SheetNames.find(
       (nombre) =>
@@ -6593,36 +6588,22 @@ function leerRecuperacionVsPresupuesto() {
     );
 
 
-  // ==================================================
-  // LOCALIZAR ENCABEZADOS DE SUCURSALES
-  // ==================================================
-
   const filaSucursales =
     datos.findIndex(
       (fila) =>
-        normalizarNombre(
-          fila[14]
-        ) === "SALAMANCA CL" &&
-        normalizarNombre(
-          fila[15]
-        ) === "CD SALAMANCA"
+        normalizarNombre(fila[14]) ===
+          "SALAMANCA CL" &&
+        normalizarNombre(fila[15]) ===
+          "CD SALAMANCA"
     );
 
-
-  // ==================================================
-  // BUSCAR FILAS POR ETIQUETA
-  // ==================================================
 
   const buscarFila =
     (etiqueta) =>
       datos.findIndex(
         (fila) =>
-          normalizarNombre(
-            fila[13]
-          ) ===
-          normalizarNombre(
-            etiqueta
-          )
+          normalizarNombre(fila[13]) ===
+          normalizarNombre(etiqueta)
       );
 
 
@@ -6631,24 +6612,22 @@ function leerRecuperacionVsPresupuesto() {
       "DÍAS POR TRANSCURRIR"
     );
 
-
-  const filaPresupuestoConEsfuerzo =
+  const filaPresupuesto =
     buscarFila(
       "RX CON ESF PPTO"
     );
 
-
-  const filaPresupuestoSinEsfuerzo =
+  const filaActual =
     buscarFila(
-      "RX SIN ESF PPTO"
+      "RX CON ESF HOY"
     );
 
 
   if (
     filaSucursales < 0 ||
     filaDiasRestantes < 0 ||
-    filaPresupuestoConEsfuerzo < 0 ||
-    filaPresupuestoSinEsfuerzo < 0
+    filaPresupuesto < 0 ||
+    filaActual < 0
   ) {
 
     throw new Error(
@@ -6658,184 +6637,94 @@ function leerRecuperacionVsPresupuesto() {
   }
 
 
-  // ==================================================
-  // CONVERTIR NÚMEROS
-  // ==================================================
-
   const numero =
     (valor) => {
 
       const resultado =
         Number(valor);
 
-
-      return Number.isFinite(
-        resultado
-      )
+      return Number.isFinite(resultado)
         ? resultado
         : 0;
 
     };
 
 
-  // ==================================================
-  // DÍAS RESTANTES DEL MES
-  // ==================================================
-
   const diasRestantes =
     Math.max(
       0,
       Math.trunc(
         numero(
-          datos[
-            filaDiasRestantes
-          ]?.[14]
+          datos[filaDiasRestantes]?.[14]
         )
       )
     );
 
 
-  // ==================================================
-  // CREAR MÉTRICA
-  // ==================================================
-
-  const crearMetrica =
-    (
-      actual,
-      presupuesto
-    ) => {
-
-      const valorActual =
-        numero(actual);
-
-      const valorPresupuesto =
-        numero(presupuesto);
-
-      const diferencia =
-        valorActual -
-        valorPresupuesto;
-
-      const faltante =
-        Math.max(
-          valorPresupuesto -
-            valorActual,
-          0
-        );
-
-
-      return {
-
-        actual:
-          valorActual,
-
-        presupuesto:
-          valorPresupuesto,
-
-        diferencia,
-
-        faltante,
-
-        avance:
-          valorPresupuesto > 0
-            ? (
-                valorActual /
-                valorPresupuesto
-              ) * 100
-            : 0,
-
-      };
-
-    };
-
-
-  // ==================================================
-  // CREAR REGISTRO POR SUCURSAL
-  // ==================================================
-
   const crearRegistro =
     (
       sucursal,
-      actualConEsfuerzo,
-      actualSinEsfuerzo,
-      presupuestoConEsfuerzo,
-      presupuestoSinEsfuerzo
+      columna
     ) => {
 
-      const conEsfuerzo =
-        crearMetrica(
-          actualConEsfuerzo,
-          presupuestoConEsfuerzo
+      const actual =
+        numero(
+          datos[filaActual]?.[columna]
         );
 
-
-      const sinEsfuerzo =
-        crearMetrica(
-          actualSinEsfuerzo,
-          presupuestoSinEsfuerzo
+      const presupuesto =
+        numero(
+          datos[filaPresupuesto]?.[columna]
         );
 
+      const diferencia =
+        actual - presupuesto;
 
-      const total =
-        crearMetrica(
-          conEsfuerzo.actual +
-            sinEsfuerzo.actual,
+      const faltante =
+        Math.max(
+          presupuesto - actual,
+          0
+        );
 
-          conEsfuerzo.presupuesto +
-            sinEsfuerzo.presupuesto
+      const avance =
+        presupuesto > 0
+          ? (
+              actual /
+              presupuesto
+            ) * 100
+          : 0;
+
+      const ritmoNecesario =
+        diasRestantes > 0
+          ? faltante /
+            diasRestantes
+          : faltante;
+
+      const metaDiaria =
+        Math.ceil(
+          ritmoNecesario
         );
 
 
       return {
-
         sucursal,
-
-        conEsfuerzo,
-
-        sinEsfuerzo,
-
-        total,
-
-        metaDiaria:
-          diasRestantes > 0
-            ? Math.ceil(
-                total.faltante /
-                diasRestantes
-              )
-            : total.faltante,
-
+        actual,
+        presupuesto,
+        diferencia,
+        faltante,
+        avance,
+        ritmoNecesario,
+        metaDiaria,
       };
 
     };
 
-
-  // ==================================================
-  // MAPA DE RX ACTUALES
-  // ==================================================
-
-  const mapaActual =
-    new Map(
-      recuperacionActual.sucursales.map(
-        (registro) => [
-
-          normalizarNombre(
-            registro.sucursal
-          ),
-
-          registro,
-
-        ]
-      )
-    );
-
-
-  // ==================================================
-  // DETALLE POR SUCURSAL
-  // ==================================================
 
   const sucursales = [];
 
 
-  // P hasta X en Excel.
+  // Columnas P hasta X:
+  // cada una representa una sucursal.
   for (
     let columna = 15;
     columna <= 23;
@@ -6844,103 +6733,43 @@ function leerRecuperacionVsPresupuesto() {
 
     const sucursal =
       String(
-        datos[
-          filaSucursales
-        ]?.[columna] ?? ""
+        datos[filaSucursales]?.[
+          columna
+        ] ?? ""
       ).trim();
 
 
-    const actual =
-      mapaActual.get(
-        normalizarNombre(
-          sucursal
-        )
-      );
-
-
-    if (
-      !sucursal ||
-      !actual
-    ) {
-
+    if (!sucursal) {
       continue;
-
     }
 
 
     sucursales.push(
       crearRegistro(
-
-        actual.sucursal,
-
-        actual
-          .conEsfuerzo
-          .actual,
-
-        actual
-          .sinEsfuerzo
-          .actual,
-
-        datos[
-          filaPresupuestoConEsfuerzo
-        ]?.[columna],
-
-        datos[
-          filaPresupuestoSinEsfuerzo
-        ]?.[columna]
-
+        sucursal,
+        columna
       )
     );
 
   }
 
 
-  // ==================================================
-  // TOTAL DEL CLÚSTER
-  // ==================================================
-
+  // Columna O:
+  // total del clúster Salamanca.
   const resumen =
     crearRegistro(
-
       "SALAMANCA CL",
-
-      recuperacionActual
-        .resumen
-        .conEsfuerzo
-        .actual,
-
-      recuperacionActual
-        .resumen
-        .sinEsfuerzo
-        .actual,
-
-      datos[
-        filaPresupuestoConEsfuerzo
-      ]?.[14],
-
-      datos[
-        filaPresupuestoSinEsfuerzo
-      ]?.[14]
-
+      14
     );
 
 
-  // ==================================================
-  // RESPUESTA
-  // ==================================================
-
   return {
-
     diasRestantes,
-
     resumen,
-
     sucursales,
-
   };
 
 }
-
 // ==================================================
 // LEER EXCEL COMPLETO
 // ==================================================
