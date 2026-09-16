@@ -942,22 +942,26 @@ app.get(
         );
 
 
-      return res.json({
+     return res.json({
 
-        correcto: true,
+  correcto: true,
 
-        fechaCorte:
-          comparativa.fechaCorte,
+  fechaCorte:
+    comparativa.fechaCorte,
 
-        mesActual:
-          comparativa.mesActual,
+  mesActual:
+    comparativa.mesActual,
 
-        mesAnterior:
-          comparativa.mesAnterior,
+  mesAnterior:
+    comparativa.mesAnterior,
 
-        resumen,
+  resumen,
 
-      });
+  integrantes:
+    comparativa.comparativaIntegrantes ||
+    [],
+
+});
 
     } catch (error) {
 
