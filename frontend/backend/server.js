@@ -17,6 +17,7 @@ const {
   leerComparativaRecuperacionMesAnterior,
   leerGestionOdc,
   leerRecuperacionYCortes,
+  leerAnalisisSabanaRecuperacion,
   actualizarDatosDesdeSupabase,
   reemplazarExcelEnSupabase,
   descargarExcelDesdeSupabase,
@@ -909,6 +910,63 @@ app.get(
         correcto: false,
         mensaje:
           "No se pudo cargar Recuperación y Cortes",
+      });
+
+    }
+
+  }
+);
+
+// ==================================================
+// ANÁLISIS DE SÁBANA DE RECUPERACIÓN
+// ==================================================
+
+app.get(
+  "/api/recuperacion/analisis-sabana",
+  autenticarToken,
+  async (req, res) => {
+
+    if (
+      normalizarRol(
+        req.rol
+      ) !== "RECUPERACION"
+    ) {
+
+      return res.status(403).json({
+        correcto: false,
+        mensaje:
+          "Acceso exclusivo del equipo de Recuperación",
+      });
+
+    }
+
+
+    try {
+
+      const analisis =
+        leerAnalisisSabanaRecuperacion();
+
+
+      return res.json({
+        correcto: true,
+        ...analisis,
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en Análisis de Sábana de Recuperación:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+        correcto: false,
+        mensaje:
+          "No se pudo cargar el análisis de la Sábana de Recuperación",
       });
 
     }
