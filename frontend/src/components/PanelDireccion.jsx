@@ -29,6 +29,9 @@ import DetalledeVentaMensual
 import ResumenVsMesAnteriorSupervisores
   from "./ResumenVsMesAnteriorSupervisores";
 
+import ResumenRxSupervisores
+  from "./ResumenRxSupervisores";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -612,6 +615,8 @@ return (
   <DetalledeVentaMensual />
 
   <ResumenVsMesAnteriorSupervisores />
+
+   <ResumenRxSupervisores />
 
   <VentaVsMesAnterior />
 
