@@ -378,6 +378,66 @@ export function obtenerNivelProductividad(
 
 
 // ==================================================
+// NIVEL DE PRODUCTIVIDAD — RECUPERACIÓN
+// ==================================================
+
+export function obtenerNivelProductividadRecuperacion(
+  productividad
+) {
+
+  const numero =
+    Number(
+      productividad
+    );
+
+
+  const valor =
+    Number.isFinite(
+      numero
+    )
+      ? Math.round(
+          (
+            numero +
+            Number.EPSILON
+          ) * 100
+        ) / 100
+      : 0;
+
+
+  if (valor <= 1) {
+
+    return "nivel-recuperacion-rojo";
+
+  }
+
+
+  if (valor < 3) {
+
+    return "nivel-recuperacion-naranja";
+
+  }
+
+
+  if (valor < 4) {
+
+    return "nivel-recuperacion-amarillo";
+
+  }
+
+
+  if (valor < 5) {
+
+    return "nivel-recuperacion-verde-claro";
+
+  }
+
+
+  return "nivel-recuperacion-verde-oscuro";
+
+}
+
+
+// ==================================================
 // OBTENER FOCO MÁS CRÍTICO POR SUPERVISOR
 // ==================================================
 
