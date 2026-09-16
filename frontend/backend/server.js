@@ -730,6 +730,261 @@ app.get(
 
 
 // ==================================================
+// RECUPERACIONES VS MISMO DÍA DEL MES ANTERIOR
+// ==================================================
+
+app.get(
+  "/api/recuperaciones-vs-mes-anterior",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      const rol =
+        normalizarRol(
+          req.rol
+        );
+
+
+      // ============================================
+      // PREPARAR EL RESUMEN DE UN SUPERVISOR
+      // ============================================
+
+      const crearResumen =
+        (
+          supervisor,
+          comparativa
+        ) => ({
+
+          supervisor,
+
+          clave:
+            normalizarSupervisor(
+              supervisor
+            ),
+
+          actual:
+            Number(
+              comparativa.totalActual ||
+              0
+            ),
+
+          anterior:
+            Number(
+              comparativa.totalAnteriorMismoDia ||
+              0
+            ),
+
+          diferencia:
+            Number(
+              comparativa.diferencia ||
+              0
+            ),
+
+          variacionPorcentaje:
+            comparativa.variacionPorcentaje,
+
+        });
+
+
+      // ============================================
+      // DIRECCIÓN — TODOS LOS SUPERVISORES
+      // ============================================
+
+      if (
+        rol === "DIRECCIÓN"
+      ) {
+
+        const datosExcel =
+          await leerExcel();
+
+        const mapaSupervisores =
+          new Map();
+
+
+        for (
+          const registro of
+          datosExcel.registros || []
+        ) {
+
+          const supervisor =
+            String(
+              registro.supervisor ?? ""
+            ).trim();
+
+          const clave =
+            normalizarSupervisor(
+              supervisor
+            );
+
+
+          if (
+            !clave ||
+            clave === "0" ||
+            clave === "SUPERVISOR" ||
+            clave === "TOTAL"
+          ) {
+
+            continue;
+
+          }
+
+
+          mapaSupervisores.set(
+            clave,
+            supervisor
+          );
+
+        }
+
+
+        const supervisores = [];
+
+        let referencia =
+          null;
+
+
+        for (
+          const supervisor of
+          mapaSupervisores.values()
+        ) {
+
+          const comparativa =
+            leerComparativaRecuperacionMesAnterior(
+              supervisor
+            );
+
+
+          referencia =
+            referencia ||
+            comparativa;
+
+
+          supervisores.push(
+            crearResumen(
+              supervisor,
+              comparativa
+            )
+          );
+
+        }
+
+
+        // ==========================================
+        // MAYOR DÉFICIT PRIMERO
+        // ==========================================
+
+        supervisores.sort(
+          (
+            registroA,
+            registroB
+          ) => {
+
+            if (
+              registroA.diferencia !==
+              registroB.diferencia
+            ) {
+
+              return (
+                registroA.diferencia -
+                registroB.diferencia
+              );
+
+            }
+
+
+            return (
+              registroB.actual -
+              registroA.actual
+            );
+
+          }
+        );
+
+
+        return res.json({
+
+          correcto: true,
+
+          fechaCorte:
+            referencia?.fechaCorte ||
+            null,
+
+          mesActual:
+            referencia?.mesActual ||
+            null,
+
+          mesAnterior:
+            referencia?.mesAnterior ||
+            null,
+
+          supervisores,
+
+        });
+
+      }
+
+
+      // ============================================
+      // SUPERVISOR — ÚNICAMENTE SU RESULTADO
+      // ============================================
+
+      const comparativa =
+        leerComparativaRecuperacionMesAnterior(
+          req.supervisor
+        );
+
+
+      const resumen =
+        crearResumen(
+          req.supervisor,
+          comparativa
+        );
+
+
+      return res.json({
+
+        correcto: true,
+
+        fechaCorte:
+          comparativa.fechaCorte,
+
+        mesActual:
+          comparativa.mesActual,
+
+        mesAnterior:
+          comparativa.mesAnterior,
+
+        resumen,
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en Recuperaciones vs Mes Anterior:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar Recuperaciones vs Mes Anterior",
+
+      });
+
+    }
+
+  }
+);
+
+// ==================================================
 // GESTIÓN DE ÓRDENES DE COBRANZA
 // ==================================================
 
