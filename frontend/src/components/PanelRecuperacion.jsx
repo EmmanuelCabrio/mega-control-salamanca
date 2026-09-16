@@ -13,6 +13,9 @@ import ComparativaRecuperacionMesAnterior
 import GestionOdc
   from "./GestionOdc";
 
+import RecuperacionYCortes
+  from "./RecuperacionYCortes";
+
 import {
   fetchProtegido
 } from "../services/authService";
@@ -47,10 +50,8 @@ function PanelRecuperacion({
               "/api/registros"
             );
 
-
           const resultado =
             await respuesta.json();
-
 
           if (
             !respuesta.ok ||
@@ -63,7 +64,6 @@ function PanelRecuperacion({
             );
 
           }
-
 
           setRegistros(
             resultado.registros || []
@@ -166,7 +166,12 @@ function PanelRecuperacion({
 
       {!cargando && error && (
 
-        <section className="panel-recuperacion-estado panel-recuperacion-error">
+        <section
+          className="
+            panel-recuperacion-estado
+            panel-recuperacion-error
+          "
+        >
 
           <p>
             {error}
@@ -196,7 +201,12 @@ function PanelRecuperacion({
       )}
 
 
-      <section className="panel-recuperacion-paso panel-recuperacion-paso-secundario">
+      <section
+        className="
+          panel-recuperacion-paso
+          panel-recuperacion-paso-secundario
+        "
+      >
 
         <span>02</span>
 
@@ -207,7 +217,8 @@ function PanelRecuperacion({
           </h2>
 
           <p>
-            Compara las RX acumuladas contra el mismo día del mes anterior.
+            Compara las RX acumuladas contra el mismo día
+            del mes anterior.
           </p>
 
         </div>
@@ -218,7 +229,12 @@ function PanelRecuperacion({
       <ComparativaRecuperacionMesAnterior />
 
 
-      <section className="panel-recuperacion-paso panel-recuperacion-paso-odc">
+      <section
+        className="
+          panel-recuperacion-paso
+          panel-recuperacion-paso-odc
+        "
+      >
 
         <span>03</span>
 
@@ -238,6 +254,34 @@ function PanelRecuperacion({
 
 
       <GestionOdc />
+
+
+      <section
+        className="
+          panel-recuperacion-paso
+          panel-recuperacion-paso-cortes
+        "
+      >
+
+        <span>04</span>
+
+        <div>
+
+          <h2>
+            ¿Cómo va la recuperación y los cortes?
+          </h2>
+
+          <p>
+            Resultado con esfuerzo, sin esfuerzo y comparación
+            contra el mes anterior.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <RecuperacionYCortes />
 
     </main>
   );
