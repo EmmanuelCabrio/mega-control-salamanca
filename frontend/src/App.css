@@ -12177,3 +12177,448 @@ td:first-child {
   }
 
 }
+
+
+/* =========================================================
+   RECUPERACIONES VS MES ANTERIOR — SUPERVISOR
+========================================================= */
+
+.rx-supervisor-card,
+.rx-supervisor-estado {
+  width: 100%;
+  margin: 24px 0;
+}
+
+
+.rx-supervisor-card {
+  overflow: hidden;
+  border: 1px solid #bfdbfe;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.09);
+}
+
+
+.rx-supervisor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    #075985,
+    #0284c7
+  );
+}
+
+
+.rx-supervisor-header > div:first-child > span {
+  color: #bae6fd;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+
+.rx-supervisor-header h2 {
+  margin: 5px 0;
+  font-size: clamp(
+    20px,
+    3vw,
+    27px
+  );
+}
+
+
+.rx-supervisor-header p {
+  margin: 0;
+  color: #e0f2fe;
+  font-size: 12px;
+}
+
+
+.rx-supervisor-balance {
+  min-width: 145px;
+  padding: 11px 15px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.35);
+  border-radius: 13px;
+  text-align: center;
+  background:
+    rgba(255, 255, 255, 0.14);
+}
+
+
+.rx-supervisor-balance strong,
+.rx-supervisor-balance span {
+  display: block;
+}
+
+
+.rx-supervisor-balance strong {
+  font-size: 25px;
+}
+
+
+.rx-supervisor-balance span {
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+
+.rx-supervisor-resumen {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+  gap: 12px;
+  padding: 18px 20px;
+  background: #f8fafc;
+}
+
+
+.rx-supervisor-resumen article {
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  background: #ffffff;
+  text-align: center;
+}
+
+
+.rx-supervisor-resumen span,
+.rx-supervisor-resumen strong {
+  display: block;
+}
+
+
+.rx-supervisor-resumen span {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+
+.rx-supervisor-resumen strong {
+  margin-top: 7px;
+  color: #0f172a;
+  font-size: 25px;
+}
+
+
+.rx-supervisor-positivo {
+  color: #15803d !important;
+}
+
+
+.rx-supervisor-negativo {
+  color: #dc2626 !important;
+}
+
+
+.rx-supervisor-neutral {
+  color: #475569 !important;
+}
+
+
+.rx-supervisor-estado {
+  padding: 28px 20px;
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  color: #475569;
+  background: #ffffff;
+  font-weight: 800;
+  text-align: center;
+}
+
+
+.rx-supervisor-error {
+  color: #991b1b;
+}
+
+
+.rx-supervisor-error button,
+.resumen-rx-direccion-error button {
+  margin-top: 10px;
+  padding: 9px 15px;
+  border: 0;
+  border-radius: 9px;
+  color: #ffffff;
+  background: #b91c1c;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   RECUPERACIONES VS MES ANTERIOR — DIRECCIÓN
+========================================================= */
+
+.resumen-rx-direccion,
+.resumen-rx-direccion-estado {
+  width: min(
+    1200px,
+    100%
+  );
+  margin: 24px auto;
+}
+
+
+.resumen-rx-direccion {
+  overflow: hidden;
+  border: 1px solid #a5f3fc;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 38px
+    rgba(15, 23, 42, 0.1);
+}
+
+
+.resumen-rx-direccion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 26px;
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    #164e63,
+    #0891b2
+  );
+}
+
+
+.resumen-rx-direccion-header
+> div:first-child
+> span {
+  color: #a5f3fc;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+
+.resumen-rx-direccion-header h2 {
+  margin: 6px 0;
+  font-size: clamp(
+    22px,
+    3vw,
+    30px
+  );
+}
+
+
+.resumen-rx-direccion-header p {
+  margin: 0;
+  color: #cffafe;
+}
+
+
+.resumen-rx-direccion-balance {
+  min-width: 175px;
+  padding: 13px 18px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  text-align: center;
+  background:
+    rgba(255, 255, 255, 0.13);
+}
+
+
+.resumen-rx-direccion-balance strong,
+.resumen-rx-direccion-balance span {
+  display: block;
+}
+
+
+.resumen-rx-direccion-balance strong {
+  font-size: 29px;
+}
+
+
+.resumen-rx-direccion-balance span {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+
+.resumen-rx-direccion-tabla-contenedor {
+  overflow-x: auto;
+  padding: 22px 24px 26px;
+}
+
+
+.resumen-rx-direccion-tabla {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+
+.resumen-rx-direccion-tabla th {
+  padding: 12px 11px;
+  color: #ffffff;
+  background: #0e7490;
+  font-size: 11px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+
+.resumen-rx-direccion-tabla
+th:first-child {
+  border-radius: 10px 0 0;
+  text-align: left;
+}
+
+
+.resumen-rx-direccion-tabla
+th:last-child {
+  border-radius: 0 10px 0 0;
+}
+
+
+.resumen-rx-direccion-tabla td {
+  padding: 11px;
+  border-bottom:
+    1px solid #e2e8f0;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+
+.resumen-rx-direccion-tabla
+tbody td:first-child {
+  text-align: left;
+}
+
+
+.resumen-rx-direccion-tabla
+tbody tr:nth-child(even) {
+  background: #ecfeff;
+}
+
+
+.resumen-rx-direccion-tabla
+tbody tr:hover {
+  background: #cffafe;
+}
+
+
+.resumen-rx-direccion-tabla
+tfoot td {
+  border-bottom: 0;
+  color: #ffffff;
+  background: #0f172a;
+  font-weight: 900;
+}
+
+
+.resumen-rx-direccion-tabla
+tfoot td:first-child {
+  border-radius: 0 0 0 10px;
+  text-align: left;
+}
+
+
+.resumen-rx-direccion-tabla
+tfoot td:last-child {
+  border-radius: 0 0 10px;
+}
+
+
+.resumen-rx-positivo {
+  color: #15803d !important;
+}
+
+
+.resumen-rx-negativo {
+  color: #dc2626 !important;
+}
+
+
+.resumen-rx-neutral {
+  color: #475569 !important;
+}
+
+
+.resumen-rx-direccion-balance.resumen-rx-positivo,
+.resumen-rx-direccion-balance.resumen-rx-negativo,
+.resumen-rx-direccion-balance.resumen-rx-neutral {
+  color: #ffffff !important;
+}
+
+
+.resumen-rx-direccion-estado {
+  padding: 38px 24px;
+  border: 1px solid #a5f3fc;
+  border-radius: 18px;
+  color: #475569;
+  background: #ffffff;
+  font-weight: 800;
+  text-align: center;
+}
+
+
+.resumen-rx-direccion-error {
+  color: #991b1b;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 760px) {
+
+  .rx-supervisor-header,
+  .resumen-rx-direccion-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+
+  .rx-supervisor-balance,
+  .resumen-rx-direccion-balance {
+    width    width: 100%;
+  }
+
+
+  .rx-supervisor-resumen {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+
+  .resumen-rx-direccion-tabla-contenedor {
+    padding: 16px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .rx-supervisor-resumen {
+    grid-template-columns: 1fr;
+  }
+
+}
