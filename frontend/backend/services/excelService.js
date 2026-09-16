@@ -5784,13 +5784,100 @@ function leerRecuperacionYCortes() {
     );
 
 
+  // ==================================================
+  // COLUMNAS EXACTAS DEL EXCEL
+  // ==================================================
+
+  const COLUMNA = {
+
+    sucursal:
+      XLSX.utils.decode_col("K"),
+
+    conEsfuerzoActual:
+      XLSX.utils.decode_col("L"),
+
+    conEsfuerzoAnterior:
+      XLSX.utils.decode_col("M"),
+
+    conEsfuerzoDiferencia:
+      XLSX.utils.decode_col("N"),
+
+
+    sinEsfuerzoActual:
+      XLSX.utils.decode_col("O"),
+
+    sinEsfuerzoAnterior:
+      XLSX.utils.decode_col("P"),
+
+    sinEsfuerzoDiferencia:
+      XLSX.utils.decode_col("Q"),
+
+
+    porcentajeConEsfuerzoActual:
+      XLSX.utils.decode_col("R"),
+
+    porcentajeConEsfuerzoAnterior:
+      XLSX.utils.decode_col("S"),
+
+    porcentajeConEsfuerzoDiferencia:
+      XLSX.utils.decode_col("T"),
+
+
+    porcentajeSinEsfuerzoActual:
+      XLSX.utils.decode_col("U"),
+
+    porcentajeSinEsfuerzoAnterior:
+      XLSX.utils.decode_col("V"),
+
+    porcentajeSinEsfuerzoDiferencia:
+      XLSX.utils.decode_col("W"),
+
+
+    totalActual:
+      XLSX.utils.decode_col("X"),
+
+    totalAnterior:
+      XLSX.utils.decode_col("Y"),
+
+    totalDiferencia:
+      XLSX.utils.decode_col("Z"),
+
+
+    porcentajeTotalActual:
+      XLSX.utils.decode_col("AA"),
+
+    porcentajeTotalAnterior:
+      XLSX.utils.decode_col("AB"),
+
+    porcentajeTotalDiferencia:
+      XLSX.utils.decode_col("AC"),
+
+
+    cortesActual:
+      XLSX.utils.decode_col("AD"),
+
+    cortesAnterior:
+      XLSX.utils.decode_col("AE"),
+
+    cortesDiferencia:
+      XLSX.utils.decode_col("AF"),
+
+  };
+
+
+  // ==================================================
+  // LOCALIZAR ENCABEZADOS
+  // ==================================================
+
   const filaEncabezados =
     datos.findIndex(
       (fila) =>
-        limpiarTexto(fila[10]) ===
-          "SUCURSAL" &&
-        limpiarTexto(fila[11]) ===
-          "CONESF"
+        limpiarTexto(
+          fila[COLUMNA.sucursal]
+        ) === "SUCURSAL" &&
+        limpiarTexto(
+          fila[COLUMNA.conEsfuerzoActual]
+        ) === "CONESF"
     );
 
 
@@ -5803,12 +5890,15 @@ function leerRecuperacionYCortes() {
   }
 
 
+  // ==================================================
+  // CONVERTIR NÚMEROS
+  // ==================================================
+
   const numero =
     (valor) => {
 
       const resultado =
         Number(valor);
-
 
       return Number.isFinite(resultado)
         ? resultado
@@ -5817,12 +5907,13 @@ function leerRecuperacionYCortes() {
     };
 
 
+  // Excel almacena 52.63% como 0.5263.
+  // Esta función lo convierte a 52.63 para mostrarlo.
   const porcentaje =
     (valor) => {
 
       const resultado =
         numero(valor);
-
 
       return Math.abs(resultado) <= 1
         ? resultado * 100
@@ -5831,95 +5922,228 @@ function leerRecuperacionYCortes() {
     };
 
 
+  // ==================================================
+  // CONVERTIR CADA FILA
+  // ==================================================
+
   const convertirFila =
     (fila) => ({
 
       sucursal:
         String(
-          fila[10] ?? ""
+          fila[COLUMNA.sucursal] ?? ""
         ).trim(),
+
+
+      // ----------------------------------------------
+      // CON ESFUERZO
+      // L = actual
+      // M = mes anterior
+      // N = diferencia
+      // R = porcentaje actual
+      // S = porcentaje anterior
+      // T = diferencia porcentual
+      // ----------------------------------------------
 
       conEsfuerzo: {
 
         actual:
-          numero(fila[11]),
+          numero(
+            fila[
+              COLUMNA.conEsfuerzoActual
+            ]
+          ),
 
         anterior:
-          numero(fila[12]),
+          numero(
+            fila[
+              COLUMNA.conEsfuerzoAnterior
+            ]
+          ),
 
         diferencia:
-          numero(fila[13]),
+          numero(
+            fila[
+              COLUMNA.conEsfuerzoDiferencia
+            ]
+          ),
 
         porcentajeActual:
-          porcentaje(fila[17]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeConEsfuerzoActual
+            ]
+          ),
 
         porcentajeAnterior:
-          porcentaje(fila[18]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeConEsfuerzoAnterior
+            ]
+          ),
 
         diferenciaPorcentaje:
-          porcentaje(fila[19]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeConEsfuerzoDiferencia
+            ]
+          ),
 
       },
+
+
+      // ----------------------------------------------
+      // SIN ESFUERZO
+      // O = actual
+      // P = mes anterior
+      // Q = diferencia
+      // U = porcentaje actual
+      // V = porcentaje anterior
+      // W = diferencia porcentual
+      // ----------------------------------------------
 
       sinEsfuerzo: {
 
         actual:
-          numero(fila[14]),
+          numero(
+            fila[
+              COLUMNA.sinEsfuerzoActual
+            ]
+          ),
 
         anterior:
-          numero(fila[15]),
+          numero(
+            fila[
+              COLUMNA.sinEsfuerzoAnterior
+            ]
+          ),
 
         diferencia:
-          numero(fila[16]),
+          numero(
+            fila[
+              COLUMNA.sinEsfuerzoDiferencia
+            ]
+          ),
 
         porcentajeActual:
-          porcentaje(fila[20]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeSinEsfuerzoActual
+            ]
+          ),
 
         porcentajeAnterior:
-          porcentaje(fila[21]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeSinEsfuerzoAnterior
+            ]
+          ),
 
         diferenciaPorcentaje:
-          porcentaje(fila[22]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeSinEsfuerzoDiferencia
+            ]
+          ),
 
       },
+
+
+      // ----------------------------------------------
+      // TOTAL DE RECUPERACIONES
+      // X  = actual
+      // Y  = mes anterior
+      // Z  = diferencia
+      // AA = porcentaje actual
+      // AB = porcentaje anterior
+      // AC = diferencia porcentual
+      // ----------------------------------------------
 
       total: {
 
         actual:
-          numero(fila[23]),
+          numero(
+            fila[
+              COLUMNA.totalActual
+            ]
+          ),
 
         anterior:
-          numero(fila[24]),
+          numero(
+            fila[
+              COLUMNA.totalAnterior
+            ]
+          ),
 
         diferencia:
-          numero(fila[25]),
+          numero(
+            fila[
+              COLUMNA.totalDiferencia
+            ]
+          ),
 
         porcentajeActual:
-          porcentaje(fila[26]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeTotalActual
+            ]
+          ),
 
         porcentajeAnterior:
-          porcentaje(fila[27]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeTotalAnterior
+            ]
+          ),
 
         diferenciaPorcentaje:
-          porcentaje(fila[28]),
+          porcentaje(
+            fila[
+              COLUMNA.porcentajeTotalDiferencia
+            ]
+          ),
 
       },
+
+
+      // ----------------------------------------------
+      // CORTES
+      // AD = actual
+      // AE = mes anterior
+      // AF = diferencia
+      // ----------------------------------------------
 
       cortes: {
 
         actual:
-          numero(fila[29]),
+          numero(
+            fila[
+              COLUMNA.cortesActual
+            ]
+          ),
 
         anterior:
-          numero(fila[30]),
+          numero(
+            fila[
+              COLUMNA.cortesAnterior
+            ]
+          ),
 
         diferencia:
-          numero(fila[31]),
+          numero(
+            fila[
+              COLUMNA.cortesDiferencia
+            ]
+          ),
 
       },
 
     });
 
+
+  // ==================================================
+  // LEER SUCURSALES Y TOTAL
+  // ==================================================
 
   const sucursales = [];
 
@@ -5967,6 +6191,10 @@ function leerRecuperacionYCortes() {
   }
 
 
+  // ==================================================
+  // VALIDACIÓN
+  // ==================================================
+
   if (
     !resumen ||
     sucursales.length === 0
@@ -5985,7 +6213,6 @@ function leerRecuperacionYCortes() {
   };
 
 }
-
 
 // ==================================================
 // LEER EXCEL COMPLETO
