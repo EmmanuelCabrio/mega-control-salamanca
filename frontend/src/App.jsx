@@ -37,6 +37,9 @@ import {
 import ComparativaMesAnterior
   from "./components/ComparativaMesAnterior";
 
+import AvancePlanTrabajo
+  from "./components/AvancePlanTrabajo";
+
 import RecuperacionesVsMesAnterior
   from "./components/RecuperacionesVsMesAnterior";
 
@@ -1984,6 +1987,12 @@ if (
   registros={registros}
   supervisorSeleccionado={supervisorSeleccionado}
 />
+
+        {/* ==========================================
+    AVANCE VS PLAN DE TRABAJO
+========================================== */}
+
+<AvancePlanTrabajo />
 
 <RecuperacionesVsMesAnterior />
 
