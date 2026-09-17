@@ -1553,6 +1553,251 @@ app.get(
 
 
 // ==================================================
+// AVANCE VS PLAN DE TRABAJO
+// ==================================================
+
+app.get(
+  "/api/avance-plan-trabajo",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      const datos =
+        await leerExcel();
+
+
+      const planTrabajo =
+        datos.planTrabajo || [];
+
+
+      const resumen =
+        datos.resumenPlanTrabajo || [];
+
+
+      // ============================================
+      // CONSTRUIR RESUMEN DE CADA SUPERVISOR
+      // ============================================
+
+      const construirRegistro =
+        (
+          registroResumen
+        ) => {
+
+          const claveSupervisor =
+            normalizarSupervisor(
+              registroResumen.supervisor
+            );
+
+
+          // Colonias detalladas en PLAN DE TRABAJO.
+
+          const colonias =
+            planTrabajo.filter(
+              (registro) =>
+                normalizarSupervisor(
+                  registro.supervisor
+                ) ===
+                claveSupervisor
+            );
+
+
+          const potenciales =
+            colonias.reduce(
+              (
+                total,
+                registro
+              ) =>
+                total +
+                Number(
+                  registro.potenciales ||
+                  0
+                ),
+              0
+            );
+
+
+          const porVender =
+            colonias.reduce(
+              (
+                total,
+                registro
+              ) =>
+                total +
+                Number(
+                  registro.porVender ||
+                  0
+                ),
+              0
+            );
+
+
+          return {
+
+            ...registroResumen,
+
+            claveSupervisor,
+
+            // Indicadores de PLAN DE TRABAJO.
+
+            colonias:
+              colonias.length,
+
+            potenciales,
+
+            porVender,
+
+          };
+
+        };
+
+
+      const supervisores =
+        resumen.map(
+          construirRegistro
+        );
+
+
+      // ============================================
+      // DIRECCIÓN — TODOS LOS SUPERVISORES
+      // ============================================
+
+      if (
+        normalizarRol(
+          req.rol
+        ) === "DIRECCIÓN"
+      ) {
+
+        const totales =
+          supervisores.reduce(
+            (
+              acumulado,
+              registro
+            ) => ({
+
+              colonias:
+                acumulado.colonias +
+                registro.colonias,
+
+              coloniasAsignadas:
+                acumulado.coloniasAsignadas +
+                registro.coloniasAsignadas,
+
+              potenciales:
+                acumulado.potenciales +
+                registro.potenciales,
+
+              porVender:
+                acumulado.porVender +
+                registro.porVender,
+
+              ventasPlan:
+                acumulado.ventasPlan +
+                registro.ventasPlan,
+
+              ventasGeneral:
+                acumulado.ventasGeneral +
+                registro.ventasGeneral,
+
+              meta:
+                acumulado.meta +
+                registro.meta,
+
+              diferencia:
+                acumulado.diferencia +
+                registro.diferencia,
+
+            }),
+            {
+
+              colonias: 0,
+
+              coloniasAsignadas: 0,
+
+              potenciales: 0,
+
+              porVender: 0,
+
+              ventasPlan: 0,
+
+              ventasGeneral: 0,
+
+              meta: 0,
+
+              diferencia: 0,
+
+            }
+          );
+
+
+        totales.avancePorcentaje =
+          totales.meta > 0
+            ? (
+                totales.ventasPlan /
+                totales.meta
+              ) * 100
+            : null;
+
+
+        return res.json({
+
+          correcto: true,
+
+          supervisores,
+
+          totales,
+
+        });
+
+      }
+
+
+      // ============================================
+      // SUPERVISOR — ÚNICAMENTE SU INFORMACIÓN
+      // ============================================
+
+      const supervisor =
+        supervisores.find(
+          (registro) =>
+            registro.claveSupervisor ===
+            req.supervisor
+        );
+
+
+      return res.json({
+
+        correcto: true,
+
+        supervisor:
+          supervisor || null,
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/avance-plan-trabajo:"
+      );
+
+      console.error(error);
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar el avance del Plan de Trabajo",
+
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
 // RANKING CL SALAMANCA
 // ==================================================
 
