@@ -1,6 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
 import {
-  fetchProtegido
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  fetchProtegido,
 } from "../services/authService";
 
 
@@ -13,6 +18,22 @@ const API_URL =
   "http://localhost:3001";
 
 
+const formatearNumero =
+  (valor) =>
+    Number(
+      valor || 0
+    ).toLocaleString(
+      "es-MX"
+    );
+
+
+const formatearProductividad =
+  (valor) =>
+    Number(
+      valor || 0
+    ).toFixed(2);
+
+
 // ==================================================
 // COMPONENTE
 // ==================================================
@@ -21,10 +42,6 @@ function AvanceSemanal({
   supervisorSeleccionado,
   setVista,
 }) {
-
-  // ==================================================
-  // ESTADO
-  // ==================================================
 
   const [registros, setRegistros] =
     useState([]);
@@ -40,101 +57,82 @@ function AvanceSemanal({
   // CARGAR AVANCE
   // ==================================================
 
-  useEffect(() => {
+  useEffect(
+    () => {
 
-    async function cargarAvance() {
+      async function cargarAvance() {
 
-      try {
+        try {
 
-        setCargando(true);
+          setCargando(true);
+          setError("");
 
-        setError("");
+
+          const supervisor =
+            encodeURIComponent(
+              supervisorSeleccionado
+            );
 
 
-        const supervisor =
-          encodeURIComponent(
-            supervisorSeleccionado
+          const respuesta =
+            await fetchProtegido(
+              `${API_URL}/api/avance-semanal?supervisor=${supervisor}`
+            );
+
+
+          const datos =
+            await respuesta.json();
+
+
+          if (
+            !respuesta.ok ||
+            !datos.correcto
+          ) {
+
+            throw new Error(
+              datos.mensaje ||
+              "No se pudo cargar el avance semanal"
+            );
+
+          }
+
+
+          setRegistros(
+            datos.registros || []
           );
 
+        } catch (errorCarga) {
 
-       const respuesta =
-  await fetchProtegido(
-    `${API_URL}/api/avance-semanal?supervisor=${supervisor}`
-  );
+          console.error(
+            "❌ Error cargando avance semanal:",
+            errorCarga
+          );
 
-
-        if (!respuesta.ok) {
-
-          throw new Error(
+          setError(
+            errorCarga.message ||
             "No se pudo cargar el avance semanal"
           );
 
-        }
+        } finally {
 
-
-        const datos =
-          await respuesta.json();
-
-
-        if (!datos.correcto) {
-
-          throw new Error(
-            datos.mensaje ||
-            "No se pudo cargar el avance semanal"
-          );
+          setCargando(false);
 
         }
-
-
-        setRegistros(
-          datos.registros || []
-        );
-
-        console.log(
-  "🔥 AVANCE SEMANAL REAL RECIBIDO:",
-  datos.registros
-);
-
-console.log(
-  "🔥 PRIMER REGISTRO:",
-  datos.registros?.[0]
-);
-
-
-      } catch (error) {
-
-        console.error(
-          "❌ Error cargando avance semanal:",
-          error
-        );
-
-
-        setError(
-          error.message ||
-          "No se pudo cargar el avance semanal"
-        );
-
-
-      } finally {
-
-        setCargando(false);
 
       }
 
-    }
 
+      if (
+        supervisorSeleccionado
+      ) {
 
-    if (
-      supervisorSeleccionado
-    ) {
+        cargarAvance();
 
-      cargarAvance();
+      }
 
-    }
-
-  }, [
-    supervisorSeleccionado
-  ]);
+    },
+    [supervisorSeleccionado]
+  );
 
 
   // ==================================================
@@ -142,21 +140,22 @@ console.log(
   // ==================================================
 
   const registrosOrdenados =
-    useMemo(() => {
-
-      return [...registros].sort(
-        (a, b) =>
-          Number(
-            b.productividad || 0
-          ) -
-          Number(
-            a.productividad || 0
-          )
-      );
-
-    }, [
-      registros
-    ]);
+    useMemo(
+      () =>
+        [...registros].sort(
+          (
+            registroA,
+            registroB
+          ) =>
+            Number(
+              registroB.productividad || 0
+            ) -
+            Number(
+              registroA.productividad || 0
+            )
+        ),
+      [registros]
+    );
 
 
   // ==================================================
@@ -164,114 +163,219 @@ console.log(
   // ==================================================
 
   const totales =
-    useMemo(() => {
+    useMemo(
+      () =>
+        registros.reduce(
+          (
+            total,
+            item
+          ) => {
 
-      return registros.reduce(
-        (total, item) => {
+            total.dobles +=
+              Number(
+                item.dobles || 0
+              );
 
-          total.dobles +=
-            Number(
-              item.dobles || 0
-            );
+            total.triples +=
+              Number(
+                item.triples || 0
+              );
 
-          total.triples +=
-            Number(
-              item.triples || 0
-            );
+            total.movil +=
+              Number(
+                item.movil || 0
+              );
 
-          total.movil +=
-            Number(
-              item.movil || 0
-            );
+            total.netflix +=
+              Number(
+                item.netflix || 0
+              );
 
-          total.netflix +=
-            Number(
-              item.netflix || 0
-            );
+            total.disney +=
+              Number(
+                item.disney || 0
+              );
 
-          total.disney +=
-            Number(
-              item.disney || 0
-            );
+            total.max +=
+              Number(
+                item.max || 0
+              );
 
-          total.max +=
-            Number(
-              item.max || 0
-            );
+            total.rx +=
+              Number(
+                item.rx || 0
+              );
 
-          total.productividad +=
-            Number(
-              item.productividad || 0
-            );
-
-          return total;
-
-        },
-        {
-          dobles: 0,
-          triples: 0,
-          movil: 0,
-          netflix: 0,
-          disney: 0,
-          max: 0,
-          productividad: 0,
-        }
-      );
-
-    }, [
-      registros
-    ]);
+            total.productividad +=
+              Number(
+                item.productividad || 0
+              );
 
 
-  // ==================================================
-  // PRODUCTIVIDAD PROMEDIO
-  // ==================================================
+            return total;
+
+          },
+          {
+            dobles: 0,
+            triples: 0,
+            movil: 0,
+            netflix: 0,
+            disney: 0,
+            max: 0,
+            rx: 0,
+            productividad: 0,
+          }
+        ),
+      [registros]
+    );
+
 
   const productividadPromedio =
     registros.length > 0
-
       ? (
           totales.productividad /
           registros.length
-        ) * 100
-
+        )
       : 0;
 
 
   // ==================================================
-  // FORMATEAR PRODUCTIVIDAD
+  // TARJETAS DEL RESUMEN
   // ==================================================
 
-  function formatearProductividad(
-    valor
-  ) {
+  const tarjetasResumen = [
 
-    const numero =
-      Number(
-        valor || 0
-      );
+    {
+      icono: "👥",
 
+      valor:
+        formatearNumero(
+          registros.length
+        ),
 
-    return `${numero.toFixed(1)}`;
+      texto:
+        "Promotores",
+    },
 
-  }
+    {
+      icono: "📈",
+
+      valor:
+        productividadPromedio.toFixed(
+          2
+        ),
+
+      texto:
+        "Productividad del equipo",
+    },
+
+    {
+      icono: "🔄",
+
+      valor:
+        formatearNumero(
+          totales.rx
+        ),
+
+      texto:
+        "RX del equipo",
+    },
+
+    {
+      icono: "📦",
+
+      valor:
+        formatearNumero(
+          totales.dobles
+        ),
+
+      texto:
+        "Paquetes dobles",
+    },
+
+    {
+      icono: "🚀",
+
+      valor:
+        formatearNumero(
+          totales.triples
+        ),
+
+      texto:
+        "Paquetes triples",
+    },
+
+    {
+      icono: "📱",
+
+      valor:
+        formatearNumero(
+          totales.movil
+        ),
+
+      texto:
+        "Mega Móvil",
+    },
+
+    {
+      icono: "🎬",
+
+      valor:
+        formatearNumero(
+          totales.netflix +
+          totales.disney +
+          totales.max
+        ),
+
+      texto:
+        "Streaming",
+    },
+
+  ];
 
 
   // ==================================================
-  // FORMATEAR NÚMERO
+  // COLUMNAS DE SERVICIOS
   // ==================================================
 
-  function formatearNumero(
-    valor
-  ) {
+  const columnasServicios = [
 
-    return Number(
-      valor || 0
-    ).toLocaleString(
-      "es-MX"
-    );
+    {
+      campo: "dobles",
+      titulo: "Dobles",
+    },
 
-  }
+    {
+      campo: "triples",
+      titulo: "Triples",
+    },
+
+    {
+      campo: "movil",
+      titulo: "Mega Móvil",
+    },
+
+    {
+      campo: "netflix",
+      titulo: "Netflix",
+    },
+
+    {
+      campo: "disney",
+      titulo: "Disney+",
+    },
+
+    {
+      campo: "max",
+      titulo: "MAX",
+    },
+
+    {
+      campo: "rx",
+      titulo: "RX",
+    },
+
+  ];
 
 
   // ==================================================
@@ -281,163 +385,385 @@ console.log(
   const estilos = {
 
     contenedor: {
-      minHeight: "100vh",
-      width: "100%",
-      boxSizing: "border-box",
-      padding: "24px",
-      background: "#f4f7fb",
-      color: "#14213d",
+
+      minHeight:
+        "100vh",
+
+      width:
+        "100%",
+
+      boxSizing:
+        "border-box",
+
+      padding:
+        "24px",
+
+      background:
+        "#f4f7fb",
+
+      color:
+        "#14213d",
+
       fontFamily:
         "Arial, Helvetica, sans-serif",
+
     },
 
 
     tarjeta: {
-      maxWidth: "1400px",
-      margin: "0 auto",
-      background: "#ffffff",
-      borderRadius: "24px",
-      padding: "28px",
-      boxSizing: "border-box",
+
+      maxWidth:
+        "1400px",
+
+      margin:
+        "0 auto",
+
+      padding:
+        "28px",
+
+      boxSizing:
+        "border-box",
+
+      borderRadius:
+        "24px",
+
+      background:
+        "#ffffff",
+
       boxShadow:
         "0 10px 30px rgba(0,0,0,0.08)",
+
     },
 
 
     encabezado: {
-      textAlign: "center",
-      marginBottom: "28px",
+
+      marginBottom:
+        "28px",
+
+      textAlign:
+        "center",
+
     },
 
 
     titulo: {
-      margin: 0,
-      fontSize: "34px",
-      fontWeight: "800",
+
+      margin:
+        0,
+
+      fontSize:
+        "34px",
+
+      fontWeight:
+        "800",
+
     },
 
 
     supervisor: {
-      marginTop: "8px",
-      fontSize: "18px",
-      fontWeight: "600",
-      color: "#2864e6",
+
+      marginTop:
+        "8px",
+
+      color:
+        "#2864e6",
+
+      fontSize:
+        "18px",
+
+      fontWeight:
+        "600",
+
     },
 
 
     resumen: {
-      display: "grid",
+
+      display:
+        "grid",
+
       gridTemplateColumns:
         "repeat(auto-fit, minmax(150px, 1fr))",
-      gap: "14px",
-      marginBottom: "28px",
+
+      gap:
+        "14px",
+
+      marginBottom:
+        "28px",
+
     },
 
 
     resumenCard: {
-      background: "#f8fafc",
-      border: "1px solid #dce3ec",
-      borderRadius: "16px",
-      padding: "18px",
-      textAlign: "center",
+
+      padding:
+        "18px",
+
+      border:
+        "1px solid #dce3ec",
+
+      borderRadius:
+        "16px",
+
+      background:
+        "#f8fafc",
+
+      textAlign:
+        "center",
+
     },
 
 
     resumenIcono: {
-      fontSize: "26px",
+
+      fontSize:
+        "26px",
+
     },
 
 
     resumenNumero: {
-      marginTop: "6px",
-      fontSize: "26px",
-      fontWeight: "800",
+
+      marginTop:
+        "6px",
+
+      fontSize:
+        "26px",
+
+      fontWeight:
+        "800",
+
     },
 
 
     resumenTexto: {
-      marginTop: "4px",
-      fontSize: "13px",
-      color: "#667085",
+
+      marginTop:
+        "4px",
+
+      color:
+        "#667085",
+
+      fontSize:
+        "13px",
+
     },
 
 
     tablaContenedor: {
-      width: "100%",
-      overflowX: "auto",
+
+      width:
+        "100%",
+
+      overflowX:
+        "auto",
+
       border:
         "1px solid #dce3ec",
-      borderRadius: "16px",
+
+      borderRadius:
+        "16px",
+
     },
 
 
     tabla: {
-      width: "100%",
-      minWidth: "850px",
-      borderCollapse: "collapse",
+
+      width:
+        "100%",
+
+      minWidth:
+        "950px",
+
+      borderCollapse:
+        "collapse",
+
     },
 
 
     th: {
-      padding: "14px 12px",
-      background: "#14213d",
-      color: "#ffffff",
-      textAlign: "center",
-      fontSize: "13px",
-      whiteSpace: "nowrap",
+
+      padding:
+        "14px 12px",
+
+      color:
+        "#ffffff",
+
+      background:
+        "#14213d",
+
+      fontSize:
+        "13px",
+
+      textAlign:
+        "center",
+
+      whiteSpace:
+        "nowrap",
+
     },
 
 
     td: {
-      padding: "14px 12px",
+
+      padding:
+        "14px 12px",
+
       borderBottom:
         "1px solid #e8edf3",
-      textAlign: "center",
-      fontSize: "14px",
+
+      fontSize:
+        "14px",
+
+      textAlign:
+        "center",
+
     },
 
 
     promotor: {
-      textAlign: "left",
-      fontWeight: "700",
+
+      fontWeight:
+        "700",
+
+      textAlign:
+        "left",
+
     },
 
 
     productividad: {
-      fontWeight: "800",
-      color: "#2864e6",
+
+      color:
+        "#2864e6",
+
+      fontWeight:
+        "800",
+
+    },
+
+
+    rx: {
+
+      color:
+        "#15803d",
+
+      fontWeight:
+        "800",
+
+    },
+
+
+    notas: {
+
+      marginTop:
+        "22px",
+
+      padding:
+        "16px",
+
+      border:
+        "1px solid #fecaca",
+
+      borderRadius:
+        "12px",
+
+      color:
+        "#b42318",
+
+      background:
+        "#fef2f2",
+
+      fontSize:
+        "14px",
+
+      fontWeight:
+        "700",
+
+      textAlign:
+        "center",
+
+    },
+
+
+    notaSecundaria: {
+
+      display:
+        "block",
+
+      marginTop:
+        "6px",
+
     },
 
 
     boton: {
-      display: "block",
+
+      display:
+        "block",
+
       margin:
         "28px auto 0",
-      border: "none",
-      borderRadius: "14px",
+
       padding:
         "14px 28px",
-      background: "#14213d",
-      color: "#ffffff",
-      fontSize: "16px",
-      fontWeight: "700",
-      cursor: "pointer",
+
+      border:
+        "none",
+
+      borderRadius:
+        "14px",
+
+      color:
+        "#ffffff",
+
+      background:
+        "#14213d",
+
+      fontSize:
+        "16px",
+
+      fontWeight:
+        "700",
+
+      cursor:
+        "pointer",
+
     },
 
 
     error: {
-      textAlign: "center",
-      padding: "40px 20px",
-      color: "#d92d20",
-      fontWeight: "700",
+
+      padding:
+        "40px 20px",
+
+      color:
+        "#d92d20",
+
+      fontWeight:
+        "700",
+
+      textAlign:
+        "center",
+
     },
 
 
     cargando: {
-      textAlign: "center",
-      padding: "80px 20px",
-      fontSize: "20px",
-      fontWeight: "700",
+
+      padding:
+        "80px 20px",
+
+      fontSize:
+        "20px",
+
+      fontWeight:
+        "700",
+
+      textAlign:
+        "center",
+
     },
 
   };
@@ -450,7 +776,6 @@ console.log(
   if (cargando) {
 
     return (
-
       <div
         style={
           estilos.contenedor
@@ -468,15 +793,12 @@ console.log(
               estilos.cargando
             }
           >
-
             📊 Cargando avance semanal...
-
           </div>
 
         </div>
 
       </div>
-
     );
 
   }
@@ -489,7 +811,6 @@ console.log(
   if (error) {
 
     return (
-
       <div
         style={
           estilos.contenedor
@@ -507,31 +828,27 @@ console.log(
               estilos.error
             }
           >
-
             ❌ {error}
-
           </div>
 
-
           <button
+            type="button"
             style={
               estilos.boton
             }
-            onClick={() =>
-              setVista(
-                "supervisor"
-              )
+            onClick={
+              () =>
+                setVista(
+                  "supervisor"
+                )
             }
           >
-
             ← Regresar al inicio
-
           </button>
 
         </div>
 
       </div>
-
     );
 
   }
@@ -542,7 +859,6 @@ console.log(
   // ==================================================
 
   return (
-
     <div
       style={
         estilos.contenedor
@@ -570,20 +886,15 @@ console.log(
               estilos.titulo
             }
           >
-
             📊 Avance semanal
-
           </h1>
-
 
           <div
             style={
               estilos.supervisor
             }
           >
-
             {supervisorSeleccionado}
-
           </div>
 
         </div>
@@ -599,214 +910,46 @@ console.log(
           }
         >
 
-          <div
-            style={
-              estilos.resumenCard
-            }
-          >
+          {tarjetasResumen.map(
+            (tarjeta) => (
 
-            <div
-              style={
-                estilos.resumenIcono
-              }
-            >
-              👥
-            </div>
+              <div
+                style={
+                  estilos.resumenCard
+                }
+                key={
+                  tarjeta.texto
+                }
+              >
 
-            <div
-              style={
-                estilos.resumenNumero
-              }
-            >
-              {registros.length}
-            </div>
+                <div
+                  style={
+                    estilos.resumenIcono
+                  }
+                >
+                  {tarjeta.icono}
+                </div>
 
-            <div
-              style={
-                estilos.resumenTexto
-              }
-            >
-              Promotores
-            </div>
+                <div
+                  style={
+                    estilos.resumenNumero
+                  }
+                >
+                  {tarjeta.valor}
+                </div>
 
-          </div>
+                <div
+                  style={
+                    estilos.resumenTexto
+                  }
+                >
+                  {tarjeta.texto}
+                </div>
 
+              </div>
 
-          <div
-            style={
-              estilos.resumenCard
-            }
-          >
-
-            <div
-              style={
-                estilos.resumenIcono
-              }
-            >
-              📈
-            </div>
-
-            <div 
-  style={ 
-    estilos.resumenNumero 
-  } 
-> 
-  {(productividadPromedio/100).toFixed(2)}
-</div>
-
-            <div
-              style={
-                estilos.resumenTexto
-              }
-            >
-              Productividad del equipo
-            </div>
-
-          </div>
-
-
-          <div
-            style={
-              estilos.resumenCard
-            }
-          >
-
-            <div
-              style={
-                estilos.resumenIcono
-              }
-            >
-              📦
-            </div>
-
-            <div
-              style={
-                estilos.resumenNumero
-              }
-            >
-              {formatearNumero(
-                totales.dobles
-              )}
-            </div>
-
-            <div
-              style={
-                estilos.resumenTexto
-              }
-            >
-              Paquetes dobles
-            </div>
-
-          </div>
-
-
-          <div
-            style={
-              estilos.resumenCard
-            }
-          >
-
-            <div
-              style={
-                estilos.resumenIcono
-              }
-            >
-              🚀
-            </div>
-
-            <div
-              style={
-                estilos.resumenNumero
-              }
-            >
-              {formatearNumero(
-                totales.triples
-              )}
-            </div>
-
-            <div
-              style={
-                estilos.resumenTexto
-              }
-            >
-              Paquetes triples
-            </div>
-
-          </div>
-
-
-          <div
-            style={
-              estilos.resumenCard
-            }
-          >
-
-            <div
-              style={
-                estilos.resumenIcono
-              }
-            >
-              📱
-            </div>
-
-            <div
-              style={
-                estilos.resumenNumero
-              }
-            >
-              {formatearNumero(
-                totales.movil
-              )}
-            </div>
-
-            <div
-              style={
-                estilos.resumenTexto
-              }
-            >
-              Mega Móvil
-            </div>
-
-          </div>
-
-
-          <div
-            style={
-              estilos.resumenCard
-            }
-          >
-
-            <div
-              style={
-                estilos.resumenIcono
-              }
-            >
-              🎬
-            </div>
-
-            <div
-              style={
-                estilos.resumenNumero
-              }
-            >
-              {
-                formatearNumero(
-                  totales.netflix +
-                  totales.disney +
-                  totales.max
-                )
-              }
-            </div>
-
-            <div
-              style={
-                estilos.resumenTexto
-              }
-            >
-              Streaming
-            </div>
-
-          </div>
+            )
+          )}
 
         </div>
 
@@ -840,9 +983,11 @@ console.log(
                 </th>
 
                 <th
-                  style={
-                    estilos.th
-                  }
+                  style={{
+                    ...estilos.th,
+                    textAlign:
+                      "left",
+                  }}
                 >
                   Promotor
                 </th>
@@ -855,53 +1000,22 @@ console.log(
                   Productividad
                 </th>
 
-                <th
-                  style={
-                    estilos.th
-                  }
-                >
-                  Dobles
-                </th>
+                {columnasServicios.map(
+                  (columna) => (
 
-                <th
-                  style={
-                    estilos.th
-                  }
-                >
-                  Triples
-                </th>
+                    <th
+                      style={
+                        estilos.th
+                      }
+                      key={
+                        columna.campo
+                      }
+                    >
+                      {columna.titulo}
+                    </th>
 
-                <th
-                  style={
-                    estilos.th
-                  }
-                >
-                  Mega Móvil
-                </th>
-
-                <th
-                  style={
-                    estilos.th
-                  }
-                >
-                  Netflix
-                </th>
-
-                <th
-                  style={
-                    estilos.th
-                  }
-                >
-                  Disney+
-                </th>
-
-                <th
-                  style={
-                    estilos.th
-                  }
-                >
-                  MAX
-                </th>
+                  )
+                )}
 
               </tr>
 
@@ -930,7 +1044,6 @@ console.log(
                       {index + 1}
                     </td>
 
-
                     <td
                       style={{
                         ...estilos.td,
@@ -940,73 +1053,42 @@ console.log(
                       {item.nombre}
                     </td>
 
-
                     <td
                       style={{
                         ...estilos.td,
                         ...estilos.productividad,
                       }}
                     >
-                      {
-                        formatearProductividad(
-                          item.productividad
-                        )
-                      }
+                      {formatearProductividad(
+                        item.productividad
+                      )}
                     </td>
 
+                    {columnasServicios.map(
+                      (columna) => (
 
-                    <td
-                      style={
-                        estilos.td
-                      }
-                    >
-                      {item.dobles}
-                    </td>
+                        <td
+                          style={{
+                            ...estilos.td,
 
+                            ...(columna.campo ===
+                            "rx"
+                              ? estilos.rx
+                              : {}),
+                          }}
+                          key={
+                            columna.campo
+                          }
+                        >
+                          {formatearNumero(
+                            item[
+                              columna.campo
+                            ]
+                          )}
+                        </td>
 
-                    <td
-                      style={
-                        estilos.td
-                      }
-                    >
-                      {item.triples}
-                    </td>
-
-
-                    <td
-                      style={
-                        estilos.td
-                      }
-                    >
-                      {item.movil}
-                    </td>
-
-
-                    <td
-                      style={
-                        estilos.td
-                      }
-                    >
-                      {item.netflix}
-                    </td>
-
-
-                    <td
-                      style={
-                        estilos.td
-                      }
-                    >
-                      {item.disney}
-                    </td>
-
-
-                    <td
-                      style={
-                        estilos.td
-                      }
-                    >
-                      {item.max}
-                    </td>
+                      )
+                    )}
 
                   </tr>
 
@@ -1019,36 +1101,29 @@ console.log(
 
         </div>
 
-         </div>
-
 
         {/* ==========================================
-            NOTA IMPORTANTE
+            NOTAS
         ========================================== */}
 
         <div
-          style={{
-            marginTop: "18px",
-            textAlign: "center",
-            color: "#d92d20",
-            fontSize: "15px",
-            fontWeight: "700",
-          }}
+          style={
+            estilos.notas
+          }
         >
-          NOTA: revisa tus ventas canceladas en tus auxiliares y comisiones
-          
-        </div>
-        <div
-          style={{
-            marginTop: "18px",
-            textAlign: "center",
-            color: "#d92d20",
-            fontSize: "15px",
-            fontWeight: "700",
-          }}
-        >
-          NOTA 2: No sustituye prenóminas
-          
+
+          <span>
+            NOTA: revisa tus ventas canceladas en tus auxiliares y comisiones.
+          </span>
+
+          <span
+            style={
+              estilos.notaSecundaria
+            }
+          >
+            NOTA 2: No sustituye prenóminas.
+          </span>
+
         </div>
 
 
@@ -1057,24 +1132,23 @@ console.log(
         ========================================== */}
 
         <button
+          type="button"
           style={
             estilos.boton
           }
-          onClick={() =>
-            setVista(
-              "supervisor"
-            )
+          onClick={
+            () =>
+              setVista(
+                "supervisor"
+              )
           }
         >
-
           ← Regresar al inicio
-
         </button>
 
       </div>
 
-    
-
+    </div>
   );
 
 }
