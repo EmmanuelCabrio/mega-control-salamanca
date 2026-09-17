@@ -1078,6 +1078,179 @@ function leerBDPlanTrabajo(
 }
 
 // ==================================================
+// LEER RESUMEN PLAN DE TRABAJO
+// ==================================================
+
+function leerResumenPlanTrabajo(
+  hoja
+) {
+
+  const datos =
+    XLSX.utils.sheet_to_json(
+      hoja,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  const resultado = [];
+
+
+  // ==================================================
+  // COLUMNAS B:H
+  // ==================================================
+
+  const COLUMNA_SUPERVISOR = 1;          // B
+  const COLUMNA_CANAL = 2;               // C
+  const COLUMNA_COLONIAS_ASIGNADAS = 3;  // D
+  const COLUMNA_VENTAS_PLAN = 4;         // E
+  const COLUMNA_VENTAS_GENERAL = 5;      // F
+  const COLUMNA_META = 6;                // G
+  const COLUMNA_DIFERENCIA = 7;          // H
+
+
+  // ==================================================
+  // CONVERTIR A NÚMERO SEGURO
+  // ==================================================
+
+  const numeroSeguro =
+    (valor) => {
+
+      const numero =
+        Number(valor);
+
+
+      return Number.isFinite(numero)
+        ? numero
+        : 0;
+
+    };
+
+
+  // ==================================================
+  // RECORRER FILAS
+  // ==================================================
+
+  for (
+    let i = 0;
+    i < datos.length;
+    i++
+  ) {
+
+    const fila =
+      datos[i];
+
+
+    const supervisor =
+      limpiarTexto(
+        fila[
+          COLUMNA_SUPERVISOR
+        ]
+      );
+
+
+    // Ignorar encabezados y filas vacías.
+
+    if (
+      esValorInvalido(
+        supervisor
+      ) ||
+      supervisor === "SUPERVISOR" ||
+      supervisor === "TOTAL"
+    ) {
+
+      continue;
+
+    }
+
+
+    const ventasPlan =
+      numeroSeguro(
+        fila[
+          COLUMNA_VENTAS_PLAN
+        ]
+      );
+
+
+    const meta =
+      numeroSeguro(
+        fila[
+          COLUMNA_META
+        ]
+      );
+
+
+    resultado.push({
+
+      supervisor,
+
+      canal:
+        limpiarTexto(
+          fila[
+            COLUMNA_CANAL
+          ]
+        ),
+
+      coloniasAsignadas:
+        numeroSeguro(
+          fila[
+            COLUMNA_COLONIAS_ASIGNADAS
+          ]
+        ),
+
+      ventasPlan,
+
+      ventasGeneral:
+        numeroSeguro(
+          fila[
+            COLUMNA_VENTAS_GENERAL
+          ]
+        ),
+
+      meta,
+
+      diferencia:
+        numeroSeguro(
+          fila[
+            COLUMNA_DIFERENCIA
+          ]
+        ),
+
+      avancePorcentaje:
+        meta > 0
+          ? (
+              ventasPlan /
+              meta
+            ) * 100
+          : null,
+
+    });
+
+  }
+
+
+  console.log(
+    "=========================================="
+  );
+
+  console.log(
+    "🎯 RESUMEN PLAN DE TRABAJO:",
+    resultado.length,
+    "supervisores"
+  );
+
+  console.log(
+    "=========================================="
+  );
+
+
+  return resultado;
+
+}
+
+// ==================================================
 // LEER BD AVANCE SEMANAL
 // ==================================================
 
@@ -7213,6 +7386,33 @@ const hojaMesAnterior =
 
 
     // ==================================================
+// RESUMEN PLAN DE TRABAJO
+// ==================================================
+
+const hojaResumenPlanTrabajo =
+  workbook.Sheets[
+    "RESUMEN PLAN DE TRABAJO"
+  ];
+
+
+if (
+  !hojaResumenPlanTrabajo
+) {
+
+  throw new Error(
+    'No se encontró la hoja "RESUMEN PLAN DE TRABAJO"'
+  );
+
+}
+
+
+const resumenPlanTrabajo =
+  leerResumenPlanTrabajo(
+    hojaResumenPlanTrabajo
+  );
+
+
+    // ==================================================
     // PENETRACIÓN
     // ==================================================
 
@@ -7627,6 +7827,8 @@ const carteraPorDia =
       registros,
 
       planTrabajo,
+
+      resumenPlanTrabajo,
 
       penetracion,
 
