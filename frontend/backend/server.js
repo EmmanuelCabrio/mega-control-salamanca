@@ -1658,6 +1658,7 @@ app.get(
         );
 
 
+      
       // ============================================
       // DIRECCIÓN — TODOS LOS SUPERVISORES
       // ============================================
@@ -1796,6 +1797,266 @@ app.get(
   }
 );
 
+
+
+// ==================================================
+// META DEL MISMO DÍA DE LA SEMANA ANTERIOR
+// ==================================================
+
+app.get(
+  "/api/meta-semana-anterior",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      const datos =
+        await leerExcel();
+
+
+      const resultado =
+        datos
+          .resultadoMismoDiaSemanaAnterior ||
+        {
+
+          fechaReferencia:
+            null,
+
+          total:
+            0,
+
+          supervisores:
+            [],
+
+        };
+
+
+      // ============================================
+      // RESULTADOS ENCONTRADOS EN LA BASE DE VENTA
+      // ============================================
+
+      const mapaResultados =
+        new Map(
+
+          resultado.supervisores.map(
+            (registro) => [
+
+              normalizarSupervisor(
+                registro.supervisor
+              ),
+
+              Number(
+                registro.resultado ||
+                0
+              ),
+
+            ]
+          )
+
+        );
+
+
+      // ============================================
+      // OBTENER TODOS LOS SUPERVISORES
+      // ============================================
+      //
+      // Se toman desde registros para también incluir
+      // a quienes tuvieron cero ventas ese día.
+      //
+      // ============================================
+
+      const mapaSupervisores =
+        new Map();
+
+
+      for (
+        const registro
+        of datos.registros || []
+      ) {
+
+        const supervisor =
+          String(
+            registro.supervisor ||
+            ""
+          ).trim();
+
+
+        const clave =
+          normalizarSupervisor(
+            supervisor
+          );
+
+
+        // ==========================================
+        // FILTRAR VALORES INVÁLIDOS Y RECUPERACIÓN
+        // ==========================================
+
+        if (
+          !clave ||
+          clave === "0" ||
+          clave === "SUPERVISOR" ||
+          clave === "TOTAL" ||
+          clave ===
+            "MORALES PEREZ BENJAMIN"
+        ) {
+
+          continue;
+
+        }
+
+
+        mapaSupervisores.set(
+          clave,
+          supervisor
+        );
+
+      }
+
+
+      // ============================================
+      // CONSTRUIR TABLA DE RESULTADOS
+      // ============================================
+
+      const supervisores =
+        Array.from(
+          mapaSupervisores.entries()
+        )
+          .map(
+            (
+              [
+                clave,
+                supervisor
+              ]
+            ) => ({
+
+              clave,
+
+              supervisor,
+
+              resultado:
+                mapaResultados.get(
+                  clave
+                ) || 0,
+
+            })
+          )
+          .sort(
+            (
+              registroA,
+              registroB
+            ) =>
+
+              registroB.resultado -
+                registroA.resultado ||
+
+              registroA.supervisor
+                .localeCompare(
+                  registroB.supervisor,
+                  "es"
+                )
+          );
+
+
+      // ============================================
+      // DIRECCIÓN — TODOS LOS SUPERVISORES
+      // ============================================
+
+      if (
+        normalizarRol(
+          req.rol
+        ) === "DIRECCIÓN"
+      ) {
+
+        const total =
+          supervisores.reduce(
+            (
+              acumulado,
+              registro
+            ) =>
+              acumulado +
+              registro.resultado,
+            0
+          );
+
+
+        return res.json({
+
+          correcto:
+            true,
+
+          fechaReferencia:
+            resultado.fechaReferencia,
+
+          total,
+
+          supervisores,
+
+        });
+
+      }
+
+
+      // ============================================
+      // SUPERVISOR — SOLAMENTE SU RESULTADO
+      // ============================================
+
+      const supervisor =
+        supervisores.find(
+          (registro) =>
+            registro.clave ===
+            req.supervisor
+        );
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        fechaReferencia:
+          resultado.fechaReferencia,
+
+        supervisor: {
+
+          nombre:
+            supervisor?.supervisor ||
+            req.supervisor,
+
+          resultado:
+            supervisor?.resultado ||
+            0,
+
+        },
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/meta-semana-anterior:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo cargar la meta del mismo día de la semana anterior",
+
+        });
+
+    }
+
+  }
+);
 
 // ==================================================
 // RANKING CL SALAMANCA
