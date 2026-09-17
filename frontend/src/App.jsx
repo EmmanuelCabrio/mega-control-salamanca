@@ -44,7 +44,8 @@ import RecuperacionesVsMesAnterior
   from "./components/RecuperacionesVsMesAnterior";
 
 
-
+import MetaSemanaAnterior
+  from "./components/MetaSemanaAnterior";
 
 
 const API_URL =
@@ -1808,6 +1809,12 @@ if (
           }
 
         />
+
+        {/* ==========================================
+    META VS MISMO DÍA SEMANA ANTERIOR
+========================================== */}
+
+<MetaSemanaAnterior />
 
 
         {/* ==========================================
