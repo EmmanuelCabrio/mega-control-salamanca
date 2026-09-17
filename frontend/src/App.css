@@ -13717,3 +13717,538 @@ td {
   }
 
 }
+
+
+/* ==================================================
+   META VS MISMO DÍA SEMANA ANTERIOR
+================================================== */
+
+.meta-semana-card,
+.meta-semana-estado,
+.meta-semana-direccion,
+.meta-semana-direccion-estado {
+  width:
+    100%;
+
+  box-sizing:
+    border-box;
+
+  margin:
+    24px 0;
+}
+
+
+/* ==================================================
+   TARJETA DEL SUPERVISOR
+================================================== */
+
+.meta-semana-card {
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    260px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid #fdba74;
+
+  border-radius:
+    22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff7ed 0%,
+      #ffedd5 100%
+    );
+
+  box-shadow:
+    0 16px 38px
+    rgba(154, 52, 18, 0.13);
+}
+
+
+.meta-semana-mensaje {
+  padding:
+    26px 30px;
+}
+
+
+.meta-semana-mensaje
+> span,
+.meta-semana-direccion-header
+> div
+> span {
+  display:
+    block;
+
+  margin-bottom:
+    6px;
+
+  color:
+    #c2410c;
+
+  font-size:
+    12px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.14em;
+}
+
+
+.meta-semana-mensaje h2,
+.meta-semana-direccion-header h2 {
+  margin:
+    0;
+
+  color:
+    #0f172a;
+
+  font-size:
+    clamp(
+      23px,
+      3vw,
+      32px
+    );
+
+  line-height:
+    1.12;
+}
+
+
+.meta-semana-mensaje p {
+  max-width:
+    850px;
+
+  margin:
+    12px 0 8px;
+
+  color:
+    #7c2d12;
+
+  font-size:
+    15px;
+
+  font-weight:
+    800;
+
+  line-height:
+    1.5;
+}
+
+
+.meta-semana-mensaje small {
+  color:
+    #64748b;
+
+  font-weight:
+    700;
+
+  text-transform:
+    capitalize;
+}
+
+
+/* ==================================================
+   RESULTADO DEL SUPERVISOR
+================================================== */
+
+.meta-semana-resultado {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  flex-direction:
+    column;
+
+  padding:
+    24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #c2410c,
+      #ea580c
+    );
+
+  color:
+    #ffffff;
+
+  text-align:
+    center;
+}
+
+
+.meta-semana-resultado span {
+  max-width:
+    190px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.06em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.meta-semana-resultado strong {
+  margin:
+    5px 0 0;
+
+  font-size:
+    clamp(
+      54px,
+      7vw,
+      78px
+    );
+
+  line-height:
+    1;
+}
+
+
+.meta-semana-resultado small {
+  font-size:
+    15px;
+
+  font-weight:
+    900;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* ==================================================
+   CARGA Y ERROR
+================================================== */
+
+.meta-semana-estado,
+.meta-semana-direccion-estado {
+  padding:
+    22px;
+
+  border:
+    1px solid #fed7aa;
+
+  border-radius:
+    16px;
+
+  background:
+    #fff7ed;
+
+  color:
+    #9a3412;
+
+  font-weight:
+    800;
+}
+
+
+.meta-semana-error {
+  border-color:
+    #fecaca;
+
+  background:
+    #fef2f2;
+
+  color:
+    #991b1b;
+}
+
+
+/* ==================================================
+   TARJETA DE DIRECCIÓN
+================================================== */
+
+.meta-semana-direccion {
+  overflow:
+    hidden;
+
+  border:
+    1px solid #fdba74;
+
+  border-radius:
+    22px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 16px 38px
+    rgba(154, 52, 18, 0.12);
+}
+
+
+.meta-semana-direccion-header {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    24px;
+
+  padding:
+    24px 28px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff7ed,
+      #ffedd5
+    );
+}
+
+
+.meta-semana-direccion-header p {
+  margin:
+    7px 0 0;
+
+  color:
+    #7c2d12;
+
+  font-weight:
+    700;
+
+  text-transform:
+    capitalize;
+}
+
+
+.meta-semana-direccion-header
+> strong {
+  min-width:
+    150px;
+
+  padding:
+    15px 20px;
+
+  border-radius:
+    16px;
+
+  background:
+    #c2410c;
+
+  color:
+    #ffffff;
+
+  font-size:
+    32px;
+
+  text-align:
+    center;
+}
+
+
+.meta-semana-direccion-header
+> strong
+small {
+  display:
+    block;
+
+  margin-top:
+    2px;
+
+  font-size:
+    11px;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* ==================================================
+   TABLA DE DIRECCIÓN
+================================================== */
+
+.meta-semana-direccion-tabla-contenedor {
+  width:
+    100%;
+
+  overflow-x:
+    auto;
+
+  padding:
+    18px;
+
+  box-sizing:
+    border-box;
+}
+
+
+.meta-semana-direccion-tabla {
+  width:
+    100%;
+
+  border-collapse:
+    collapse;
+}
+
+
+.meta-semana-direccion-tabla th {
+  padding:
+    12px 14px;
+
+  background:
+    #9a3412;
+
+  color:
+    #ffffff;
+
+  font-size:
+    11px;
+
+  text-align:
+    left;
+
+  text-transform:
+    uppercase;
+}
+
+
+.meta-semana-direccion-tabla
+th:last-child,
+.meta-semana-direccion-tabla
+td:last-child {
+  width:
+    190px;
+
+  text-align:
+    center;
+}
+
+
+.meta-semana-direccion-tabla td {
+  padding:
+    11px 14px;
+
+  border-bottom:
+    1px solid #e2e8f0;
+
+  color:
+    #334155;
+
+  font-size:
+    12px;
+
+  font-weight:
+    750;
+}
+
+
+.meta-semana-direccion-tabla
+tbody
+tr:nth-child(even) {
+  background:
+    #fff7ed;
+}
+
+
+.meta-semana-direccion-tabla
+tbody
+tr:hover {
+  background:
+    #ffedd5;
+}
+
+
+.meta-semana-direccion-tabla
+tbody
+td:last-child
+strong {
+  color:
+    #c2410c;
+
+  font-size:
+    17px;
+}
+
+
+.meta-semana-direccion-tabla
+tfoot
+td {
+  border:
+    0;
+
+  background:
+    #0f172a;
+
+  color:
+    #ffffff;
+
+  font-weight:
+    900;
+}
+
+
+/* ==================================================
+   CELULAR
+================================================== */
+
+@media (
+  max-width: 700px
+) {
+
+  .meta-semana-card {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .meta-semana-mensaje {
+    padding:
+      22px 20px;
+  }
+
+
+  .meta-semana-resultado {
+    padding:
+      22px;
+  }
+
+
+  .meta-semana-direccion-header {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+    padding:
+      22px 20px;
+  }
+
+
+  .meta-semana-direccion-header
+  > strong {
+    width:
+      100%;
+
+    box-sizing:
+      border-box;
+  }
+
+}
