@@ -14252,3 +14252,640 @@ td {
   }
 
 }
+
+
+/* ==================================================
+   LOGIN DE SUPERVISORES
+================================================== */
+
+.login-supervisores-card,
+.login-supervisores-estado {
+  width:
+    100%;
+
+  box-sizing:
+    border-box;
+
+  margin:
+    24px 0;
+}
+
+
+/* ==================================================
+   CONTENEDOR
+================================================== */
+
+.login-supervisores-card {
+  overflow:
+    hidden;
+
+  border:
+    1px solid #cbd5e1;
+
+  border-radius:
+    22px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 16px 38px
+    rgba(15, 23, 42, 0.1);
+}
+
+
+/* ==================================================
+   ENCABEZADO
+================================================== */
+
+.login-supervisores-header {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    24px;
+
+  padding:
+    24px 28px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #1e293b
+    );
+
+  color:
+    #ffffff;
+}
+
+
+.login-supervisores-header
+> div:first-child
+> span {
+  display:
+    block;
+
+  margin-bottom:
+    5px;
+
+  color:
+    #93c5fd;
+
+  font-size:
+    11px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.14em;
+}
+
+
+.login-supervisores-header h2 {
+  margin:
+    0;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      23px,
+      3vw,
+      32px
+    );
+}
+
+
+.login-supervisores-header p {
+  margin:
+    6px 0 0;
+
+  color:
+    #cbd5e1;
+
+  font-weight:
+    600;
+}
+
+
+/* ==================================================
+   CONTADORES
+================================================== */
+
+.login-supervisores-resumen {
+  display:
+    flex;
+
+  align-items:
+    stretch;
+
+  gap:
+    10px;
+}
+
+
+.login-supervisores-resumen
+> strong {
+  min-width:
+    92px;
+
+  padding:
+    10px 14px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.18
+    );
+
+  border-radius:
+    13px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    );
+
+  color:
+    #ffffff;
+
+  font-size:
+    24px;
+
+  text-align:
+    center;
+}
+
+
+.login-supervisores-resumen
+small {
+  display:
+    block;
+
+  margin-top:
+    2px;
+
+  font-size:
+    9px;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* ==================================================
+   BOTÓN ACTUALIZAR
+================================================== */
+
+.login-supervisores-resumen
+button {
+  border:
+    0;
+
+  border-radius:
+    13px;
+
+  padding:
+    0 16px;
+
+  background:
+    #2563eb;
+
+  color:
+    #ffffff;
+
+  font:
+    inherit;
+
+  font-size:
+    12px;
+
+  font-weight:
+    900;
+
+  cursor:
+    pointer;
+}
+
+
+.login-supervisores-resumen
+button:hover {
+  background:
+    #1d4ed8;
+}
+
+
+.login-supervisores-resumen
+button:disabled {
+  opacity:
+    0.65;
+
+  cursor:
+    wait;
+}
+
+
+/* ==================================================
+   DOS COLUMNAS
+================================================== */
+
+.login-supervisores-columnas {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap:
+    18px;
+
+  padding:
+    20px;
+}
+
+
+/* ==================================================
+   LISTAS
+================================================== */
+
+.login-supervisores-lista {
+  overflow:
+    hidden;
+
+  border:
+    1px solid #e2e8f0;
+
+  border-radius:
+    17px;
+
+  background:
+    #f8fafc;
+}
+
+
+.login-supervisores-lista
+> div:first-child {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  padding:
+    14px 17px;
+}
+
+
+.login-supervisores-lista
+> div:first-child
+span {
+  font-size:
+    12px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.06em;
+}
+
+
+.login-supervisores-lista
+> div:first-child
+strong {
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  width:
+    34px;
+
+  height:
+    34px;
+
+  border-radius:
+    50%;
+
+  color:
+    #ffffff;
+
+  font-size:
+    16px;
+}
+
+
+/* ==================================================
+   COLUMNA VERDE
+================================================== */
+
+.login-supervisores-lista-ok
+> div:first-child {
+  background:
+    #dcfce7;
+
+  color:
+    #166534;
+}
+
+
+.login-supervisores-lista-ok
+> div:first-child
+strong {
+  background:
+    #16a34a;
+}
+
+
+/* ==================================================
+   COLUMNA ROJA
+================================================== */
+
+.login-supervisores-lista-pendiente
+> div:first-child {
+  background:
+    #fee2e2;
+
+  color:
+    #991b1b;
+}
+
+
+.login-supervisores-lista-pendiente
+> div:first-child
+strong {
+  background:
+    #dc2626;
+}
+
+
+/* ==================================================
+   NOMBRES
+================================================== */
+
+.login-supervisores-lista ul {
+  margin:
+    0;
+
+  padding:
+    8px 14px 14px;
+
+  list-style:
+    none;
+}
+
+
+.login-supervisores-lista li {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    11px;
+
+  padding:
+    11px 5px;
+
+  border-bottom:
+    1px solid #e2e8f0;
+}
+
+
+.login-supervisores-lista
+li:last-child {
+  border-bottom:
+    0;
+}
+
+
+.login-supervisores-lista
+li
+> span {
+  display:
+    grid;
+
+  flex:
+    0 0 28px;
+
+  place-items:
+    center;
+
+  width:
+    28px;
+
+  height:
+    28px;
+
+  border-radius:
+    50%;
+
+  color:
+    #ffffff;
+
+  font-weight:
+    900;
+}
+
+
+.login-supervisores-lista-ok
+li
+> span {
+  background:
+    #16a34a;
+}
+
+
+.login-supervisores-lista-pendiente
+li
+> span {
+  background:
+    #dc2626;
+}
+
+
+.login-supervisores-lista
+li
+div {
+  min-width:
+    0;
+}
+
+
+.login-supervisores-lista
+li
+strong {
+  display:
+    block;
+
+  overflow:
+    hidden;
+
+  color:
+    #1e293b;
+
+  font-size:
+    12px;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+
+.login-supervisores-lista
+li
+small {
+  display:
+    block;
+
+  margin-top:
+    3px;
+
+  color:
+    #64748b;
+
+  font-size:
+    10px;
+
+  font-weight:
+    700;
+}
+
+
+.login-supervisores-lista
+> p {
+  margin:
+    0;
+
+  padding:
+    25px 18px;
+
+  color:
+    #64748b;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  text-align:
+    center;
+}
+
+
+/* ==================================================
+   CARGA Y ERROR
+================================================== */
+
+.login-supervisores-estado {
+  padding:
+    22px;
+
+  border:
+    1px solid #cbd5e1;
+
+  border-radius:
+    16px;
+
+  background:
+    #ffffff;
+
+  color:
+    #475569;
+
+  font-weight:
+    800;
+}
+
+
+.login-supervisores-error {
+  border-color:
+    #fecaca;
+
+  background:
+    #fef2f2;
+
+  color:
+    #991b1b;
+}
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (
+  max-width: 800px
+) {
+
+  .login-supervisores-header {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+    padding:
+      21px 18px;
+  }
+
+
+  .login-supervisores-resumen {
+    width:
+      100%;
+
+    flex-wrap:
+      wrap;
+  }
+
+
+  .login-supervisores-resumen
+  > strong {
+    flex:
+      1;
+  }
+
+
+  .login-supervisores-resumen
+  button {
+    min-height:
+      48px;
+  }
+
+
+  .login-supervisores-columnas {
+    grid-template-columns:
+      1fr;
+
+    padding:
+      15px;
+  }
+
+}
