@@ -11,6 +11,7 @@ const {
   leerVentaVsMesAnterior,
   leerPlantilla,
   leerProductividadPorCanal,
+  leerCeroVentasPorCanal,
   leerCarteraPorDia,
   leerProyeccion,
   leerDetalleVentaMensual,
@@ -1922,6 +1923,80 @@ app.get(
 
         mensaje:
           "No se pudo cargar la productividad por canal",
+
+      });
+
+    }
+
+  }
+);
+
+// ==================================================
+// PROMOTORES CON CERO VENTAS POR DÍA Y CANAL
+// ==================================================
+
+app.get(
+  "/api/cero-ventas-por-canal",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      const rol =
+        normalizarRol(
+          req.rol
+        );
+
+
+      if (
+        rol !== "DIRECCIÓN"
+      ) {
+
+        return res.status(403).json({
+
+          correcto: false,
+
+          mensaje:
+            "Acceso exclusivo para Dirección",
+
+        });
+
+      }
+
+
+      const datos =
+        leerCeroVentasPorCanal();
+
+
+      return res.json({
+
+        correcto: true,
+
+        fechaCorte:
+          datos.fechaCorte,
+
+        canales:
+          datos.canales || [],
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/cero-ventas-por-canal:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar el análisis de promotores con cero ventas",
 
       });
 
