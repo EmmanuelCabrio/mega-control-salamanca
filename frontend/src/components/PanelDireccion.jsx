@@ -38,6 +38,9 @@ import CeroVentasPorCanal
 import ResumenPlanTrabajoDireccion
   from "./ResumenPlanTrabajoDireccion";
 
+import MetaSemanaAnteriorDireccion
+  from "./MetaSemanaAnteriorDireccion";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -615,6 +618,8 @@ return (
 
 
  <Fragment key={versionDatos}>
+
+   <MetaSemanaAnteriorDireccion />
 
   <PlantillaStatus />
 
