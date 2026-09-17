@@ -8232,6 +8232,457 @@ function reemplazarExcelEnSupabase(
 
 }
 
+
+// ==================================================
+// PROMOTORES CON CERO VENTAS POR DÍA Y CANAL
+// ==================================================
+
+function leerCeroVentasPorCanal() {
+
+  const workbook =
+    cargarExcel();
+
+
+  const buscarHoja =
+    (nombreBuscado) => {
+
+      const nombre =
+        workbook.SheetNames.find(
+          (hoja) =>
+            limpiarTexto(hoja) ===
+            limpiarTexto(nombreBuscado)
+        );
+
+
+      return nombre
+        ? workbook.Sheets[nombre]
+        : null;
+
+    };
+
+
+  const hojaSinVenta =
+    buscarHoja(
+      "BD SIN VENTA"
+    );
+
+  const hojaPlantilla =
+    buscarHoja(
+      "PLANTILLA"
+    );
+
+  const hojaVentas =
+    buscarHoja(
+      "BD ACUMULADO VENTA MES"
+    );
+
+
+  if (
+    !hojaSinVenta ||
+    !hojaPlantilla ||
+    !hojaVentas
+  ) {
+
+    throw new Error(
+      "No se encontraron las hojas necesarias para calcular promotores con cero ventas"
+    );
+
+  }
+
+
+  const convertirFilas =
+    (hoja) =>
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+  const datosSinVenta =
+    convertirFilas(
+      hojaSinVenta
+    );
+
+  const datosPlantilla =
+    convertirFilas(
+      hojaPlantilla
+    );
+
+  const datosVentas =
+    convertirFilas(
+      hojaVentas
+    );
+
+
+  // ================================================
+  // ÚLTIMA FECHA CARGADA EN LA BASE DE VENTAS
+  // AD = FECHA VENTA, ÍNDICE 29
+  // ================================================
+
+  const serialFechaCorte =
+    datosVentas
+      .slice(1)
+      .reduce(
+        (
+          fechaMayor,
+          fila
+        ) => {
+
+          const fecha =
+            Number(
+              fila[29]
+            );
+
+
+          return (
+            Number.isFinite(fecha) &&
+            fecha > fechaMayor
+          )
+            ? fecha
+            : fechaMayor;
+
+        },
+        0
+      );
+
+
+  const fechaExcel =
+    XLSX.SSF.parse_date_code(
+      serialFechaCorte
+    );
+
+
+  if (!fechaExcel) {
+
+    throw new Error(
+      "No se encontró una fecha de corte en BD ACUMULADO VENTA MES"
+    );
+
+  }
+
+
+  const fechaCorte = {
+
+    anio:
+      fechaExcel.y,
+
+    mes:
+      fechaExcel.m,
+
+    dia:
+      fechaExcel.d,
+
+  };
+
+
+  // ================================================
+  // VENTAS DIARIAS POR PROMOTOR
+  // F = PROMOTOR
+  // G = DÍA 1
+  // ================================================
+
+  const COLUMNA_PROMOTOR = 5;
+  const COLUMNA_DIA_1 = 6;
+
+  const ventasPorPromotor =
+    new Map();
+
+
+  for (
+    let indice = 1;
+    indice < datosSinVenta.length;
+    indice++
+  ) {
+
+    const fila =
+      datosSinVenta[indice];
+
+    const clave =
+      normalizarNombre(
+        fila[
+          COLUMNA_PROMOTOR
+        ]
+      );
+
+
+    if (
+      !clave ||
+      clave === "0" ||
+      clave === "PROMOTOR"
+    ) {
+
+      continue;
+
+    }
+
+
+    ventasPorPromotor.set(
+      clave,
+      fila
+    );
+
+  }
+
+
+  // ================================================
+  // PLANTILLA ACTIVA POR CANAL
+  // D = NOMBRE
+  // G = PUESTO
+  // L = ESTATUS
+  // ================================================
+
+  const ordenCanales = [
+
+    "PUNTO DE VENTA",
+
+    "CAMBACEO",
+
+    "CAMBACEO EMPRESARIAL",
+
+  ];
+
+
+  const plantillaPorCanal =
+    new Map(
+      ordenCanales.map(
+        (canal) => [
+
+          canal,
+
+          new Map(),
+
+        ]
+      )
+    );
+
+
+  for (
+    let indice = 1;
+    indice < datosPlantilla.length;
+    indice++
+  ) {
+
+    const fila =
+      datosPlantilla[indice];
+
+    const nombre =
+      limpiarTexto(
+        fila[3]
+      );
+
+    const clave =
+      normalizarNombre(
+        nombre
+      );
+
+    const puesto =
+      limpiarTexto(
+        fila[6]
+      );
+
+    const estatus =
+      limpiarTexto(
+        fila[11]
+      );
+
+
+    if (
+      !clave ||
+      estatus !== "ACTIVO" ||
+      !puesto.includes("PROMOTOR") ||
+      puesto.includes("SUPERVISOR")
+    ) {
+
+      continue;
+
+    }
+
+
+    let canal =
+      "";
+
+
+    if (
+      puesto.includes(
+        "PUNTO DE VENTA"
+      )
+    ) {
+
+      canal =
+        "PUNTO DE VENTA";
+
+    } else if (
+      puesto.includes(
+        "EMPRESARIAL"
+      )
+    ) {
+
+      canal =
+        "CAMBACEO EMPRESARIAL";
+
+    } else if (
+      puesto.includes(
+        "CAMBACEO"
+      )
+    ) {
+
+      canal =
+        "CAMBACEO";
+
+    }
+
+
+    if (!canal) {
+
+      continue;
+
+    }
+
+
+    plantillaPorCanal
+      .get(canal)
+      .set(
+        clave,
+        {
+          nombre,
+
+          filaVentas:
+            ventasPorPromotor.get(
+              clave
+            ) || null,
+        }
+      );
+
+  }
+
+
+  // ================================================
+  // CONTAR CEROS POR DÍA
+  // ================================================
+
+  const canales =
+    ordenCanales.map(
+      (canal) => {
+
+        const promotores =
+          Array.from(
+            plantillaPorCanal
+              .get(canal)
+              .values()
+          );
+
+        const dias =
+          [];
+
+
+        for (
+          let dia = 1;
+          dia <= fechaCorte.dia;
+          dia++
+        ) {
+
+          const fecha =
+            new Date(
+              Date.UTC(
+                fechaCorte.anio,
+                fechaCorte.mes - 1,
+                dia
+              )
+            );
+
+
+          // El domingo no cuenta.
+          if (
+            fecha.getUTCDay() === 0
+          ) {
+
+            continue;
+
+          }
+
+
+          let ceroVentas =
+            0;
+
+
+          for (
+            const promotor of
+            promotores
+          ) {
+
+            const venta =
+              Number(
+                promotor.filaVentas?.[
+                  COLUMNA_DIA_1 +
+                  dia -
+                  1
+                ] ?? 0
+              );
+
+
+            if (
+              !Number.isFinite(venta) ||
+              venta <= 0
+            ) {
+
+              ceroVentas++;
+
+            }
+
+          }
+
+
+          dias.push({
+
+            dia,
+
+            ceroVentas,
+
+            conVenta:
+              promotores.length -
+              ceroVentas,
+
+            porcentajeCero:
+              promotores.length > 0
+                ? (
+                    ceroVentas /
+                    promotores.length
+                  ) * 100
+                : 0,
+
+          });
+
+        }
+
+
+        return {
+
+          canal,
+
+          totalPromotores:
+            promotores.length,
+
+          dias,
+
+        };
+
+      }
+    );
+
+
+  return {
+
+    fechaCorte,
+
+    canales,
+
+  };
+
+}
+
 // ==================================================
 // EXPORTACIONES
 // ==================================================
@@ -8249,6 +8700,8 @@ module.exports = {
   leerPlantilla,
 
   leerProductividadPorCanal,
+
+  leerCeroVentasPorCanal,
 
   leerCarteraPorDia,
 
