@@ -373,6 +373,263 @@ app.post(
         );
 
 
+      // ==================================================
+// DIRECCIÓN — LOGIN DE SUPERVISORES HOY
+// ==================================================
+
+app.get(
+  "/api/direccion/logins-hoy",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      // ============================================
+      // ACCESO EXCLUSIVO PARA DIRECCIÓN
+      // ============================================
+
+      if (
+        normalizarRol(
+          req.rol
+        ) !== "DIRECCIÓN"
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Acceso exclusivo para Dirección",
+
+          });
+
+      }
+
+
+      // ============================================
+      // USUARIOS ACTIVOS DEL EXCEL
+      // ============================================
+
+      const usuarios =
+        obtenerUsuarios();
+
+
+      // ============================================
+      // ACCESOS REGISTRADOS HOY
+      // ============================================
+
+      const {
+        fecha,
+        accesos,
+      } =
+        await obtenerLoginsDelDia();
+
+
+      const mapaSupervisores =
+        new Map();
+
+
+      // ============================================
+      // OBTENER ÚNICAMENTE SUPERVISORES ACTIVOS
+      // ============================================
+
+      for (
+        const usuario
+        of usuarios
+      ) {
+
+        const estado =
+          String(
+            usuario.estado ||
+            ""
+          )
+            .trim()
+            .toUpperCase();
+
+
+        const rol =
+          normalizarRol(
+            usuario.rol
+          );
+
+
+        const supervisor =
+          String(
+            usuario.supervisor ||
+            ""
+          ).trim();
+
+
+        const clave =
+          normalizarSupervisor(
+            supervisor
+          );
+
+
+        if (
+          estado !== "ACTIVO" ||
+          rol !== "SUPERVISOR" ||
+          !clave
+        ) {
+
+          continue;
+
+        }
+
+
+        const acceso =
+          accesos[
+            clave
+          ] || null;
+
+
+        mapaSupervisores.set(
+          clave,
+          {
+
+            clave,
+
+            supervisor,
+
+            logueado:
+              Boolean(
+                acceso
+              ),
+
+            primerAcceso:
+              acceso?.primerAcceso ||
+              null,
+
+            ultimoAcceso:
+              acceso?.ultimoAcceso ||
+              null,
+
+            accesos:
+              Number(
+                acceso?.accesos ||
+                0
+              ),
+
+          }
+        );
+
+      }
+
+
+      const supervisores =
+        Array.from(
+          mapaSupervisores.values()
+        );
+
+
+      // ============================================
+      // YA SE LOGUEARON
+      // ============================================
+
+      const logueados =
+        supervisores
+          .filter(
+            (registro) =>
+              registro.logueado
+          )
+          .sort(
+            (
+              registroA,
+              registroB
+            ) =>
+
+              new Date(
+                registroA.primerAcceso
+              ) -
+
+              new Date(
+                registroB.primerAcceso
+              )
+          );
+
+
+      // ============================================
+      // TODAVÍA NO SE LOGUEAN
+      // ============================================
+
+      const pendientes =
+        supervisores
+          .filter(
+            (registro) =>
+              !registro.logueado
+          )
+          .sort(
+            (
+              registroA,
+              registroB
+            ) =>
+
+              registroA.supervisor
+                .localeCompare(
+                  registroB.supervisor,
+                  "es"
+                )
+          );
+
+
+      // ============================================
+      // RESPUESTA
+      // ============================================
+
+      return res.json({
+
+        correcto:
+          true,
+
+        fecha,
+
+        total:
+          supervisores.length,
+
+        totalLogueados:
+          logueados.length,
+
+        totalPendientes:
+          pendientes.length,
+
+        logueados,
+
+        pendientes,
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/direccion/logins-hoy:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo consultar el estado de los accesos",
+
+        });
+
+    }
+
+  }
+);
+
+
       // ==========================================
 // REGISTRAR ACCESO DEL SUPERVISOR
 // ==========================================
