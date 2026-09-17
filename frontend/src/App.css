@@ -12747,3 +12747,358 @@ tbody tr:last-child td {
   }
 
 }
+
+
+/* =========================================================
+   DIRECCIÓN — PROMOTORES CON CERO VENTAS POR CANAL
+========================================================= */
+
+.cero-ventas-seccion,
+.cero-ventas-estado {
+  width: 100%;
+  margin: 24px 0;
+  box-sizing: border-box;
+}
+
+
+.cero-ventas-seccion {
+  overflow: hidden;
+  border: 1px solid
+    rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      145deg,
+      #151c2c,
+      #0f172a
+    );
+  box-shadow:
+    0 14px 34px
+    rgba(0, 0, 0, 0.2);
+}
+
+
+.cero-ventas-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 26px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #7f1d1d,
+      #dc2626
+    );
+}
+
+
+.cero-ventas-encabezado
+> div
+> span {
+  color: #fecaca;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+
+.cero-ventas-encabezado h2 {
+  margin: 5px 0;
+  font-size: clamp(
+    23px,
+    3vw,
+    31px
+  );
+}
+
+
+.cero-ventas-encabezado p {
+  margin: 0;
+  color: #fee2e2;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.cero-ventas-encabezado
+> strong {
+  flex-shrink: 0;
+  padding: 11px 16px;
+  border: 1px solid
+    rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  background:
+    rgba(255, 255, 255, 0.13);
+  font-size: 12px;
+}
+
+
+.cero-ventas-graficas {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+  gap: 16px;
+  padding: 20px;
+}
+
+
+.cero-ventas-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dbeafe;
+  border-radius: 17px;
+  background: #ffffff;
+}
+
+
+.cero-ventas-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 17px 18px;
+  border-bottom:
+    1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+
+.cero-ventas-card-header
+> div
+> span {
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+
+.cero-ventas-card-header h3 {
+  margin: 4px 0 2px;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+
+.cero-ventas-card-header
+> div
+> small {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+.cero-ventas-card-header
+> strong {
+  min-width: 84px;
+  color: #dc2626;
+  font-size: 26px;
+  line-height: 1;
+  text-align: right;
+}
+
+
+.cero-ventas-card-header
+> strong
+small {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+
+.cero-ventas-scroll {
+  overflow-x: auto;
+  padding: 17px 14px 8px;
+}
+
+
+.cero-ventas-grafica {
+  display: grid;
+  grid-auto-columns:
+    minmax(29px, 1fr);
+  grid-auto-flow: column;
+  gap: 6px;
+  min-width: 480px;
+  height: 205px;
+  padding: 0 2px;
+  border-bottom:
+    1px solid #cbd5e1;
+}
+
+
+.cero-ventas-columna {
+  display: grid;
+  grid-template-rows:
+    22px 155px 24px;
+  align-items: end;
+  min-width: 0;
+  text-align: center;
+}
+
+
+.cero-ventas-columna b {
+  align-self: center;
+  color: #334155;
+  font-size: 10px;
+}
+
+
+.cero-ventas-columna
+> div {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 155px;
+}
+
+
+.cero-ventas-columna
+> div
+> span {
+  display: block;
+  width: min(22px, 82%);
+  min-height: 2px;
+  border-radius: 6px 6px 2px 2px;
+  background:
+    linear-gradient(
+      180deg,
+      #fb7185,
+      #dc2626
+    );
+  box-shadow:
+    0 5px 12px
+    rgba(220, 38, 38, 0.22);
+  transition:
+    height 0.25s ease;
+}
+
+
+.cero-ventas-card:nth-child(2)
+.cero-ventas-columna
+> div
+> span {
+  background:
+    linear-gradient(
+      180deg,
+      #fb923c,
+      #ea580c
+    );
+  box-shadow:
+    0 5px 12px
+    rgba(234, 88, 12, 0.22);
+}
+
+
+.cero-ventas-card:nth-child(3)
+.cero-ventas-columna
+> div
+> span {
+  background:
+    linear-gradient(
+      180deg,
+      #facc15,
+      #ca8a04
+    );
+  box-shadow:
+    0 5px 12px
+    rgba(202, 138, 4, 0.22);
+}
+
+
+.cero-ventas-columna small {
+  align-self: center;
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+
+.cero-ventas-leyenda {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px 15px;
+  color: #64748b;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+
+.cero-ventas-leyenda strong {
+  color: #15803d;
+}
+
+
+.cero-ventas-estado {
+  padding: 35px 22px;
+  border: 1px solid #fecaca;
+  border-radius: 18px;
+  color: #475569;
+  background: #ffffff;
+  font-weight: 800;
+  text-align: center;
+}
+
+
+.cero-ventas-error {
+  color: #991b1b;
+}
+
+
+.cero-ventas-error button {
+  margin-top: 10px;
+  padding: 9px 15px;
+  border: 0;
+  border-radius: 9px;
+  color: #ffffff;
+  background: #b91c1c;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .cero-ventas-graficas {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .cero-ventas-encabezado {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px 18px;
+  }
+
+
+  .cero-ventas-encabezado
+  > strong {
+    width: 100%;
+    text-align: center;
+  }
+
+
+  .cero-ventas-graficas {
+    padding: 12px;
+  }
+
+}
