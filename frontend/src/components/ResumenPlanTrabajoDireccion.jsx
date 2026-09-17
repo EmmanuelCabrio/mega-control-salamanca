@@ -17,11 +17,11 @@ const formatearNumero =
     );
 
 
-function AvancePlanTrabajo() {
+function ResumenPlanTrabajoDireccion() {
 
   const [
-    resumen,
-    setResumen,
+    datos,
+    setDatos,
   ] = useState(null);
 
 
@@ -38,7 +38,7 @@ function AvancePlanTrabajo() {
 
 
   // ==================================================
-  // CARGAR AVANCE
+  // CARGAR INFORMACIÓN
   // ==================================================
 
   useEffect(() => {
@@ -58,38 +58,38 @@ function AvancePlanTrabajo() {
           );
 
 
-        const datos =
+        const resultado =
           await respuesta.json();
 
 
         if (
           !respuesta.ok ||
-          !datos.correcto
+          !resultado.correcto
         ) {
 
           throw new Error(
-            datos.mensaje ||
-            "No se pudo cargar el avance"
+            resultado.mensaje ||
+            "No se pudo cargar el resumen"
           );
 
         }
 
 
-        setResumen(
-          datos.supervisor || null
+        setDatos(
+          resultado
         );
 
       } catch (errorCarga) {
 
         console.error(
-          "❌ Error avance Plan de Trabajo:",
+          "❌ Error resumen Plan de Trabajo:",
           errorCarga
         );
 
 
         setError(
           errorCarga.message ||
-          "No se pudo cargar el avance"
+          "No se pudo cargar el resumen"
         );
 
       } finally {
@@ -114,7 +114,11 @@ function AvancePlanTrabajo() {
 
     return (
 
-      <section className="avance-plan-estado">
+      <section
+        className="
+          resumen-plan-direccion-estado
+        "
+      >
 
         Cargando avance del Plan de Trabajo…
 
@@ -126,27 +130,21 @@ function AvancePlanTrabajo() {
 
 
   // ==================================================
-  // ERROR O SIN INFORMACIÓN
+  // ERROR
   // ==================================================
 
-  if (
-    error ||
-    !resumen
-  ) {
+  if (error) {
 
     return (
 
       <section
         className="
-          avance-plan-estado
+          resumen-plan-direccion-estado
           avance-plan-error
         "
       >
 
-        {
-          error ||
-          "No hay información del Plan de Trabajo para este supervisor."
-        }
+        {error}
 
       </section>
 
@@ -155,32 +153,14 @@ function AvancePlanTrabajo() {
   }
 
 
-  // ==================================================
-  // CÁLCULOS VISUALES
-  // ==================================================
-
-  const avance =
-    Number(
-      resumen.avancePorcentaje ||
-      0
-    );
+  const supervisores =
+    datos?.supervisores ||
+    [];
 
 
-  const avanceBarra =
-    Math.min(
-      Math.max(
-        avance,
-        0
-      ),
-      100
-    );
-
-
-  const diferencia =
-    Number(
-      resumen.diferencia ||
-      0
-    );
+  const totales =
+    datos?.totales ||
+    {};
 
 
   // ==================================================
@@ -189,14 +169,18 @@ function AvancePlanTrabajo() {
 
   return (
 
-    <section className="avance-plan-card">
+    <section className="resumen-plan-direccion">
 
 
       {/* ==========================================
           ENCABEZADO
       ========================================== */}
 
-      <div className="avance-plan-header">
+      <div
+        className="
+          resumen-plan-direccion-header
+        "
+      >
 
         <div>
 
@@ -205,13 +189,12 @@ function AvancePlanTrabajo() {
           </span>
 
           <h2>
-            Avance vs meta
+            Avance por supervisor
           </h2>
 
           <p>
-            {resumen.canal}
-            {" · "}
-            {resumen.supervisor}
+            Ventas realizadas en las colonias
+            asignadas contra la meta.
           </p>
 
         </div>
@@ -219,10 +202,13 @@ function AvancePlanTrabajo() {
 
         <strong>
 
-          {avance.toFixed(1)}%
+          {Number(
+            totales.avancePorcentaje ||
+            0
+          ).toFixed(1)}%
 
           <small>
-            avance
+            avance general
           </small>
 
         </strong>
@@ -231,223 +217,310 @@ function AvancePlanTrabajo() {
 
 
       {/* ==========================================
-          INDICADORES DEL PLAN DETALLADO
+          TABLA
       ========================================== */}
 
       <div
         className="
-          avance-plan-indicadores
-          avance-plan-indicadores-principales
+          resumen-plan-direccion-tabla-contenedor
         "
       >
 
-        <article>
+        <table
+          className="
+            resumen-plan-direccion-tabla
+          "
+        >
 
-          <strong>
+          <thead>
 
-            {formatearNumero(
-              resumen.colonias
+            <tr>
+
+              <th>
+                Supervisor
+              </th>
+
+              <th>
+                Canal
+              </th>
+
+              <th>
+                Colonias
+              </th>
+
+              <th>
+                Col. asignadas
+              </th>
+
+              <th>
+                Potenciales
+              </th>
+
+              <th>
+                Por vender
+              </th>
+
+              <th>
+                Ventas plan
+              </th>
+
+              <th>
+                Ventas general
+              </th>
+
+              <th>
+                Meta
+              </th>
+
+              <th>
+                Diferencia
+              </th>
+
+              <th>
+                Avance
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            {supervisores.map(
+              (registro) => {
+
+                const diferencia =
+                  Number(
+                    registro.diferencia ||
+                    0
+                  );
+
+
+                return (
+
+                  <tr
+                    key={
+                      registro.claveSupervisor
+                    }
+                  >
+
+                    <td>
+                      {registro.supervisor}
+                    </td>
+
+                    <td>
+                      {registro.canal}
+                    </td>
+
+                    <td>
+
+                      {formatearNumero(
+                        registro.colonias
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      {formatearNumero(
+                        registro.coloniasAsignadas
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      {formatearNumero(
+                        registro.potenciales
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      {formatearNumero(
+                        registro.porVender
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      {formatearNumero(
+                        registro.ventasPlan
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      {formatearNumero(
+                        registro.ventasGeneral
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      {formatearNumero(
+                        registro.meta
+                      )}
+
+                    </td>
+
+                    <td
+                      className={
+                        diferencia >= 0
+                          ? "avance-plan-positivo"
+                          : "avance-plan-negativo"
+                      }
+                    >
+
+                      {
+                        diferencia > 0
+                          ? "+"
+                          : ""
+                      }
+
+                      {formatearNumero(
+                        diferencia
+                      )}
+
+                    </td>
+
+                    <td>
+
+                      {Number(
+                        registro
+                          .avancePorcentaje ||
+                        0
+                      ).toFixed(1)}%
+
+                    </td>
+
+                  </tr>
+
+                );
+
+              }
             )}
 
-          </strong>
+          </tbody>
 
-          <span>
-            Colonias
-          </span>
 
-        </article>
+          {/* ========================================
+              TOTAL GENERAL
+          ======================================== */}
 
+          <tfoot>
 
-        <article>
+            <tr>
 
-          <strong>
+              <td>
+                TOTAL
+              </td>
 
-            {formatearNumero(
-              resumen.potenciales
-            )}
+              <td>
+                —
+              </td>
 
-          </strong>
+              <td>
 
-          <span>
-            Potenciales
-          </span>
+                {formatearNumero(
+                  totales.colonias
+                )}
 
-        </article>
+              </td>
 
+              <td>
 
-        <article>
+                {formatearNumero(
+                  totales.coloniasAsignadas
+                )}
 
-          <strong>
+              </td>
 
-            {formatearNumero(
-              resumen.porVender
-            )}
+              <td>
 
-          </strong>
+                {formatearNumero(
+                  totales.potenciales
+                )}
 
-          <span>
-            Por vender
-          </span>
+              </td>
 
-        </article>
+              <td>
 
-      </div>
+                {formatearNumero(
+                  totales.porVender
+                )}
 
+              </td>
 
-      {/* ==========================================
-          INDICADORES DE RESUMEN PLAN DE TRABAJO
-      ========================================== */}
+              <td>
 
-      <div
-        className="
-          avance-plan-indicadores
-          avance-plan-indicadores-resumen
-        "
-      >
+                {formatearNumero(
+                  totales.ventasPlan
+                )}
 
-        <article>
+              </td>
 
-          <span>
-            Colonias asignadas
-          </span>
+              <td>
 
-          <strong>
+                {formatearNumero(
+                  totales.ventasGeneral
+                )}
 
-            {formatearNumero(
-              resumen.coloniasAsignadas
-            )}
+              </td>
 
-          </strong>
+              <td>
 
-        </article>
+                {formatearNumero(
+                  totales.meta
+                )}
 
+              </td>
 
-        <article>
+              <td
+                className={
+                  Number(
+                    totales.diferencia ||
+                    0
+                  ) >= 0
+                    ? "avance-plan-positivo"
+                    : "avance-plan-negativo"
+                }
+              >
 
-          <span>
-            Ventas del plan
-          </span>
+                {
+                  Number(
+                    totales.diferencia ||
+                    0
+                  ) > 0
+                    ? "+"
+                    : ""
+                }
 
-          <strong>
+                {formatearNumero(
+                  totales.diferencia
+                )}
 
-            {formatearNumero(
-              resumen.ventasPlan
-            )}
+              </td>
 
-          </strong>
+              <td>
 
-        </article>
+                {Number(
+                  totales.avancePorcentaje ||
+                  0
+                ).toFixed(1)}%
 
+              </td>
 
-        <article>
+            </tr>
 
-          <span>
-            Ventas generales
-          </span>
+          </tfoot>
 
-          <strong>
-
-            {formatearNumero(
-              resumen.ventasGeneral
-            )}
-
-          </strong>
-
-        </article>
-
-
-        <article>
-
-          <span>
-            Meta
-          </span>
-
-          <strong>
-
-            {formatearNumero(
-              resumen.meta
-            )}
-
-          </strong>
-
-        </article>
-
-
-        <article>
-
-          <span>
-            Diferencia
-          </span>
-
-          <strong
-            className={
-              diferencia >= 0
-                ? "avance-plan-positivo"
-                : "avance-plan-negativo"
-            }
-          >
-
-            {
-              diferencia > 0
-                ? "+"
-                : ""
-            }
-
-            {formatearNumero(
-              diferencia
-            )}
-
-          </strong>
-
-        </article>
-
-      </div>
-
-
-      {/* ==========================================
-          BARRA DE AVANCE
-      ========================================== */}
-
-      <div className="avance-plan-progreso">
-
-        <div>
-
-          <span>
-
-            {formatearNumero(
-              resumen.ventasPlan
-            )}
-
-            {" de "}
-
-            {formatearNumero(
-              resumen.meta
-            )}
-
-            {" ventas"}
-
-          </span>
-
-
-          <strong>
-            {avance.toFixed(1)}%
-          </strong>
-
-        </div>
-
-
-        <span>
-
-          <i
-            style={{
-
-              width:
-                `${avanceBarra}%`,
-
-            }}
-          />
-
-        </span>
+        </table>
 
       </div>
 
@@ -459,4 +532,4 @@ function AvancePlanTrabajo() {
 }
 
 
-export default AvancePlanTrabajo;
+export default ResumenPlanTrabajoDireccion;
