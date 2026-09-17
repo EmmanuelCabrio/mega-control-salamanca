@@ -1164,6 +1164,11 @@ function leerAvanceSemanal(hoja) {
         fila[10]
       );
 
+     const rx =
+       Number(
+        fila[11]
+      );
+
     registros.push({
       supervisor,
       nombre,
@@ -1216,6 +1221,13 @@ function leerAvanceSemanal(hoja) {
         )
           ? max
           : 0,
+
+      rx:
+  Number.isFinite(
+    rx
+  )
+    ? rx
+    : 0,
     });
   }
 
