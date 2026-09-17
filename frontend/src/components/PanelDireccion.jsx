@@ -35,6 +35,9 @@ import ResumenRxSupervisores
 import CeroVentasPorCanal
   from "./CeroVentasPorCanal";
 
+import ResumenPlanTrabajoDireccion
+  from "./ResumenPlanTrabajoDireccion";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -614,6 +617,8 @@ return (
  <Fragment key={versionDatos}>
 
   <PlantillaStatus />
+
+   <ResumenPlanTrabajoDireccion />
 
    <CeroVentasPorCanal />
 
