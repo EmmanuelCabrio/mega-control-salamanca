@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const {
+  obtenerUsuarios,
   validarUsuario,
   leerExcel,
   leerVentaVsMesAnterior,
@@ -26,6 +27,12 @@ const {
   descargarExcelDesdeSupabase,
 } = require("./services/excelService");
 
+const {
+  registrarLoginSupervisor,
+  obtenerLoginsDelDia,
+} = require(
+  "./services/loginTrackerService"
+);
 
 // ==================================================
 // CONFIGURACIÓN
@@ -326,10 +333,16 @@ app.post(
       await leerExcel();
 
 
-      const supervisor =
-        normalizarSupervisor(
-          resultado.supervisor
+          const supervisor =
+       normalizarSupervisor(
+    resultado.supervisor
         );
+
+
+       const rol =
+       normalizarRol(
+        resultado.rol
+  );
 
 
       const token =
@@ -344,10 +357,7 @@ app.post(
 
             supervisor,
 
-            rol:
-              normalizarRol(
-                resultado.rol
-              ),
+            rol,
 
           },
 
@@ -363,6 +373,36 @@ app.post(
         );
 
 
+      // ==========================================
+// REGISTRAR ACCESO DEL SUPERVISOR
+// ==========================================
+
+try {
+
+  await registrarLoginSupervisor({
+
+    supervisor,
+
+    rol,
+
+  });
+
+} catch (errorRegistro) {
+
+  // Un problema con el registro no debe
+  // impedir que el supervisor inicie sesión.
+
+  console.error(
+    "⚠️ No se pudo registrar el login:"
+  );
+
+  console.error(
+    errorRegistro
+  );
+
+}
+
+
       return res.json({
 
         correcto: true,
@@ -374,11 +414,7 @@ app.post(
         empleado:
           resultado.empleado,
 
-        rol:
-          normalizarRol(
-            resultado.rol
-          ),
-
+        rol,
       });
 
     } catch (error) {
