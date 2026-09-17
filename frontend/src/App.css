@@ -13102,3 +13102,618 @@ small {
   }
 
 }
+
+/* ==================================================
+   AVANCE VS PLAN DE TRABAJO
+================================================== */
+
+.avance-plan-card,
+.avance-plan-estado,
+.resumen-plan-direccion,
+.resumen-plan-direccion-estado {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 24px 0;
+}
+
+
+/* ==================================================
+   CONTENEDORES
+================================================== */
+
+.avance-plan-card,
+.resumen-plan-direccion {
+  overflow: hidden;
+
+  border:
+    1px solid #dbe4f0;
+
+  border-radius:
+    22px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 14px 38px
+    rgba(15, 23, 42, 0.08);
+}
+
+
+/* ==================================================
+   ENCABEZADOS
+================================================== */
+
+.avance-plan-header,
+.resumen-plan-direccion-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 24px;
+
+  padding:
+    24px 28px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #172554 0%,
+      #1d4ed8 100%
+    );
+
+  color:
+    #ffffff;
+}
+
+
+.avance-plan-header
+> div
+> span,
+.resumen-plan-direccion-header
+> div
+> span {
+  display: block;
+
+  margin-bottom:
+    5px;
+
+  color:
+    #bfdbfe;
+
+  font-size:
+    12px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.13em;
+}
+
+
+.avance-plan-header h2,
+.resumen-plan-direccion-header h2 {
+  margin:
+    0;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      24px,
+      3vw,
+      34px
+    );
+}
+
+
+.avance-plan-header p,
+.resumen-plan-direccion-header p {
+  margin:
+    6px 0 0;
+
+  color:
+    #dbeafe;
+
+  font-weight:
+    600;
+}
+
+
+/* ==================================================
+   PORCENTAJE PRINCIPAL
+================================================== */
+
+.avance-plan-header
+> strong,
+.resumen-plan-direccion-header
+> strong {
+  min-width:
+    140px;
+
+  padding:
+    14px 18px;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.32
+    );
+
+  border-radius:
+    16px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    );
+
+  color:
+    #ffffff;
+
+  font-size:
+    30px;
+
+  text-align:
+    center;
+}
+
+
+.avance-plan-header
+> strong
+small,
+.resumen-plan-direccion-header
+> strong
+small {
+  display:
+    block;
+
+  margin-top:
+    2px;
+
+  font-size:
+    11px;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* ==================================================
+   INDICADORES
+================================================== */
+
+.avance-plan-indicadores {
+  display:
+    grid;
+
+  gap:
+    14px;
+
+  padding:
+    20px 28px 0;
+}
+
+
+.avance-plan-indicadores-principales {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+}
+
+
+.avance-plan-indicadores-resumen {
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0, 1fr)
+    );
+}
+
+
+.avance-plan-indicadores article {
+  min-width:
+    0;
+
+  padding:
+    18px;
+
+  border:
+    1px solid #dbe4f0;
+
+  border-radius:
+    16px;
+
+  background:
+    #f8fafc;
+
+  text-align:
+    center;
+}
+
+
+.avance-plan-indicadores-principales
+article {
+  border-top:
+    4px solid #2563eb;
+
+  background:
+    #ffffff;
+}
+
+
+.avance-plan-indicadores span {
+  display:
+    block;
+
+  color:
+    #64748b;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+
+  text-transform:
+    uppercase;
+}
+
+
+.avance-plan-indicadores strong {
+  display:
+    block;
+
+  margin-bottom:
+    5px;
+
+  color:
+    #0f172a;
+
+  font-size:
+    clamp(
+      22px,
+      3vw,
+      32px
+    );
+}
+
+
+.avance-plan-indicadores-resumen
+strong {
+  margin:
+    6px 0 0;
+
+  font-size:
+    23px;
+}
+
+
+/* ==================================================
+   BARRA DE AVANCE
+================================================== */
+
+.avance-plan-progreso {
+  padding:
+    22px 28px 26px;
+}
+
+
+.avance-plan-progreso
+> div {
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  gap:
+    16px;
+
+  margin-bottom:
+    8px;
+
+  color:
+    #475569;
+
+  font-size:
+    13px;
+
+  font-weight:
+    800;
+}
+
+
+.avance-plan-progreso
+> span {
+  display:
+    block;
+
+  height:
+    12px;
+
+  overflow:
+    hidden;
+
+  border-radius:
+    999px;
+
+  background:
+    #e2e8f0;
+}
+
+
+.avance-plan-progreso i {
+  display:
+    block;
+
+  height:
+    100%;
+
+  border-radius:
+    inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #22c55e
+    );
+}
+
+
+/* ==================================================
+   DIFERENCIAS
+================================================== */
+
+.avance-plan-positivo {
+  color:
+    #15803d !important;
+
+  font-weight:
+    900;
+}
+
+
+.avance-plan-negativo {
+  color:
+    #dc2626 !important;
+
+  font-weight:
+    900;
+}
+
+
+/* ==================================================
+   CARGA Y ERROR
+================================================== */
+
+.avance-plan-estado,
+.resumen-plan-direccion-estado {
+  padding:
+    22px;
+
+  border:
+    1px solid #dbe4f0;
+
+  border-radius:
+    16px;
+
+  background:
+    #ffffff;
+
+  color:
+    #475569;
+
+  font-weight:
+    700;
+}
+
+
+.avance-plan-error {
+  border-color:
+    #fecaca;
+
+  background:
+    #fef2f2;
+
+  color:
+    #991b1b;
+}
+
+
+/* ==================================================
+   TABLA DE DIRECCIÓN
+================================================== */
+
+.resumen-plan-direccion-tabla-contenedor {
+  width:
+    100%;
+
+  overflow-x:
+    auto;
+
+  padding:
+    18px;
+
+  box-sizing:
+    border-box;
+}
+
+
+.resumen-plan-direccion-tabla {
+  width:
+    100%;
+
+  min-width:
+    1250px;
+
+  border-collapse:
+    collapse;
+}
+
+
+.resumen-plan-direccion-tabla th {
+  padding:
+    12px 10px;
+
+  background:
+    #1d4ed8;
+
+  color:
+    #ffffff;
+
+  font-size:
+    11px;
+
+  text-align:
+    center;
+
+  text-transform:
+    uppercase;
+}
+
+
+.resumen-plan-direccion-tabla
+th:first-child,
+.resumen-plan-direccion-tabla
+td:first-child {
+  text-align:
+    left;
+}
+
+
+.resumen-plan-direccion-tabla td {
+  padding:
+    11px 10px;
+
+  border-bottom:
+    1px solid #e2e8f0;
+
+  color:
+    #334155;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  text-align:
+    center;
+}
+
+
+.resumen-plan-direccion-tabla
+tbody
+tr:nth-child(even) {
+  background:
+    #eff6ff;
+}
+
+
+.resumen-plan-direccion-tabla
+tbody
+tr:hover {
+  background:
+    #dbeafe;
+}
+
+
+.resumen-plan-direccion-tabla
+tfoot
+td {
+  border:
+    0;
+
+  background:
+    #0f172a;
+
+  color:
+    #ffffff;
+
+  font-weight:
+    900;
+}
+
+
+/* ==================================================
+   TABLET
+================================================== */
+
+@media (
+  max-width: 900px
+) {
+
+  .avance-plan-indicadores-resumen {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+}
+
+
+/* ==================================================
+   CELULAR
+================================================== */
+
+@media (
+  max-width: 640px
+) {
+
+  .avance-plan-header,
+  .resumen-plan-direccion-header {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+    padding:
+      20px;
+  }
+
+
+  .avance-plan-header
+  > strong,
+  .resumen-plan-direccion-header
+  > strong {
+    width:
+      100%;
+
+    box-sizing:
+      border-box;
+  }
+
+
+  .avance-plan-indicadores {
+    grid-template-columns:
+      1fr;
+
+    padding:
+      16px 18px 0;
+  }
+
+
+  .avance-plan-progreso {
+    padding:
+      20px 18px 22px;
+  }
+
+}
