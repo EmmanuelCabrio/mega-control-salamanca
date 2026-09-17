@@ -4237,6 +4237,7 @@ function leerComparativaMesAnterior(
   }
 
 
+
   // ==================================================
   // LOG
   // ==================================================
@@ -4278,6 +4279,541 @@ function leerComparativaMesAnterior(
 
 }
 
+
+// ==================================================
+// VENTAS DEL MISMO DÍA DE LA SEMANA ANTERIOR
+// ==================================================
+
+function leerResultadoMismoDiaSemanaAnterior(
+  hojaMesActual,
+  hojaMesAnterior,
+  registros = []
+) {
+
+  const filasActuales =
+    XLSX.utils.sheet_to_json(
+      hojaMesActual,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  const filasAnteriores =
+    XLSX.utils.sheet_to_json(
+      hojaMesAnterior,
+      {
+        header: 1,
+        defval: "",
+      }
+    );
+
+
+  // ==================================================
+  // COLUMNAS DE LA BASE
+  // ==================================================
+
+  const COLUMNA_NEGOCIO = 13;    // N
+  const COLUMNA_PROMOTOR = 26;   // AA
+  const COLUMNA_FECHA = 29;      // AD
+  const COLUMNA_SUPERVISOR = 32; // AG
+
+
+  // ==================================================
+  // CONVERTIR FECHAS
+  // ==================================================
+
+  function convertirFecha(
+    valor
+  ) {
+
+    // Fecha de JavaScript.
+
+    if (
+      valor instanceof Date &&
+      !Number.isNaN(
+        valor.getTime()
+      )
+    ) {
+
+      return {
+
+        anio:
+          valor.getFullYear(),
+
+        mes:
+          valor.getMonth() + 1,
+
+        dia:
+          valor.getDate(),
+
+      };
+
+    }
+
+
+    // Fecha numérica de Excel.
+
+    const numero =
+      Number(
+        valor
+      );
+
+
+    if (
+      Number.isFinite(
+        numero
+      ) &&
+      numero > 0
+    ) {
+
+      const fechaExcel =
+        XLSX.SSF.parse_date_code(
+          numero
+        );
+
+
+      if (
+        fechaExcel
+      ) {
+
+        return {
+
+          anio:
+            fechaExcel.y,
+
+          mes:
+            fechaExcel.m,
+
+          dia:
+            fechaExcel.d,
+
+        };
+
+      }
+
+    }
+
+
+    // Fecha guardada como texto.
+
+    const texto =
+      String(
+        valor ?? ""
+      ).trim();
+
+
+    // Formato DD/MM/YYYY.
+
+    let coincidencia =
+      texto.match(
+        /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/
+      );
+
+
+    if (
+      coincidencia
+    ) {
+
+      return {
+
+        dia:
+          Number(
+            coincidencia[1]
+          ),
+
+        mes:
+          Number(
+            coincidencia[2]
+          ),
+
+        anio:
+          Number(
+            coincidencia[3]
+          ),
+
+      };
+
+    }
+
+
+    // Formato YYYY-MM-DD.
+
+    coincidencia =
+      texto.match(
+        /^(\d{4})-(\d{1,2})-(\d{1,2})/
+      );
+
+
+    if (
+      coincidencia
+    ) {
+
+      return {
+
+        anio:
+          Number(
+            coincidencia[1]
+          ),
+
+        mes:
+          Number(
+            coincidencia[2]
+          ),
+
+        dia:
+          Number(
+            coincidencia[3]
+          ),
+
+      };
+
+    }
+
+
+    return null;
+
+  }
+
+
+  // ==================================================
+  // OBTENER FECHA ACTUAL EN SALAMANCA
+  // ==================================================
+
+  const partesHoy =
+    new Intl.DateTimeFormat(
+      "en-CA",
+      {
+        timeZone:
+          "America/Mexico_City",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+      }
+    ).formatToParts(
+      new Date()
+    );
+
+
+  const obtenerParte =
+    (tipo) =>
+      Number(
+        partesHoy.find(
+          (parte) =>
+            parte.type === tipo
+        )?.value
+      );
+
+
+  const fechaReferencia =
+    new Date(
+      Date.UTC(
+        obtenerParte(
+          "year"
+        ),
+
+        obtenerParte(
+          "month"
+        ) - 1,
+
+        obtenerParte(
+          "day"
+        )
+      )
+    );
+
+
+  // Retroceder exactamente siete días.
+
+  fechaReferencia.setUTCDate(
+    fechaReferencia.getUTCDate() -
+    7
+  );
+
+
+  const fechaObjetivo = {
+
+    anio:
+      fechaReferencia.getUTCFullYear(),
+
+    mes:
+      fechaReferencia.getUTCMonth() +
+      1,
+
+    dia:
+      fechaReferencia.getUTCDate(),
+
+  };
+
+
+  // ==================================================
+  // RELACIONAR PROMOTORES CON SU SUPERVISOR
+  // ==================================================
+  //
+  // Se utiliza como respaldo cuando una venta no trae
+  // supervisor directamente en la columna AG.
+  //
+  // ==================================================
+
+  const mapaPromotores =
+    new Map();
+
+
+  for (
+    const registro
+    of registros
+  ) {
+
+    const promotor =
+      normalizarNombre(
+        registro.nombre
+      );
+
+
+    const supervisor =
+      limpiarTexto(
+        registro.supervisor
+      );
+
+
+    if (
+      promotor &&
+      supervisor
+    ) {
+
+      mapaPromotores.set(
+        promotor,
+        supervisor
+      );
+
+    }
+
+  }
+
+
+  // ==================================================
+  // UNIR MES ACTUAL Y MES ANTERIOR
+  // ==================================================
+  //
+  // Esto permite que funcione durante los primeros
+  // siete días de cada mes.
+  //
+  // ==================================================
+
+  const filas = [
+
+    ...filasActuales.slice(1),
+
+    ...filasAnteriores.slice(1),
+
+  ];
+
+
+  const mapaSupervisores =
+    new Map();
+
+
+  // ==================================================
+  // CONTAR VENTAS
+  // ==================================================
+
+  for (
+    const fila
+    of filas
+  ) {
+
+    // Únicamente ventas de Internet.
+
+    const negocio =
+      limpiarTexto(
+        fila[
+          COLUMNA_NEGOCIO
+        ]
+      );
+
+
+    if (
+      negocio !== "INTERNET"
+    ) {
+
+      continue;
+
+    }
+
+
+    // Validar fecha.
+
+    const fecha =
+      convertirFecha(
+        fila[
+          COLUMNA_FECHA
+        ]
+      );
+
+
+    if (
+      !fecha ||
+      fecha.anio !==
+        fechaObjetivo.anio ||
+      fecha.mes !==
+        fechaObjetivo.mes ||
+      fecha.dia !==
+        fechaObjetivo.dia
+    ) {
+
+      continue;
+
+    }
+
+
+    // Obtener supervisor directamente de la venta.
+
+    let supervisor =
+      limpiarTexto(
+        fila[
+          COLUMNA_SUPERVISOR
+        ]
+      );
+
+
+    // Si no viene supervisor, buscarlo por promotor.
+
+    if (
+      esValorInvalido(
+        supervisor
+      ) ||
+      supervisor === "0" ||
+      supervisor === "SUPERVISOR"
+    ) {
+
+      const promotor =
+        normalizarNombre(
+          fila[
+            COLUMNA_PROMOTOR
+          ]
+        );
+
+
+      supervisor =
+        mapaPromotores.get(
+          promotor
+        ) || "";
+
+    }
+
+
+    if (
+      !supervisor
+    ) {
+
+      continue;
+
+    }
+
+
+    const clave =
+      normalizarNombre(
+        supervisor
+      );
+
+
+    const registroActual =
+      mapaSupervisores.get(
+        clave
+      ) || {
+
+        supervisor,
+
+        resultado:
+          0,
+
+      };
+
+
+    registroActual.resultado++;
+
+
+    mapaSupervisores.set(
+      clave,
+      registroActual
+    );
+
+  }
+
+
+  // ==================================================
+  // CONVERTIR RESULTADOS EN LISTA
+  // ==================================================
+
+  const supervisores =
+    Array.from(
+      mapaSupervisores.values()
+    ).sort(
+      (
+        registroA,
+        registroB
+      ) =>
+
+        registroB.resultado -
+          registroA.resultado ||
+
+        registroA.supervisor.localeCompare(
+          registroB.supervisor,
+          "es"
+        )
+    );
+
+
+  const total =
+    supervisores.reduce(
+      (
+        acumulado,
+        registro
+      ) =>
+        acumulado +
+        registro.resultado,
+      0
+    );
+
+
+  console.log(
+    "=========================================="
+  );
+
+  console.log(
+    "📅 MISMO DÍA SEMANA ANTERIOR:",
+    `${fechaObjetivo.dia}/${fechaObjetivo.mes}/${fechaObjetivo.anio}`
+  );
+
+  console.log(
+    "📈 VENTAS DEL DÍA:",
+    total
+  );
+
+  console.log(
+    "=========================================="
+  );
+
+
+  return {
+
+    fechaReferencia:
+      fechaObjetivo,
+
+    total,
+
+    supervisores,
+
+  };
+
+}
 
 // ==================================================
 // 🔄 RECUPERACIÓN VS MISMO DÍA DEL MES ANTERIOR
@@ -7323,6 +7859,18 @@ const hojaMesAnterior =
 
 
     // ==================================================
+// RESULTADO DEL MISMO DÍA DE LA SEMANA ANTERIOR
+// ==================================================
+
+const resultadoMismoDiaSemanaAnterior =
+  leerResultadoMismoDiaSemanaAnterior(
+    hojaMesActual,
+    hojaMesAnterior,
+    registros
+  );
+
+
+    // ==================================================
     // PLAN DE TRABAJO
     // ==================================================
 
@@ -7825,6 +8373,8 @@ const carteraPorDia =
     datosCacheados = {
 
       registros,
+
+      resultadoMismoDiaSemanaAnterior,
 
       planTrabajo,
 
