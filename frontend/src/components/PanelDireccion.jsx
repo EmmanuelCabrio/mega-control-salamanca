@@ -41,6 +41,9 @@ import ResumenPlanTrabajoDireccion
 import MetaSemanaAnteriorDireccion
   from "./MetaSemanaAnteriorDireccion";
 
+import EstadoLoginSupervisores
+  from "./EstadoLoginSupervisores";
+
 
 // ==================================================
 // 👑 DASHBOARD DE DIRECCIÓN
@@ -620,6 +623,8 @@ return (
  <Fragment key={versionDatos}>
 
    <MetaSemanaAnteriorDireccion />
+
+   <EstadoLoginSupervisores />
 
   <PlantillaStatus />
 
