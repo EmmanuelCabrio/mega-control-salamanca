@@ -66,6 +66,13 @@ function esValorInvalido(valor) {
   );
 }
 
+function esVacante(valor) {
+  const texto = limpiarTexto(valor)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  return /(^|[^A-Z])VACANTES?(?=$|[^A-Z])/.test(texto);
+}
 // ==================================================
 // DESCARGAR EXCEL DESDE SUPABASE
 // ==================================================
@@ -1575,12 +1582,11 @@ function leerRegistros(
     }
 
     if (
-      esValorInvalido(
-        nombrePromotor
-      )
-    ) {
-      continue;
-    }
+  esValorInvalido(nombrePromotor) ||
+  esVacante(nombrePromotor)
+      ) {
+  continue;
+     }
 
     if (
       nombrePromotor ===
