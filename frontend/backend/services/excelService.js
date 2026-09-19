@@ -5480,9 +5480,10 @@ function leerComparativaRecuperacionMesAnterior(
     );
 
 
-  const COLUMNA_FECHA = 16;
-  const COLUMNA_SUPERVISOR = 19;
-  const COLUMNA_PROMOTOR = 14;
+ const COLUMNA_CANAL = 9;       // J
+ const COLUMNA_PROMOTOR = 14;   // O
+ const COLUMNA_FECHA = 16;      // Q
+ const COLUMNA_SUPERVISOR = 19; // T
 
 
   const convertirFecha =
@@ -5850,6 +5851,239 @@ function leerComparativaRecuperacionMesAnterior(
 
     );
 
+  // ================================================
+// RX POR CANAL
+// ================================================
+
+const canalesActual =
+  contarCanales(
+    datosActual,
+    fechaCorte.anio,
+    fechaCorte.mes
+  );
+
+
+const canalesAnterior =
+  contarCanales(
+    datosAnterior,
+    anioAnterior,
+    mesAnterior
+  );
+
+
+// ================================================
+// UNIR CANALES DE AMBOS MESES
+// ================================================
+
+const clavesCanales =
+  new Set([
+    ...canalesActual.keys(),
+    ...canalesAnterior.keys(),
+  ]);
+
+
+// ================================================
+// CONSTRUIR COMPARATIVA
+// ================================================
+
+const comparativaCanales =
+  Array.from(
+    clavesCanales
+  )
+
+    .map(
+      (clave) => {
+
+        const registroActual =
+          canalesActual.get(
+            clave
+          );
+
+
+        const registroAnterior =
+          canalesAnterior.get(
+            clave
+          );
+
+
+        const rxActuales =
+          registroActual
+            ?.total || 0;
+
+
+        const rxAnteriores =
+          registroAnterior
+            ?.total || 0;
+
+
+        const diferencia =
+          rxActuales -
+          rxAnteriores;
+
+
+        return {
+
+          canal:
+            registroActual
+              ?.canal ||
+            registroAnterior
+              ?.canal ||
+            clave,
+
+          actual:
+            rxActuales,
+
+          anterior:
+            rxAnteriores,
+
+          diferencia,
+
+          variacionPorcentaje:
+
+            rxAnteriores > 0
+
+              ? (
+                  diferencia /
+                  rxAnteriores
+                ) * 100
+
+              : null,
+
+        };
+
+      }
+    )
+
+    // Mayor volumen actual primero.
+    .sort(
+      (
+        canalA,
+        canalB
+      ) =>
+
+        canalB.actual -
+          canalA.actual ||
+
+        canalA.canal.localeCompare(
+          canalB.canal,
+          "es"
+        )
+    );
+
+  // ================================================
+// CONTAR RX POR CANAL
+// ================================================
+//
+// IMPORTANTE:
+// Esta comparativa es general del CL.
+// NO se filtra por supervisor.
+//
+// J = CANAL
+// Q = FECHA VENTA
+//
+// ================================================
+
+const contarCanales =
+  (
+    datos,
+    anio,
+    mes
+  ) => {
+
+    const mapaCanales =
+      new Map();
+
+
+    for (
+      let indice = 1;
+      indice < datos.length;
+      indice++
+    ) {
+
+      const fila =
+        datos[indice];
+
+
+      const fecha =
+        convertirFecha(
+          fila[
+            COLUMNA_FECHA
+          ]
+        );
+
+
+      // ============================================
+      // SOLO EL MES CORRECTO Y HASTA EL DÍA DE CORTE
+      // ============================================
+
+      if (
+        !fecha ||
+        fecha.anio !== anio ||
+        fecha.mes !== mes ||
+        fecha.dia > fechaCorte.dia
+      ) {
+
+        continue;
+
+      }
+
+
+      // ============================================
+      // OBTENER CANAL
+      // ============================================
+
+      let canal =
+        limpiarTexto(
+          fila[
+            COLUMNA_CANAL
+          ]
+        );
+
+
+      if (
+        !canal ||
+        canal === "0"
+      ) {
+
+        canal =
+          "Sin Canal";
+
+      }
+
+
+      const clave =
+        normalizarNombre(
+          canal
+        );
+
+
+      const registro =
+        mapaCanales.get(
+          clave
+        ) || {
+
+          canal,
+
+          total: 0,
+
+        };
+
+
+      registro.total++;
+
+
+      mapaCanales.set(
+        clave,
+        registro
+      );
+
+    }
+
+
+    return mapaCanales;
+
+  };
+
 
   // ================================================
   // COMPARATIVA DIARIA ACUMULADA
@@ -6186,6 +6420,8 @@ function leerComparativaRecuperacionMesAnterior(
 
     comparativaIntegrantes,
 
+    comparativaCanales,
+
     fueraPlantilla: {
 
       actual:
@@ -6197,6 +6433,8 @@ function leerComparativaRecuperacionMesAnterior(
         totalPlantillaAnterior,
 
     },
+
+  
 
     detalle,
 
