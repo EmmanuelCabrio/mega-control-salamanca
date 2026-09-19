@@ -481,6 +481,173 @@ function ComparativaRecuperacionMesAnterior() {
       </div>
 
 
+      {/* =============================================
+    COMPARATIVA POR CANAL
+============================================= */}
+
+<div className="comparativa-rx-bloque">
+
+  <div className="comparativa-rx-titulo-tabla">
+
+    <div>
+
+      <span>
+        RECUPERACIONES POR CANAL
+      </span>
+
+      <h3>
+        Comparativa vs mes anterior
+      </h3>
+
+    </div>
+
+
+    <p>
+      Acumulado al día {datos.fechaCorte?.dia}.
+    </p>
+
+  </div>
+
+
+  <div className="comparativa-rx-tabla-contenedor">
+
+    <table className="comparativa-rx-tabla">
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Canal
+          </th>
+
+          <th>
+            {datos.mesActual.nombre}
+          </th>
+
+          <th>
+
+            {datos.mesAnterior.nombre}
+
+            <small>
+              Al día {datos.fechaCorte?.dia}
+            </small>
+
+          </th>
+
+          <th>
+            Diferencia
+          </th>
+
+          <th>
+            Variación
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+        {(datos.comparativaCanales || []).map(
+          (canal) => {
+
+            const clase =
+              canal.diferencia > 0
+                ? "comparativa-rx-positivo"
+                : canal.diferencia < 0
+                  ? "comparativa-rx-negativo"
+                  : "comparativa-rx-neutral";
+
+
+            const variacionCanal =
+              canal.variacionPorcentaje == null
+                ? null
+                : Number(
+                    canal.variacionPorcentaje
+                  );
+
+
+            return (
+
+              <tr key={canal.canal}>
+
+                <td>
+
+                  <strong>
+                    {canal.canal}
+                  </strong>
+
+                </td>
+
+
+                <td>
+
+                  {Number(
+                    canal.actual || 0
+                  ).toLocaleString(
+                    "es-MX"
+                  )}
+
+                </td>
+
+
+                <td>
+
+                  {Number(
+                    canal.anterior || 0
+                  ).toLocaleString(
+                    "es-MX"
+                  )}
+
+                </td>
+
+
+                <td className={clase}>
+
+                  {formatearDiferencia(
+                    canal.diferencia
+                  )}
+
+                </td>
+
+
+                <td className={clase}>
+
+                  {variacionCanal == null
+
+                    ? canal.actual > 0
+                      ? "Nuevo"
+                      : "—"
+
+                    : `${
+                        variacionCanal > 0
+                          ? "+"
+                          : ""
+                      }${variacionCanal.toFixed(
+                        1
+                      )}%`
+                  }
+
+                </td>
+
+              </tr>
+
+            );
+
+          }
+        )}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+
       <div className="comparativa-rx-titulo-tabla comparativa-rx-titulo-diario">
 
         <div>
