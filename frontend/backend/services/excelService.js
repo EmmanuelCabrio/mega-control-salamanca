@@ -5827,6 +5827,103 @@ function leerComparativaRecuperacionMesAnterior(
 
     };
 
+  // ================================================
+// CONTAR RX POR CANAL
+// ================================================
+
+const contarCanales =
+  (
+    datos,
+    anio,
+    mes
+  ) => {
+
+    const mapaCanales =
+      new Map();
+
+
+    for (
+      let indice = 1;
+      indice < datos.length;
+      indice++
+    ) {
+
+      const fila =
+        datos[indice];
+
+
+      const fecha =
+        convertirFecha(
+          fila[
+            COLUMNA_FECHA
+          ]
+        );
+
+
+      if (
+        !fecha ||
+        fecha.anio !== anio ||
+        fecha.mes !== mes ||
+        fecha.dia > fechaCorte.dia
+      ) {
+
+        continue;
+
+      }
+
+
+      let canal =
+        limpiarTexto(
+          fila[
+            COLUMNA_CANAL
+          ]
+        );
+
+
+      if (
+        !canal ||
+        canal === "0"
+      ) {
+
+        canal =
+          "Sin Canal";
+
+      }
+
+
+      const clave =
+        normalizarNombre(
+          canal
+        );
+
+
+      const registro =
+        mapaCanales.get(
+          clave
+        ) || {
+
+          canal,
+
+          total: 0,
+
+        };
+
+
+      registro.total++;
+
+
+      mapaCanales.set(
+        clave,
+        registro
+      );
+
+    }
+
+
+    return mapaCanales;
+
+  };
+
 
   const actual =
     contarRegistros(
@@ -5970,121 +6067,7 @@ const comparativaCanales =
         )
     );
 
-  // ================================================
-// CONTAR RX POR CANAL
-// ================================================
-//
-// IMPORTANTE:
-// Esta comparativa es general del CL.
-// NO se filtra por supervisor.
-//
-// J = CANAL
-// Q = FECHA VENTA
-//
-// ================================================
-
-const contarCanales =
-  (
-    datos,
-    anio,
-    mes
-  ) => {
-
-    const mapaCanales =
-      new Map();
-
-
-    for (
-      let indice = 1;
-      indice < datos.length;
-      indice++
-    ) {
-
-      const fila =
-        datos[indice];
-
-
-      const fecha =
-        convertirFecha(
-          fila[
-            COLUMNA_FECHA
-          ]
-        );
-
-
-      // ============================================
-      // SOLO EL MES CORRECTO Y HASTA EL DÍA DE CORTE
-      // ============================================
-
-      if (
-        !fecha ||
-        fecha.anio !== anio ||
-        fecha.mes !== mes ||
-        fecha.dia > fechaCorte.dia
-      ) {
-
-        continue;
-
-      }
-
-
-      // ============================================
-      // OBTENER CANAL
-      // ============================================
-
-      let canal =
-        limpiarTexto(
-          fila[
-            COLUMNA_CANAL
-          ]
-        );
-
-
-      if (
-        !canal ||
-        canal === "0"
-      ) {
-
-        canal =
-          "Sin Canal";
-
-      }
-
-
-      const clave =
-        normalizarNombre(
-          canal
-        );
-
-
-      const registro =
-        mapaCanales.get(
-          clave
-        ) || {
-
-          canal,
-
-          total: 0,
-
-        };
-
-
-      registro.total++;
-
-
-      mapaCanales.set(
-        clave,
-        registro
-      );
-
-    }
-
-
-    return mapaCanales;
-
-  };
-
-
+  
   // ================================================
   // COMPARATIVA DIARIA ACUMULADA
   // ================================================
