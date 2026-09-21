@@ -13,6 +13,7 @@ const {
   leerPlantilla,
   leerProductividadPorCanal,
   leerProductividadAntiguedad,
+  leerPromotoresProductividadBaja,
   leerCeroVentasPorCanal,
   leerCarteraPorDia,
   leerProyeccion,
@@ -2756,6 +2757,42 @@ app.get(
     }
   }
 );
+
+
+// PROMOTORES CON PRODUCTIVIDAD MENOR A 0.80 — DIRECCIÓN
+app.get(
+  "/api/promotores-productividad-baja",
+  autenticarToken,
+  async (req, res) => {
+    if (normalizarRol(req.rol) !== "DIRECCIÓN") {
+      return res.status(403).json({
+        correcto: false,
+        mensaje: "Acceso exclusivo de Dirección",
+      });
+    }
+
+    try {
+      const datos = await leerPromotoresProductividadBaja();
+
+      return res.json({
+        correcto: true,
+        ...datos,
+      });
+    } catch (error) {
+      console.error(
+        "Error en /api/promotores-productividad-baja:",
+        error
+      );
+
+      return res.status(500).json({
+        correcto: false,
+        mensaje:
+          "No se pudo cargar el análisis de productividad",
+      });
+    }
+  }
+);
+
 
 // ==================================================
 // PROMOTORES CON CERO VENTAS POR DÍA Y CANAL
