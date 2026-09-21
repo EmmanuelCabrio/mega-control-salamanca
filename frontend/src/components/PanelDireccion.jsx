@@ -17,6 +17,9 @@ import PlantillaStatus
 import ProductividadPorCanal
   from "./ProductividadPorCanal";
 
+import ProductividadAntiguedad
+  from "./ProductividadAntiguedad";
+
 import CarteraPorDia
   from "./CarteraPorDia";
 
@@ -43,6 +46,8 @@ import MetaSemanaAnteriorDireccion
 
 import EstadoLoginSupervisores
   from "./EstadoLoginSupervisores";
+
+
 
 
 // ==================================================
@@ -641,6 +646,8 @@ return (
   <VentaVsMesAnterior />
 
   <ProductividadPorCanal />
+
+   <ProductividadAntiguedad />
 
   <CarteraPorDia />
 
