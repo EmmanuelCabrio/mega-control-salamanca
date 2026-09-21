@@ -20,6 +20,9 @@ import ProductividadPorCanal
 import ProductividadAntiguedad
   from "./ProductividadAntiguedad";
 
+import ProductividadBajaDireccion
+  from "./ProductividadBajaDireccion";
+
 import CarteraPorDia
   from "./CarteraPorDia";
 
@@ -648,6 +651,8 @@ return (
   <ProductividadPorCanal />
 
    <ProductividadAntiguedad />
+
+   <ProductividadBajaDireccion />
 
   <CarteraPorDia />
 
