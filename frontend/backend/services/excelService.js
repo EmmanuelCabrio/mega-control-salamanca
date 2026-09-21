@@ -9778,6 +9778,106 @@ function leerCeroVentasPorCanal() {
 
 }
 
+
+// PROMOTORES CON PRODUCTIVIDAD MENOR A 0.80
+async function leerPromotoresProductividadBaja() {
+  const { registros = [] } = await leerExcel();
+  const hojaPlantilla = cargarExcel().Sheets["PLANTILLA"];
+
+  if (!hojaPlantilla) {
+    throw new Error('No se encontró la hoja "PLANTILLA"');
+  }
+
+  const filasPlantilla = XLSX.utils.sheet_to_json(hojaPlantilla, {
+    header: 1,
+    defval: "",
+  });
+
+  const canalPorNombre = new Map();
+
+  for (const fila of filasPlantilla.slice(1)) {
+    const nombre = limpiarTexto(fila[3]);
+    const puesto = normalizarNombre(fila[6]);
+    const estado = normalizarNombre(fila[11]);
+
+    if (
+      !nombre ||
+      nombre === "0" ||
+      esVacante(nombre) ||
+      estado !== "ACTIVO"
+    ) {
+      continue;
+    }
+
+    let canal;
+
+    if (puesto.includes("PUNTO DE VENTA")) {
+      canal = "PDV";
+    } else if (puesto.includes("EMPRESARIAL")) {
+      canal = "EMP";
+    } else if (puesto.includes("CAMBACEO")) {
+      canal = "CAM";
+    } else {
+      continue;
+    }
+
+    canalPorNombre.set(normalizarNombre(nombre), canal);
+  }
+
+  const resumen = [
+    { rango: "cero", etiqueta: "0.00", cantidad: 0 },
+    { rango: "rojo", etiqueta: "0.01 a menos de 0.60", cantidad: 0 },
+    { rango: "naranja", etiqueta: "0.60 a menos de 0.80", cantidad: 0 },
+  ];
+
+  const detalle = [];
+
+  for (const promotor of registros) {
+    const nombre = limpiarTexto(promotor.nombre);
+    const canal = canalPorNombre.get(normalizarNombre(nombre));
+    const productividad = Number(promotor.productividad);
+
+    if (
+      !canal ||
+      !nombre ||
+      esVacante(nombre) ||
+      !Number.isFinite(productividad) ||
+      productividad < 0 ||
+      productividad >= 0.8
+    ) {
+      continue;
+    }
+
+    const rango =
+      productividad === 0
+        ? "cero"
+        : productividad < 0.6
+          ? "rojo"
+          : "naranja";
+
+    resumen.find((item) => item.rango === rango).cantidad++;
+
+    detalle.push({
+      canal,
+      nombre,
+      supervisor: promotor.supervisor,
+      productividad,
+      diasSinVenta: Number(promotor.diasSinVenta) || 0,
+      rango,
+    });
+  }
+
+  detalle.sort(
+    (a, b) =>
+      a.productividad - b.productividad ||
+      b.diasSinVenta - a.diasSinVenta ||
+      a.nombre.localeCompare(b.nombre, "es")
+  );
+
+  return { resumen, detalle };
+}
+
+
 // ==================================================
 // EXPORTACIONES
 // ==================================================
@@ -9797,6 +9897,8 @@ module.exports = {
   leerProductividadPorCanal,
 
   leerProductividadAntiguedad,
+
+  leerPromotoresProductividadBaja,
 
   leerCeroVentasPorCanal,
 
