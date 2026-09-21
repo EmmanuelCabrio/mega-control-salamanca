@@ -14985,3 +14985,156 @@ small {
     font-size: 19px;
   }
 }
+
+/* DIRECCIÓN — PROMOTORES POR RANGO DE PRODUCTIVIDAD */
+
+.productividad-baja-direccion {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 24px;
+  padding: 28px;
+  color: #f8fafc;
+  background: linear-gradient(145deg, #0b1220, #142039 60%, #0b1220);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+}
+
+.productividad-baja-direccion__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.productividad-baja-direccion__header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.productividad-baja-direccion__header p {
+  margin: 0;
+  color: #aec5e2;
+}
+
+.productividad-baja-direccion__header > strong {
+  white-space: nowrap;
+  color: #93c5fd;
+  font-size: 16px;
+}
+
+.productividad-baja-direccion__resumen {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.productividad-baja-direccion__cuadro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  border-radius: 14px;
+  color: #172033;
+}
+
+.productividad-baja-direccion__cuadro--cero {
+  background: #fecaca;
+}
+
+.productividad-baja-direccion__cuadro--rojo {
+  background: #fee2e2;
+}
+
+.productividad-baja-direccion__cuadro--naranja {
+  background: #ffedd5;
+}
+
+.productividad-baja-direccion__cuadro span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.productividad-baja-direccion__cuadro strong {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.productividad-baja-direccion__cuadro small {
+  font-size: 12px;
+}
+
+.productividad-baja-direccion__tabla {
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+}
+
+.productividad-baja-direccion table {
+  width: 100%;
+  min-width: 830px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.productividad-baja-direccion th,
+.productividad-baja-direccion td {
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.productividad-baja-direccion thead {
+  background: #1c304e;
+}
+
+.productividad-baja-direccion thead th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.productividad-baja-direccion tbody td {
+  font-size: 13px;
+}
+
+.productividad-baja-direccion tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.productividad-baja-direccion__fila--cero {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.productividad-baja-direccion__fila--rojo {
+  background: rgba(248, 113, 113, 0.11);
+}
+
+.productividad-baja-direccion__fila--naranja {
+  background: rgba(251, 146, 60, 0.11);
+}
+
+.productividad-baja-direccion tbody tr:hover {
+  filter: brightness(1.2);
+}
+
+@media (max-width: 700px) {
+  .productividad-baja-direccion {
+    padding: 18px;
+  }
+
+  .productividad-baja-direccion__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .productividad-baja-direccion__header h2 {
+    font-size: 19px;
+  }
+
+  .productividad-baja-direccion__resumen {
+    grid-template-columns: 1fr;
+  }
+}
