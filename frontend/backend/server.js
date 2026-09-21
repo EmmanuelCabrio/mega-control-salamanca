@@ -12,6 +12,7 @@ const {
   leerVentaVsMesAnterior,
   leerPlantilla,
   leerProductividadPorCanal,
+  leerProductividadAntiguedad,
   leerCeroVentasPorCanal,
   leerCarteraPorDia,
   leerProyeccion,
@@ -2727,6 +2728,32 @@ app.get(
 
     }
 
+  }
+);
+
+
+// PRODUCTIVIDAD POR ANTIGÜEDAD — DIRECCIÓN
+app.get(
+  "/api/productividad-antiguedad",
+  autenticarToken,
+  (req, res) => {
+    try {
+      return res.json({
+        correcto: true,
+        ...leerProductividadAntiguedad(),
+      });
+    } catch (error) {
+      console.error(
+        "Error en /api/productividad-antiguedad:",
+        error
+      );
+
+      return res.status(500).json({
+        correcto: false,
+        mensaje:
+          "No se pudo cargar la productividad por antigüedad",
+      });
+    }
   }
 );
 
