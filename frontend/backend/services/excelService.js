@@ -2973,6 +2973,110 @@ function leerProductividadPorCanal() {
 
 }
 
+// FIN DE LEER PRODUCTIVIDAD//
+
+
+// PRODUCTIVIDAD POR ANTIGÜEDAD
+// PRODUCTIVIDAD: D = ID vendedor, F = nombre, G = días,
+// H = productividad venta + RX, AO = productividad venta.
+// PLANTILLA: A = ID vendedor, G = puesto, L = estatus.
+function leerProductividadAntiguedad() {
+  const workbook = cargarExcel();
+  const productividad = workbook.Sheets["PRODUCTIVIDAD"];
+  const plantilla = workbook.Sheets["PLANTILLA"];
+
+  if (!productividad || !plantilla) {
+    throw new Error("Faltan las hojas PRODUCTIVIDAD o PLANTILLA");
+  }
+
+  const filasPlantilla = XLSX.utils.sheet_to_json(plantilla, {
+    header: 1,
+    defval: "",
+  });
+
+  const personas = new Map();
+
+  for (const fila of filasPlantilla.slice(1)) {
+    const id = String(fila[0] ?? "").trim();
+
+    if (id) {
+      personas.set(id, {
+        puesto: normalizarNombre(fila[6]),
+        estado: normalizarNombre(fila[11]),
+      });
+    }
+  }
+
+  const canales = ["CAM", "PDV", "EMP", "REC", "POOL"];
+
+  const acumulados = new Map(
+    canales.map((canal) => [canal, {
+      menos45: { promotores: 0, venta: 0, ventaRx: 0 },
+      mas45: { promotores: 0, venta: 0, ventaRx: 0 },
+    }])
+  );
+
+  const vistos = new Set();
+
+  const filas = XLSX.utils.sheet_to_json(productividad, {
+    header: 1,
+    defval: "",
+  });
+
+  for (const fila of filas.slice(7)) {
+    const id = String(fila[3] ?? "").trim();
+    const nombre = limpiarTexto(fila[5]);
+    const persona = personas.get(id);
+    const dias = fila[6];
+    const venta = fila[40];   // AO
+    const ventaRx = fila[7];  // H
+
+    if (
+      !id || vistos.has(id) || !persona ||
+      persona.estado !== "ACTIVO" ||
+      !nombre || nombre === "0" || esVacante(nombre) ||
+      typeof dias !== "number" || !Number.isFinite(dias) || dias < 0 ||
+      typeof venta !== "number" || !Number.isFinite(venta) ||
+      typeof ventaRx !== "number" || !Number.isFinite(ventaRx)
+    ) {
+      continue;
+    }
+
+    const puesto = persona.puesto;
+    let canal;
+
+    if (puesto.includes("POOL")) canal = "POOL";
+    else if (puesto.includes("RECUPERADOR")) canal = "REC";
+    else if (puesto.includes("PUNTO DE VENTA")) canal = "PDV";
+    else if (puesto.includes("EMPRESARIAL")) canal = "EMP";
+    else if (puesto.includes("CAMBACEO")) canal = "CAM";
+    else continue;
+
+    vistos.add(id);
+
+    const grupo =
+      acumulados.get(canal)[dias <= 45 ? "menos45" : "mas45"];
+
+    grupo.promotores += 1;
+    grupo.venta += venta;
+    grupo.ventaRx += ventaRx;
+  }
+
+  const resumir = ({ promotores, venta, ventaRx }) => ({
+    promotores,
+    productividadVenta: promotores ? venta / promotores : null,
+    productividadVentaRx: promotores ? ventaRx / promotores : null,
+  });
+
+  return {
+    registros: canales.map((canal) => ({
+      canal,
+      menos45: resumir(acumulados.get(canal).menos45),
+      mas45: resumir(acumulados.get(canal).mas45),
+    })),
+  };
+}
+
 // ==================================================
 // 👥 CARTERA POR DÍA
 // ==================================================
@@ -9691,6 +9795,8 @@ module.exports = {
   leerPlantilla,
 
   leerProductividadPorCanal,
+
+  leerProductividadAntiguedad,
 
   leerCeroVentasPorCanal,
 
