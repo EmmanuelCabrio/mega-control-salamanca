@@ -56,6 +56,9 @@ import PromotorVsMesAnterior
 import PromotorAvanceSemanal
   from "./components/PromotorAvanceSemanal";
 
+import PromotorRankingCompleto
+  from "./components/PromotorRankingCompleto";
+
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -1394,11 +1397,36 @@ if (
 
       onContinuar={() => {
 
-        console.log(
-          "➡️ Siguiente: Ranking Cluster del promotor"
-        );
+  setVista(
+    "promotorRankingCompleto"
+  );
 
-      }}
+}}
+
+    />
+
+  );
+
+}
+
+
+
+  // ==================================================
+// 🏆 PROMOTOR — RANKING CLUSTER COMPLETO
+// ==================================================
+
+if (
+  rolUsuario === "PROMOTOR" &&
+  vista === "promotorRankingCompleto"
+) {
+
+  return (
+
+    <PromotorRankingCompleto
+
+      onCerrarSesion={
+        cerrarSesion
+      }
 
     />
 
