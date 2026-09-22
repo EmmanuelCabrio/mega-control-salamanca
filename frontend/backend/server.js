@@ -212,27 +212,62 @@ function autenticarToken(
       );
 
 
-    if (
-      !datos.supervisor &&
-      rol !== "DIRECCIÓN"
-    ) {
+   const tieneSupervisor =
+  Boolean(
+    normalizarSupervisor(
+      datos.supervisor
+    )
+  );
 
-      return res.status(401).json({
+const tieneSupervisorPromotor =
+  Boolean(
+    normalizarSupervisor(
+      datos.supervisorPromotor
+    )
+  );
 
-        correcto: false,
+const tokenValido =
+  rol === "DIRECCIÓN" ||
+  rol === "RECUPERACION" ||
+  (
+    rol === "SUPERVISOR" &&
+    tieneSupervisor
+  ) ||
+  (
+    rol === "PROMOTOR" &&
+    tieneSupervisorPromotor &&
+    datos.empleado
+  );
 
-        mensaje:
-          "Token inválido",
 
-      });
+if (!tokenValido) {
 
-    }
+  return res.status(401).json({
+
+    correcto: false,
+
+    mensaje:
+      "Token inválido",
+
+  });
+
+}
 
 
     req.supervisor =
       normalizarSupervisor(
         datos.supervisor
       );
+
+    req.supervisorPromotor =
+  normalizarSupervisor(
+    datos.supervisorPromotor
+  );
+
+req.empleado =
+  String(
+    datos.empleado ?? ""
+  ).trim();
 
 
     req.usuario =
@@ -332,13 +367,22 @@ app.post(
       }
 
 
-      await leerExcel();
+    await leerExcel();
 
-
-          const supervisor =
-       normalizarSupervisor(
+const supervisor =
+  normalizarSupervisor(
     resultado.supervisor
-        );
+  );
+
+const supervisorPromotor =
+  normalizarSupervisor(
+    resultado.supervisorPromotor
+  );
+
+const empleado =
+  String(
+    resultado.empleado ?? ""
+  ).trim();
 
 
        const rol =
@@ -348,31 +392,38 @@ app.post(
 
 
       const token =
-        jwt.sign(
+  jwt.sign(
 
-          {
+    {
 
-            usuario:
-              String(usuario)
-                .trim()
-                .toUpperCase(),
+      usuario:
+        String(usuario)
+          .trim()
+          .toUpperCase(),
 
-            supervisor,
+      supervisor,
 
-            rol,
+      supervisorPromotor,
 
-          },
+      empleado,
 
-          JWT_SECRET,
+      rol:
+        normalizarRol(
+          resultado.rol
+        ),
 
-          {
+    },
 
-            expiresIn:
-              "12h",
+    JWT_SECRET,
 
-          }
+    {
 
-        );
+      expiresIn:
+        "12h",
+
+    }
+
+  );
 
 
       // ==================================================
@@ -583,25 +634,20 @@ app.get(
 
       return res.json({
 
-        correcto:
-          true,
+  correcto: true,
 
-        fecha,
+  token,
 
-        total:
-          supervisores.length,
+  supervisor,
 
-        totalLogueados:
-          logueados.length,
+  supervisorPromotor,
 
-        totalPendientes:
-          pendientes.length,
+  empleado,
 
-        logueados,
+  rol:
+    resultado.rol,
 
-        pendientes,
-
-      });
+});
 
     } catch (error) {
 
