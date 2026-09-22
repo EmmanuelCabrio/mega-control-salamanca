@@ -2926,7 +2926,8 @@ ventasMesAnteriorMismoDia:
 diferenciaVsMesAnterior:
   Number(
     promotor.diferenciaVsMesAnterior ?? 0
-  
+
+    ),  
         },
 
       });
