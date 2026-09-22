@@ -2914,10 +2914,19 @@ console.log(
             ),
 
           productividad:
-            Number(
-              promotor.productividad ?? 0
-            ),
+  Number(
+    promotor.productividad ?? 0
+  ),
 
+ventasMesAnteriorMismoDia:
+  Number(
+    promotor.ventasMesAnteriorMismoDia ?? 0
+  ),
+
+diferenciaVsMesAnterior:
+  Number(
+    promotor.diferenciaVsMesAnterior ?? 0
+  
         },
 
       });
