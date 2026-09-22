@@ -53,8 +53,8 @@ import PromotorRankingInicial
 import PromotorVsMesAnterior
   from "./components/PromotorVsMesAnterior";
 
-import PromotorVsMesAnterior
-  from "./components/PromotorVsMesAnterior";
+import PromotorAvanceSemanal
+  from "./components/PromotorAvanceSemanal";
 
 
 const API_URL =
