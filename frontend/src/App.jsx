@@ -47,6 +47,9 @@ import RecuperacionesVsMesAnterior
 import MetaSemanaAnterior
   from "./components/MetaSemanaAnterior";
 
+import PromotorRankingInicial
+  from "./components/PromotorRankingInicial";
+
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -62,24 +65,47 @@ function App() {
   // ESTADO
   // ==================================================
 
-  const [vista, setVista] =
-    useState(() => {
+ const [vista, setVista] =
+  useState(() => {
 
-      try {
+    try {
 
-        return localStorage.getItem(
+      const rolGuardado =
+        localStorage.getItem(
           "mega_rol"
-        ) === "RECUPERACION"
-          ? "recuperacion"
-          : "supervisor";
+        );
 
-      } catch {
 
-        return "supervisor";
+      if (
+        rolGuardado ===
+        "RECUPERACION"
+      ) {
+
+        return "recuperacion";
 
       }
 
-    });
+
+      if (
+        rolGuardado ===
+        "PROMOTOR"
+      ) {
+
+        return "promotorRanking";
+
+      }
+
+
+      return "supervisor";
+
+
+    } catch {
+
+      return "supervisor";
+
+    }
+
+  });
 
 
   const [registros, setRegistros] =
@@ -196,6 +222,22 @@ const [
           "mega_sesion"
         );
 
+        localStorage.removeItem(
+  "mega_empleado"
+);
+
+localStorage.removeItem(
+  "mega_supervisor_promotor"
+);
+
+        setEmpleadoPromotor(
+  ""
+);
+
+setSupervisorPromotor(
+  ""
+);
+
         return "";
 
       }
@@ -235,6 +277,55 @@ const [
     return localStorage.getItem(
       "mega_rol"
     ) || "";
+
+  } catch {
+
+    return "";
+
+  }
+
+});
+
+
+
+  // ==================================================
+// 👤 DATOS DEL PROMOTOR LOGUEADO
+// ==================================================
+
+const [
+  empleadoPromotor,
+  setEmpleadoPromotor
+] = useState(() => {
+
+  try {
+
+    return (
+      localStorage.getItem(
+        "mega_empleado"
+      ) || ""
+    );
+
+  } catch {
+
+    return "";
+
+  }
+
+});
+
+
+const [
+  supervisorPromotor,
+  setSupervisorPromotor
+] = useState(() => {
+
+  try {
+
+    return (
+      localStorage.getItem(
+        "mega_supervisor_promotor"
+      ) || ""
+    );
 
   } catch {
 
@@ -678,14 +769,15 @@ console.log(
 
 useEffect(() => {
 
-  if (
-    !logueado ||
-    rolUsuario === "RECUPERACION"
-  ) {
+ if (
+  !logueado ||
+  rolUsuario === "RECUPERACION" ||
+  rolUsuario === "PROMOTOR"
+) {
 
-    return;
+  return;
 
-  }
+}
 
 
   console.log(
@@ -713,6 +805,18 @@ function manejarLogin(
 
   const supervisor =
     resultadoLogin.supervisor;
+
+
+  const empleado =
+  String(
+    resultadoLogin.empleado ?? ""
+  ).trim();
+
+
+const supervisorDelPromotor =
+  String(
+    resultadoLogin.supervisorPromotor ?? ""
+  ).trim();
 
   const rol =
     String(
@@ -1111,6 +1215,43 @@ function manejarSiguienteFoco() {
     );
 
   }
+
+
+  // ==================================================
+// 👤 PERFIL PROMOTOR — POSICIÓN CLUSTER
+// ==================================================
+
+if (
+  rolUsuario === "PROMOTOR" &&
+  vista === "promotorRanking"
+) {
+
+  return (
+
+    <PromotorRankingInicial
+
+      onCerrarSesion={
+        cerrarSesion
+      }
+
+      onContinuar={() => {
+
+        // ==========================================
+        // PRÓXIMA PANTALLA:
+        // VS MES ANTERIOR
+        // ==========================================
+
+        console.log(
+          "➡️ Siguiente: Promotor vs mes anterior"
+        );
+
+      }}
+
+    />
+
+  );
+
+}
 
 
 
@@ -1692,6 +1833,108 @@ if (
     />
 
   );
+
+}
+
+
+  // ==========================================
+// 👤 PROMOTOR
+// ==========================================
+
+if (
+  rol === "PROMOTOR"
+) {
+
+  setEmpleadoPromotor(
+    empleado
+  );
+
+  setSupervisorPromotor(
+    supervisorDelPromotor
+  );
+
+
+  // El PROMOTOR no utiliza
+  // supervisorSeleccionado
+  // para navegar el sistema.
+
+  setSupervisorSeleccionado(
+    ""
+  );
+
+
+  try {
+
+    localStorage.setItem(
+      "mega_sesion",
+      JSON.stringify(
+        empleado
+      )
+    );
+
+
+    localStorage.setItem(
+      "mega_empleado",
+      empleado
+    );
+
+
+    localStorage.setItem(
+      "mega_supervisor_promotor",
+      supervisorDelPromotor
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "❌ No se pudo guardar la sesión del promotor:",
+      error
+    );
+
+  }
+
+
+  setLogueado(
+    true
+  );
+
+
+  setVista(
+    "promotorRanking"
+  );
+
+
+  // Evitar cualquier flujo
+  // perteneciente a supervisores
+
+  setMostrarRankingInicial(
+    false
+  );
+
+  setMostrarReconocimientoCL(
+    false
+  );
+
+  setMostrarRankingSupervisoresIntermedio(
+    false
+  );
+
+  setMostrarFocosRojosIniciales(
+    false
+  );
+
+
+  setAusencias(
+    {}
+  );
+
+  setFocosAtendidos(
+    []
+  );
+
+
+  return;
 
 }
 
