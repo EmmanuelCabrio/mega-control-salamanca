@@ -50,6 +50,9 @@ import MetaSemanaAnterior
 import PromotorRankingInicial
   from "./components/PromotorRankingInicial";
 
+import PromotorVsMesAnterior
+  from "./components/PromotorVsMesAnterior";
+
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -1324,13 +1327,40 @@ if (
 
       onContinuar={() => {
 
-        // ==========================================
-        // PRÓXIMA PANTALLA:
-        // VS MES ANTERIOR
-        // ==========================================
+  setVista(
+    "promotorMesAnterior"
+  );
+
+}}
+
+    />
+
+  );
+
+}
+
+
+  // ==================================================
+// 📈 PROMOTOR VS MES ANTERIOR
+// ==================================================
+
+if (
+  rolUsuario === "PROMOTOR" &&
+  vista === "promotorMesAnterior"
+) {
+
+  return (
+
+    <PromotorVsMesAnterior
+
+      onCerrarSesion={
+        cerrarSesion
+      }
+
+      onContinuar={() => {
 
         console.log(
-          "➡️ Siguiente: Promotor vs mes anterior"
+          "➡️ Siguiente: Avance semanal del promotor"
         );
 
       }}
@@ -1340,7 +1370,6 @@ if (
   );
 
 }
-
 
 
 
