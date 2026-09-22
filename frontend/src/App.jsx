@@ -895,6 +895,94 @@ const supervisorDelPromotor =
   }
 
 
+
+  // ==========================================
+// 👤 PROMOTOR
+// ==========================================
+
+if (
+  rol === "PROMOTOR"
+) {
+
+  setEmpleadoPromotor(
+    empleado
+  );
+
+  setSupervisorPromotor(
+    supervisorDelPromotor
+  );
+
+  setSupervisorSeleccionado(
+    ""
+  );
+
+
+  try {
+
+    localStorage.setItem(
+      "mega_sesion",
+      JSON.stringify(
+        empleado
+      )
+    );
+
+    localStorage.setItem(
+      "mega_empleado",
+      empleado
+    );
+
+    localStorage.setItem(
+      "mega_supervisor_promotor",
+      supervisorDelPromotor
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ No se pudo guardar la sesión del promotor:",
+      error
+    );
+
+  }
+
+
+  setLogueado(
+    true
+  );
+
+  setVista(
+    "promotorRanking"
+  );
+
+  setMostrarRankingInicial(
+    false
+  );
+
+  setMostrarReconocimientoCL(
+    false
+  );
+
+  setMostrarRankingSupervisoresIntermedio(
+    false
+  );
+
+  setMostrarFocosRojosIniciales(
+    false
+  );
+
+  setAusencias(
+    {}
+  );
+
+  setFocosAtendidos(
+    []
+  );
+
+  return;
+
+}
+
+
  if (
   rol === "DIRECCIÓN"
 ) {
@@ -1836,107 +1924,6 @@ if (
 
 }
 
-
-  // ==========================================
-// 👤 PROMOTOR
-// ==========================================
-
-if (
-  rol === "PROMOTOR"
-) {
-
-  setEmpleadoPromotor(
-    empleado
-  );
-
-  setSupervisorPromotor(
-    supervisorDelPromotor
-  );
-
-
-  // El PROMOTOR no utiliza
-  // supervisorSeleccionado
-  // para navegar el sistema.
-
-  setSupervisorSeleccionado(
-    ""
-  );
-
-
-  try {
-
-    localStorage.setItem(
-      "mega_sesion",
-      JSON.stringify(
-        empleado
-      )
-    );
-
-
-    localStorage.setItem(
-      "mega_empleado",
-      empleado
-    );
-
-
-    localStorage.setItem(
-      "mega_supervisor_promotor",
-      supervisorDelPromotor
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "❌ No se pudo guardar la sesión del promotor:",
-      error
-    );
-
-  }
-
-
-  setLogueado(
-    true
-  );
-
-
-  setVista(
-    "promotorRanking"
-  );
-
-
-  // Evitar cualquier flujo
-  // perteneciente a supervisores
-
-  setMostrarRankingInicial(
-    false
-  );
-
-  setMostrarReconocimientoCL(
-    false
-  );
-
-  setMostrarRankingSupervisoresIntermedio(
-    false
-  );
-
-  setMostrarFocosRojosIniciales(
-    false
-  );
-
-
-  setAusencias(
-    {}
-  );
-
-  setFocosAtendidos(
-    []
-  );
-
-
-  return;
-
-}
 
 
 // ==================================================
