@@ -31,6 +31,11 @@ function PromotorRankingCompleto({
   ] = useState([]);
 
   const [
+    nombrePromotor,
+    setNombrePromotor,
+  ] = useState("");
+
+  const [
     cargando,
     setCargando,
   ] = useState(true);
@@ -46,14 +51,8 @@ function PromotorRankingCompleto({
 
 
   // ==================================================
-  // PROMOTOR LOGUEADO
+  // NORMALIZAR NOMBRE
   // ==================================================
-
-  const empleado =
-    localStorage.getItem(
-      "mega_empleado"
-    ) || "";
-
 
   const normalizarNombre =
     (valor) =>
@@ -73,19 +72,19 @@ function PromotorRankingCompleto({
         .toUpperCase();
 
 
-  const empleadoNormalizado =
+  const nombrePromotorNormalizado =
     normalizarNombre(
-      empleado
+      nombrePromotor
     );
 
 
   // ==================================================
-  // CARGAR RANKING
+  // CARGAR RANKING + IDENTIDAD DEL PROMOTOR
   // ==================================================
 
   useEffect(() => {
 
-    async function cargarRanking() {
+    async function cargarDatos() {
 
       try {
 
@@ -93,31 +92,82 @@ function PromotorRankingCompleto({
         setError("");
 
 
-        const respuesta =
-          await fetchProtegido(
-            `${API_URL}/api/ranking-cl-completo`
-          );
+        const [
+          respuestaRanking,
+          respuestaResumen,
+        ] =
+          await Promise.all([
+
+            fetchProtegido(
+              `${API_URL}/api/ranking-cl-completo`
+            ),
+
+            fetchProtegido(
+              `${API_URL}/api/promotor/resumen`
+            ),
+
+          ]);
 
 
-        const datos =
-          await respuesta.json();
+        const [
+          datosRanking,
+          datosResumen,
+        ] =
+          await Promise.all([
 
+            respuestaRanking.json(),
+
+            respuestaResumen.json(),
+
+          ]);
+
+
+        // ==========================================
+        // VALIDAR RANKING
+        // ==========================================
 
         if (
-          !respuesta.ok ||
-          !datos.correcto
+          !respuestaRanking.ok ||
+          !datosRanking.correcto
         ) {
 
           throw new Error(
-            datos.mensaje ||
+            datosRanking.mensaje ||
             "No se pudo cargar el Ranking Cluster"
           );
 
         }
 
 
+        // ==========================================
+        // VALIDAR PROMOTOR
+        // ==========================================
+
+        if (
+          !respuestaResumen.ok ||
+          !datosResumen.correcto
+        ) {
+
+          throw new Error(
+            datosResumen.mensaje ||
+            "No se pudo identificar al promotor"
+          );
+
+        }
+
+
+        // ==========================================
+        // GUARDAR
+        // ==========================================
+
         setRanking(
-          datos.ranking || []
+          datosRanking.ranking || []
+        );
+
+
+        setNombrePromotor(
+          datosResumen.promotor?.nombre ||
+          ""
         );
 
 
@@ -144,7 +194,7 @@ function PromotorRankingCompleto({
     }
 
 
-    cargarRanking();
+    cargarDatos();
 
   }, []);
 
@@ -161,11 +211,11 @@ function PromotorRankingCompleto({
             normalizarNombre(
               registro.nombre
             ) ===
-            empleadoNormalizado
+            nombrePromotorNormalizado
         ),
       [
         ranking,
-        empleadoNormalizado,
+        nombrePromotorNormalizado,
       ]
     );
 
@@ -178,27 +228,35 @@ function PromotorRankingCompleto({
 
     if (
       !cargando &&
+      indicePromotor >= 0 &&
       filaPromotorRef.current
     ) {
 
-      setTimeout(
-        () => {
+      const timer =
+        setTimeout(
+          () => {
 
-          filaPromotorRef.current
-            ?.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
+            filaPromotorRef.current
+              ?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
 
-        },
-        450
-      );
+          },
+          450
+        );
+
+
+      return () =>
+        clearTimeout(
+          timer
+        );
 
     }
 
   }, [
     cargando,
-    ranking,
+    indicePromotor,
   ]);
 
 
@@ -259,6 +317,16 @@ function PromotorRankingCompleto({
             {error}
           </p>
 
+          <button
+            type="button"
+            className="promotor-semana-salir"
+            onClick={
+              onCerrarSesion
+            }
+          >
+            Cerrar sesión
+          </button>
+
         </div>
 
       </div>
@@ -267,6 +335,10 @@ function PromotorRankingCompleto({
 
   }
 
+
+  // ==================================================
+  // RENDER
+  // ==================================================
 
   return (
 
@@ -366,7 +438,7 @@ function PromotorRankingCompleto({
                     normalizarNombre(
                       promotor.nombre
                     ) ===
-                    empleadoNormalizado;
+                    nombrePromotorNormalizado;
 
 
                   return (
@@ -375,11 +447,13 @@ function PromotorRankingCompleto({
                       key={
                         `${promotor.nombre}-${index}`
                       }
+
                       ref={
                         esYo
                           ? filaPromotorRef
                           : null
                       }
+
                       className={
                         esYo
                           ? "promotor-ranking-final-yo"
