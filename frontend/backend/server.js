@@ -2960,6 +2960,254 @@ diferenciaVsMesAnterior:
 
 
 // ==================================================
+// 📅 AVANCE SEMANAL PERSONAL DEL PROMOTOR
+// ==================================================
+
+app.get(
+  "/api/promotor/avance-semanal",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      // ==========================================
+      // SOLO PROMOTORES
+      // ==========================================
+
+      if (
+        req.rol !== "PROMOTOR"
+      ) {
+
+        return res.status(403).json({
+
+          correcto: false,
+
+          mensaje:
+            "Acceso exclusivo para promotores",
+
+        });
+
+      }
+
+
+      // ==========================================
+      // NORMALIZAR NOMBRES
+      // ==========================================
+
+      const normalizarNombrePromotor =
+        (valor) =>
+          String(
+            valor ?? ""
+          )
+            .normalize("NFD")
+            .replace(
+              /[\u0300-\u036f]/g,
+              ""
+            )
+            .replace(
+              /\s+/g,
+              " "
+            )
+            .trim()
+            .toUpperCase();
+
+
+      // ==========================================
+      // IDENTIDADES POSIBLES DEL PROMOTOR
+      // ==========================================
+
+      const identidadesPromotor =
+        [
+          normalizarNombrePromotor(
+            req.empleado
+          ),
+
+          normalizarNombrePromotor(
+            req.supervisor
+          ),
+        ]
+          .filter(
+            (valor) =>
+              valor &&
+              valor !== "0"
+          );
+
+
+      const supervisorPromotor =
+        normalizarNombrePromotor(
+          req.supervisorPromotor
+        );
+
+
+      // ==========================================
+      // CARGAR DATOS
+      // ==========================================
+
+      const datos =
+        await leerExcel();
+
+
+      const avanceSemanal =
+        datos.avanceSemanal || [];
+
+
+      // ==========================================
+      // BUSCAR AL PROMOTOR
+      // ==========================================
+
+      const coincidencias =
+        avanceSemanal.filter(
+          (item) => {
+
+            const nombre =
+              normalizarNombrePromotor(
+                item.nombre
+              );
+
+
+            return (
+              identidadesPromotor.includes(
+                nombre
+              )
+            );
+
+          }
+        );
+
+
+      // ==========================================
+      // SI HAY MÁS DE UNA COINCIDENCIA,
+      // USAR SU SUPERVISOR COMO RESPALDO
+      // ==========================================
+
+      let registroPromotor =
+        coincidencias.find(
+          (item) =>
+
+            normalizarNombrePromotor(
+              item.supervisor
+            ) ===
+            supervisorPromotor
+        );
+
+
+      // Si no encontró por supervisor,
+      // usar la primera coincidencia por nombre.
+
+      if (!registroPromotor) {
+
+        registroPromotor =
+          coincidencias[0];
+
+      }
+
+
+      // ==========================================
+      // NO ENCONTRADO
+      // ==========================================
+
+      if (!registroPromotor) {
+
+        return res.status(404).json({
+
+          correcto: false,
+
+          mensaje:
+            "No se encontró el avance semanal del promotor",
+
+        });
+
+      }
+
+
+      // ==========================================
+      // RESPUESTA
+      // ==========================================
+
+      return res.json({
+
+        correcto: true,
+
+        avance: {
+
+          nombre:
+            registroPromotor.nombre,
+
+          supervisor:
+            registroPromotor.supervisor,
+
+          productividad:
+            Number(
+              registroPromotor.productividad ?? 0
+            ),
+
+          dobles:
+            Number(
+              registroPromotor.dobles ?? 0
+            ),
+
+          triples:
+            Number(
+              registroPromotor.triples ?? 0
+            ),
+
+          movil:
+            Number(
+              registroPromotor.movil ?? 0
+            ),
+
+          netflix:
+            Number(
+              registroPromotor.netflix ?? 0
+            ),
+
+          disney:
+            Number(
+              registroPromotor.disney ?? 0
+            ),
+
+          max:
+            Number(
+              registroPromotor.max ?? 0
+            ),
+
+          rx:
+            Number(
+              registroPromotor.rx ?? 0
+            ),
+
+        },
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/promotor/avance-semanal:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar el avance semanal del promotor",
+
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
 // VENTA VS MES ANTERIOR
 // ==================================================
 
