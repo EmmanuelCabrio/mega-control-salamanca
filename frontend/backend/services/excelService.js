@@ -363,6 +363,7 @@ const COLUMNA_USUARIO = 2;
 const COLUMNA_PASSWORD = 3;
 const COLUMNA_ESTADO = 4;
 const COLUMNA_SUPERVISOR = 5;
+const COLUMNA_SUPERVISOR_PROMOTOR = 6;
 const COLUMNA_ROL = 7;
 
   for (
@@ -408,6 +409,13 @@ const COLUMNA_ROL = 7;
         ] ?? ""
       ).trim();
 
+    const supervisorPromotor =
+  String(
+    fila[
+      COLUMNA_SUPERVISOR_PROMOTOR
+    ] ?? ""
+  ).trim();
+
     const rol =
       String(
         fila[
@@ -422,14 +430,17 @@ const COLUMNA_ROL = 7;
       continue;
     }
 
-    usuarios.push({
-      empleado,
-      usuario,
-      password,
-      estado,
-      supervisor,
-      rol,
-    });
+   usuarios.push({
+
+  empleado,
+  usuario,
+  password,
+  estado,
+  supervisor,
+  supervisorPromotor,
+  rol,
+
+});
   }
 
   console.log(
@@ -508,20 +519,25 @@ function validarUsuario(
         "Tu usuario se encuentra inactivo",
     };
   }
+  
 
   return {
-    correcto: true,
 
-    supervisor:
-      encontrado.supervisor,
+  correcto: true,
 
-    empleado:
-      encontrado.empleado,
+  supervisor:
+    encontrado.supervisor,
 
-    rol:
-      encontrado.rol,
-  };
-}
+  supervisorPromotor:
+    encontrado.supervisorPromotor,
+
+  empleado:
+    encontrado.empleado,
+
+  rol:
+    encontrado.rol,
+
+};
 
 // ==================================================
 // LEER VENTA VS PPTO
