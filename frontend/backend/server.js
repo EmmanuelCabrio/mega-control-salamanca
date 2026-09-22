@@ -2691,10 +2691,37 @@ app.get(
       .toUpperCase();
 
 
-      const empleadoNormalizado =
-        normalizarNombreComparacion(
-          empleado
-        );
+    // ==========================================
+// IDENTIDADES POSIBLES DEL PROMOTOR
+// ==========================================
+
+const empleadoNormalizado =
+  normalizarNombreComparacion(
+    req.empleado
+  );
+
+const nombreDesdeSupervisor =
+  normalizarNombreComparacion(
+    req.supervisor
+  );
+
+
+const identidadesPromotor =
+  [
+    empleadoNormalizado,
+    nombreDesdeSupervisor,
+  ]
+    .filter(
+      (valor) =>
+        valor &&
+        valor !== "0"
+    );
+
+
+console.log(
+  "👤 IDENTIDADES PROMOTOR:",
+  identidadesPromotor
+);
 
 
       // ==========================================
@@ -2815,14 +2842,21 @@ console.log(
     )
 );
       const indicePromotor =
-        registrosRanking.findIndex(
-          (registro) =>
+  registrosRanking.findIndex(
+    (registro) => {
 
-            normalizarNombreComparacion(
-              registro.nombre
-            ) ===
-            empleadoNormalizado
+      const nombreRegistro =
+        normalizarNombreComparacion(
+          registro.nombre
         );
+
+
+      return identidadesPromotor.includes(
+        nombreRegistro
+      );
+
+    }
+  );
 
 
       if (
