@@ -346,23 +346,24 @@ function obtenerUsuarios() {
 
   const usuarios = [];
 
-  // ==================================================
-  // USERS
-  //
-  // B = Empleado
-  // C = Usuario
-  // D = Contraseña
-  // E = Estado
-  // F = Supervisor
-  // G = Rol
-  // ==================================================
+// ==================================================
+// USERS
+//
+// B = Empleado
+// C = Usuario
+// D = Contraseña
+// E = Estado
+// F = Supervisor
+// G = Supervisor Promotor
+// H = Rol
+// ==================================================
 
-  const COLUMNA_EMPLEADO = 1;
-  const COLUMNA_USUARIO = 2;
-  const COLUMNA_PASSWORD = 3;
-  const COLUMNA_ESTADO = 4;
-  const COLUMNA_SUPERVISOR = 5;
-  const COLUMNA_ROL = 6;
+const COLUMNA_EMPLEADO = 1;
+const COLUMNA_USUARIO = 2;
+const COLUMNA_PASSWORD = 3;
+const COLUMNA_ESTADO = 4;
+const COLUMNA_SUPERVISOR = 5;
+const COLUMNA_ROL = 7;
 
   for (
     let i = 1;
