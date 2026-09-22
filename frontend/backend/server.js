@@ -2592,6 +2592,285 @@ app.get(
 
 
 // ==================================================
+// 👤 RESUMEN PERSONAL DEL PROMOTOR
+// ==================================================
+
+app.get(
+  "/api/promotor/resumen",
+  autenticarToken,
+  async (req, res) => {
+
+    try {
+
+      // ==========================================
+      // VALIDAR ROL
+      // ==========================================
+
+      if (
+        req.rol !== "PROMOTOR"
+      ) {
+
+        return res.status(403).json({
+
+          correcto: false,
+
+          mensaje:
+            "Acceso exclusivo para promotores",
+
+        });
+
+      }
+
+
+      // ==========================================
+      // DATOS DEL PROMOTOR DESDE EL TOKEN
+      // ==========================================
+
+      const empleado =
+        String(
+          req.empleado ?? ""
+        )
+          .trim()
+          .toUpperCase();
+
+
+      const supervisorPromotor =
+        String(
+          req.supervisorPromotor ?? ""
+        )
+          .trim()
+          .toUpperCase();
+
+
+      if (!empleado) {
+
+        return res.status(400).json({
+
+          correcto: false,
+
+          mensaje:
+            "No se encontró el empleado en la sesión",
+
+        });
+
+      }
+
+
+      // ==========================================
+      // CARGAR EXCEL DESDE MEMORIA
+      // ==========================================
+
+      const datos =
+        await leerExcel();
+
+
+      // ==========================================
+      // NORMALIZAR NOMBRES
+      // ==========================================
+
+      const normalizarNombreComparacion =
+        (valor) =>
+          String(
+            valor ?? ""
+          )
+            .normalize("NFD")
+            .replace(
+              /[\u0300-\u036f]/g,
+              ""
+            )
+            .trim()
+            .toUpperCase();
+
+
+      const empleadoNormalizado =
+        normalizarNombreComparacion(
+          empleado
+        );
+
+
+      // ==========================================
+      // CONSTRUIR MISMO RANKING CL
+      // ==========================================
+
+      const registrosRanking =
+        (datos.registros || [])
+
+          .filter(
+            (registro) => {
+
+              const nombre =
+                String(
+                  registro.nombre ?? ""
+                ).trim();
+
+              const supervisor =
+                String(
+                  registro.supervisor ?? ""
+                )
+                  .trim()
+                  .toUpperCase();
+
+
+              if (
+                !nombre ||
+                nombre === "0"
+              ) {
+
+                return false;
+
+              }
+
+
+              if (
+                supervisor ===
+                "MORALES PEREZ BENJAMIN"
+              ) {
+
+                return false;
+
+              }
+
+
+              const nombreNormalizado =
+                normalizarNombreComparacion(
+                  nombre
+                );
+
+
+              // EXCLUIR VACANTES
+              if (
+                nombreNormalizado.includes(
+                  "VACANTE"
+                )
+              ) {
+
+                return false;
+
+              }
+
+
+              return true;
+
+            }
+          )
+
+          .sort(
+            (a, b) =>
+              Number(
+                b.productividad || 0
+              ) -
+              Number(
+                a.productividad || 0
+              )
+          );
+
+
+      // ==========================================
+      // BUSCAR PROMOTOR DENTRO DEL RANKING
+      // ==========================================
+
+      const indicePromotor =
+        registrosRanking.findIndex(
+          (registro) =>
+
+            normalizarNombreComparacion(
+              registro.nombre
+            ) ===
+            empleadoNormalizado
+        );
+
+
+      if (
+        indicePromotor === -1
+      ) {
+
+        return res.status(404).json({
+
+          correcto: false,
+
+          mensaje:
+            "No se encontró al promotor dentro del Ranking CL",
+
+        });
+
+      }
+
+
+      const promotor =
+        registrosRanking[
+          indicePromotor
+        ];
+
+
+      // ==========================================
+      // RESPUESTA
+      // ==========================================
+
+      return res.json({
+
+        correcto: true,
+
+        promotor: {
+
+          nombre:
+            promotor.nombre,
+
+          supervisor:
+            supervisorPromotor,
+
+          posicion:
+            indicePromotor + 1,
+
+          totalPromotores:
+            registrosRanking.length,
+
+          ventas:
+            Number(
+              promotor.ventasMesPromotor ?? 0
+            ),
+
+          recuperaciones:
+            Number(
+              promotor.recuperaciones ?? 0
+            ),
+
+          productividad:
+            Number(
+              promotor.productividad ?? 0
+            ),
+
+        },
+
+      });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error en /api/promotor/resumen:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res.status(500).json({
+
+        correcto: false,
+
+        mensaje:
+          "No se pudo cargar el resumen del promotor",
+
+      });
+
+    }
+
+  }
+);
+
+
+// ==================================================
 // VENTA VS MES ANTERIOR
 // ==================================================
 
