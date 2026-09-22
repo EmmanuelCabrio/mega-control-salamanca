@@ -2778,6 +2778,42 @@ app.get(
       // BUSCAR PROMOTOR DENTRO DEL RANKING
       // ==========================================
 
+
+
+
+
+      console.log(
+  "👤 PROMOTOR BUSCADO:",
+  empleadoNormalizado
+);
+
+console.log(
+  "🏆 TOTAL RANKING:",
+  registrosRanking.length
+);
+
+console.log(
+  "🔎 COINCIDENCIAS GALLEGOS:",
+  registrosRanking
+    .filter(
+      (registro) =>
+        normalizarNombreComparacion(
+          registro.nombre
+        ).includes(
+          "GALLEGOS"
+        )
+    )
+    .map(
+      (registro) => ({
+        nombre:
+          registro.nombre,
+        supervisor:
+          registro.supervisor,
+        productividad:
+          registro.productividad,
+      })
+    )
+);
       const indicePromotor =
         registrosRanking.findIndex(
           (registro) =>
