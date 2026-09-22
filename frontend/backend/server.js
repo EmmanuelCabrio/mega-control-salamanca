@@ -2668,18 +2668,27 @@ app.get(
       // NORMALIZAR NOMBRES
       // ==========================================
 
-      const normalizarNombreComparacion =
-        (valor) =>
-          String(
-            valor ?? ""
-          )
-            .normalize("NFD")
-            .replace(
-              /[\u0300-\u036f]/g,
-              ""
-            )
-            .trim()
-            .toUpperCase();
+     const normalizarNombreComparacion =
+  (valor) =>
+    String(
+      valor ?? ""
+    )
+      .normalize("NFD")
+
+      // Quitar acentos
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+
+      // Espacios raros de Excel
+      .replace(
+        /\s+/g,
+        " "
+      )
+
+      .trim()
+      .toUpperCase();
 
 
       const empleadoNormalizado =
