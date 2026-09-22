@@ -53,6 +53,9 @@ import PromotorRankingInicial
 import PromotorVsMesAnterior
   from "./components/PromotorVsMesAnterior";
 
+import PromotorVsMesAnterior
+  from "./components/PromotorVsMesAnterior";
+
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -1359,8 +1362,40 @@ if (
 
       onContinuar={() => {
 
+  setVista(
+    "promotorAvanceSemanal"
+  );
+
+}}
+
+    />
+
+  );
+
+}
+
+
+  // ==================================================
+// 📅 PROMOTOR — AVANCE SEMANAL
+// ==================================================
+
+if (
+  rolUsuario === "PROMOTOR" &&
+  vista === "promotorAvanceSemanal"
+) {
+
+  return (
+
+    <PromotorAvanceSemanal
+
+      onCerrarSesion={
+        cerrarSesion
+      }
+
+      onContinuar={() => {
+
         console.log(
-          "➡️ Siguiente: Avance semanal del promotor"
+          "➡️ Siguiente: Ranking Cluster del promotor"
         );
 
       }}
@@ -1370,7 +1405,6 @@ if (
   );
 
 }
-
 
 
   // ==================================================
