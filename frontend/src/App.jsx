@@ -2143,6 +2143,7 @@ if (
         ========================================== */}
 
        <KPICard
+  className="kpi-presupuesto"
 
   icono="📈"
 
@@ -2170,6 +2171,22 @@ if (
 
       </span>
 
+
+      <div className="avance-barra">
+
+  <div
+    className="avance-barra-relleno"
+    style={{
+      width:
+        `${Math.min(
+          porcentajePpto,
+          100
+        )}%`
+    }}
+  />
+
+</div>
+      
 
       <br />
 
@@ -2269,7 +2286,9 @@ if (
             KPI — RITMO NECESARIO
         ========================================== */}
 
- <KPICard
+<KPICard
+
+  className="kpi-ritmo"
 
   icono="🔥"
 
@@ -2277,7 +2296,7 @@ if (
 
   valor={
 
-    <>
+    <div className="ritmo-contenido">
 
       <span className="ritmo-numero">
 
@@ -2285,27 +2304,41 @@ if (
 
       </span>
 
-      <span className="ritmo-unidad " >
+      <div className="ritmo-texto">
 
-          VENTAS DIARIAS
+        <span className="ritmo-unidad">
+          VENTAS
+        </span>
 
-      </span>
+        <span className="ritmo-periodo">
+          DIARIAS
+        </span>
 
-    </>
+      </div>
+
+    </div>
 
   }
 
   detalle={
 
-    `TE QUEDAN ${diasHabilesRestantes} DÍAS HÁBILES RESTANTES`
+    <div className="ritmo-restantes">
+
+      <span>📅</span>
+
+      Te quedan
+
+      <strong>
+        {diasHabilesRestantes}
+      </strong>
+
+      días hábiles restantes
+
+    </div>
 
   }
 
 />
-
-
-
-
 
         {/* ==========================================
     VS MISMO DÍA MES ANTERIOR
