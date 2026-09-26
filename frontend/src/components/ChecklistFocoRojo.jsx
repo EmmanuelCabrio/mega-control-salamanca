@@ -917,6 +917,16 @@ ${copia.outerHTML}
       cursor: "pointer",
     },
 
+    corporateButton: {
+    border: "none",
+    borderRadius: "10px",
+    padding: "13px 24px",
+   background: "#17202a",
+   color: "#fff",
+   fontWeight: "800",
+   cursor: "pointer",
+    },
+
     exportButton: {
       border: "none",
       borderRadius: "10px",
@@ -2159,6 +2169,21 @@ ${copia.outerHTML}
               ? "↩️ Regresar al Dashboard"
               : "🔒 Descarga la evidencia para continuar"}
           </button>
+
+
+          <button
+        type="button"
+        style={styles.corporateButton}
+        onClick={() => {
+         window.open(
+          "https://forms.cloud.microsoft/r/5WKYqP7h3N",
+         "_blank",
+         "noopener,noreferrer"
+          );
+       }}
+      >
+       🏢 Check list corporativo
+     </button>
 
           <button
             type="button"
