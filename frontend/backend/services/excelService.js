@@ -7756,9 +7756,9 @@ async function leerExcel() {
 
 
     const hojaVentaVsPpto =
-      workbook.Sheets[
-        "VENTA VS PPTO"
-      ];
+  workbook.Sheets[
+    "VENTA DIARIA POR SUPERVISOR"
+  ];
 
     // ==================================================
 // COMPARATIVA VS MES ANTERIOR
@@ -8493,7 +8493,6 @@ function actualizarDatosDesdeSupabase() {
 
       "PRODUCTIVIDAD",
       "BD SIN VENTA",
-      "VENTA VS PPTO",
       "BD PLAN DE TRABAJO",
       "PLAN DE TRABAJO",
       "BD AVANCE SEMANAL",
@@ -8637,7 +8636,6 @@ function validarExcelParaCarga(buffer) {
 
     "PRODUCTIVIDAD",
     "BD SIN VENTA",
-    "VENTA VS PPTO",
     "BD PLAN DE TRABAJO",
     "PLAN DE TRABAJO",
     "BD AVANCE SEMANAL",
