@@ -3,20 +3,33 @@ function KPICard({
   titulo,
   valor,
   detalle,
+  className = "",
 }) {
 
   return (
 
-    <div className="sales-summary">
+    <div
+      className={
+        `sales-summary ${className}`.trim()
+      }
+    >
 
-      <h2>
-        {icono} {titulo}
-      </h2>
+      <div className="kpi-encabezado">
+
+        <span className="kpi-icono">
+          {icono}
+        </span>
+
+        <h2>
+          {titulo}
+        </h2>
+
+      </div>
 
 
-      <h1>
+      <div className="kpi-valor">
         {valor}
-      </h1>
+      </div>
 
 
       <div className="kpi-detalle">
