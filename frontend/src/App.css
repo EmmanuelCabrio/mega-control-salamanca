@@ -13318,7 +13318,7 @@ small {
 .avance-plan-indicadores-resumen {
   grid-template-columns:
     repeat(
-      5,
+      3,
       minmax(0, 1fr)
     );
 }
@@ -13559,8 +13559,9 @@ strong {
     100%;
 
   min-width:
-    1250px;
+  1550px;
 
+   
   border-collapse:
     collapse;
 }
