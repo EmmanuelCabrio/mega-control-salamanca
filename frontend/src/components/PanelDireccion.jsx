@@ -14,8 +14,6 @@ import VentaVsMesAnterior
 import PlantillaStatus
   from "./PlantillaStatus";
 
-import ProductividadPorCanal
-  from "./ProductividadPorCanal";
 
 import ProductividadAntiguedad
   from "./ProductividadAntiguedad";
@@ -647,8 +645,6 @@ return (
    <ResumenRxSupervisores />
 
   <VentaVsMesAnterior />
-
-  <ProductividadPorCanal />
 
    <ProductividadAntiguedad />
 
