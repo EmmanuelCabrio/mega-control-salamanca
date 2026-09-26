@@ -15541,3 +15541,497 @@ small {
   }
 
 }
+
+/* ==================================================
+   DASHBOARD — FOCOS ROJOS Y RANKINGS EJECUTIVOS
+================================================== */
+
+/* Contenedor de las tres tarjetas */
+
+.performance-grid {
+  gap: 22px;
+  align-items: stretch;
+}
+
+
+/* ==================================================
+   FOCOS ROJOS
+================================================== */
+
+.performance-grid .focus-alerts {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 100%;
+  padding: 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #fff7f7 100%
+    );
+
+  border: 1px solid #fecaca;
+  border-radius: 24px;
+
+  box-shadow:
+    0 14px 35px rgba(127, 29, 29, 0.1);
+}
+
+
+/* Línea roja superior */
+
+.performance-grid .focus-alerts::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 5px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #dc2626,
+      #fb7185,
+      #f97316
+    );
+}
+
+
+/* Decoración circular */
+
+.performance-grid .focus-alerts::after {
+  content: "";
+
+  position: absolute;
+  top: -70px;
+  right: -70px;
+
+  width: 190px;
+  height: 190px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(220, 38, 38, 0.055);
+
+  pointer-events: none;
+}
+
+
+.performance-grid .focus-alerts h2 {
+  position: relative;
+  z-index: 1;
+
+  margin: 0 0 7px;
+
+  font-size: 29px;
+  line-height: 1.1;
+  font-weight: 950;
+
+  color: #b91c1c;
+
+  letter-spacing: -0.5px;
+}
+
+
+.performance-grid .subtitulo-focos {
+  position: relative;
+  z-index: 1;
+
+  margin: 0 0 22px;
+
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+
+  color: #64748b;
+}
+
+
+/* Promotor prioritario */
+
+.performance-grid .alerta {
+  position: relative;
+  z-index: 1;
+
+  padding: 18px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  border: 1px solid #fecaca;
+  border-left: 5px solid #ef4444;
+  border-radius: 17px;
+
+  box-shadow:
+    0 8px 22px rgba(127, 29, 29, 0.08);
+}
+
+
+.performance-grid .alerta > strong {
+  display: block;
+
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 900;
+
+  color: #172033;
+}
+
+
+.performance-grid .boton-detalle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 14px;
+  padding: 10px 17px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dc2626,
+      #ef4444
+    );
+
+  color: #ffffff;
+
+  border: none;
+  border-radius: 11px;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  box-shadow:
+    0 7px 16px rgba(220, 38, 38, 0.22);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.performance-grid .boton-detalle:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #b91c1c,
+      #dc2626
+    );
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 20px rgba(220, 38, 38, 0.3);
+}
+
+
+/* ==================================================
+   COLUMNA DE RANKINGS
+================================================== */
+
+.rankings-dashboard {
+  gap: 16px;
+}
+
+
+.rankings-dashboard .honor-board {
+  position: relative;
+  overflow: hidden;
+
+  padding: 20px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f5f8ff 100%
+    );
+
+  border: 1px solid #dbe5f3;
+  border-radius: 21px;
+
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.075);
+}
+
+
+/* Franja superior */
+
+.rankings-dashboard .honor-board::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #60a5fa
+    );
+}
+
+
+/* Segundo ranking con identidad dorada */
+
+.rankings-dashboard
+.honor-board:nth-child(2)::before {
+  background:
+    linear-gradient(
+      90deg,
+      #f59e0b,
+      #fbbf24,
+      #f97316
+    );
+}
+
+
+.rankings-dashboard .honor-tittle {
+  position: relative;
+  z-index: 1;
+
+  margin: 0 0 13px;
+
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 950;
+
+  color: #0f172a;
+
+  letter-spacing: -0.2px;
+}
+
+
+/* Cada integrante */
+
+.rankings-dashboard .honor-card {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  margin: 7px 0;
+  padding: 10px 12px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5ebf5;
+  border-radius: 13px;
+
+  box-shadow:
+    0 4px 12px rgba(15, 23, 42, 0.045);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.rankings-dashboard .honor-card:hover {
+  transform: translateX(4px);
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.1);
+}
+
+
+/* Primer lugar */
+
+.rankings-dashboard .honor-card.lugar-1 {
+  background:
+    linear-gradient(
+      90deg,
+      #fffbeb,
+      #ffffff
+    );
+
+  border-color: #fde68a;
+}
+
+
+/* Segundo lugar */
+
+.rankings-dashboard .honor-card.lugar-2 {
+  background:
+    linear-gradient(
+      90deg,
+      #f8fafc,
+      #ffffff
+    );
+
+  border-color: #d8e0eb;
+}
+
+
+/* Tercer lugar */
+
+.rankings-dashboard .honor-card.lugar-3 {
+  background:
+    linear-gradient(
+      90deg,
+      #fff7ed,
+      #ffffff
+    );
+
+  border-color: #fed7aa;
+}
+
+
+/* Medallas */
+
+.rankings-dashboard .honor-medalla {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  font-size: 21px;
+
+  background: #f1f5f9;
+
+  border-radius: 11px;
+}
+
+
+.rankings-dashboard
+.lugar-1
+.honor-medalla {
+  background: #fef3c7;
+}
+
+
+.rankings-dashboard
+.lugar-2
+.honor-medalla {
+  background: #eef2f7;
+}
+
+
+.rankings-dashboard
+.lugar-3
+.honor-medalla {
+  background: #ffedd5;
+}
+
+
+/* Información */
+
+.rankings-dashboard .honor-info {
+  min-width: 0;
+}
+
+
+.rankings-dashboard .honor-nombre {
+  overflow: hidden;
+
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 900;
+
+  color: #172033;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.rankings-dashboard .honor-productividad {
+  display: inline-block;
+
+  margin: 4px 0 0;
+  padding: 3px 8px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  color: #1d4ed8;
+  background: #eff6ff;
+
+  border-radius: 999px;
+}
+
+
+/* ==================================================
+   SIN FOCOS ROJOS
+================================================== */
+
+.performance-grid .sin-focos {
+  position: relative;
+  z-index: 1;
+
+  padding: 18px;
+
+  color: #166534;
+  background: #f0fdf4;
+
+  border: 1px solid #bbf7d0;
+  border-radius: 15px;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 900px) {
+
+  .performance-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .rankings-dashboard {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .performance-grid .focus-alerts {
+    padding: 21px 17px;
+    border-radius: 19px;
+  }
+
+
+  .performance-grid .focus-alerts h2 {
+    font-size: 24px;
+  }
+
+
+  .rankings-dashboard .honor-board {
+    padding: 17px 14px;
+    border-radius: 18px;
+  }
+
+
+  .rankings-dashboard .honor-tittle {
+    font-size: 17px;
+  }
+
+
+  .rankings-dashboard .honor-nombre {
+    white-space: normal;
+  }
+
+}
