@@ -2051,6 +2051,22 @@ app.get(
                 acumulado.diferencia +
                 registro.diferencia,
 
+              ventaApps:
+             acumulado.ventaApps +
+              registro.ventaApps,
+
+              ventaMovil:
+             acumulado.ventaMovil +
+             registro.ventaMovil,
+
+             cortes:
+             acumulado.cortes +
+             registro.cortes,
+
+            rx:
+            acumulado.rx +
+            registro.rx,
+
             }),
             {
 
@@ -2069,6 +2085,14 @@ app.get(
               meta: 0,
 
               diferencia: 0,
+              
+              ventaApps: 0,
+
+              ventaMovil: 0,
+
+              cortes: 0,
+
+              rx: 0,
 
             }
           );
