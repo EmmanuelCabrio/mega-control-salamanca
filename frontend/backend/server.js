@@ -115,7 +115,16 @@ function normalizarSupervisor(
     supervisor || ""
   )
     .trim()
-    .toUpperCase();
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .replace(
+      /\s+/g,
+      " "
+    );
 
 }
 
