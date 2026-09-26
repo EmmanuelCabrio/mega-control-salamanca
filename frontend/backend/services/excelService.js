@@ -2595,64 +2595,7 @@ function leerVentaVsMesAnterior() {
 }
 
 
-    // ==============================================
-    // LOG
-    // ==============================================
-
-    console.log(
-      "=========================================="
-    );
-
-    console.log(
-      "📈 PRODUCTIVIDAD POR CANAL"
-    );
-
-    console.log(
-      "📦 REGISTROS:",
-      registros.length
-    );
-
-    console.log(
-      registros
-    );
-
-    console.log(
-      "=========================================="
-    );
-
-
-    // ==============================================
-    // DEVOLVER
-    // ==============================================
-
-    return {
-
-      registros,
-
-    };
-
-
-  } catch (error) {
-
-    console.error(
-      "❌ ERROR EN PRODUCTIVIDAD POR CANAL:",
-      error
-    );
-
-
-    return {
-
-      registros: [],
-
-    };
-
-  }
-
-}
-
-// FIN DE LEER PRODUCTIVIDAD//
-
-
+   
 // PRODUCTIVIDAD POR ANTIGÜEDAD
 // PRODUCTIVIDAD: D = ID vendedor, F = nombre, G = días,
 // H = productividad venta + RX, AO = productividad venta.
