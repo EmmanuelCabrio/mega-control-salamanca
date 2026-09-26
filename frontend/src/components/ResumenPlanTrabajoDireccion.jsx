@@ -276,6 +276,23 @@ function ResumenPlanTrabajoDireccion() {
                 Diferencia
               </th>
 
+
+              <th>
+               Apps
+              </th>
+
+              <th>
+                Móvil
+             </th>
+
+            <th>
+            Cortes
+            </th>
+
+            <th>
+              RX
+            </th>
+
               <th>
                 Avance
               </th>
@@ -388,6 +405,30 @@ function ResumenPlanTrabajoDireccion() {
                       )}
 
                     </td>
+
+                    <td>
+              {formatearNumero(
+             registro.ventaApps
+                )}
+             </td>
+
+              <td>
+              {formatearNumero(
+              registro.ventaMovil
+                )}
+            </td>
+
+             <td>
+               {formatearNumero(
+                registro.cortes
+               )}
+             </td>
+
+             <td>
+              {formatearNumero(
+            registro.rx
+              )}
+            </td>
 
                     <td>
 
@@ -506,6 +547,30 @@ function ResumenPlanTrabajoDireccion() {
                 )}
 
               </td>
+
+              <td>
+             {formatearNumero(
+               totales.ventaApps
+            )}
+           </td>
+
+           <td>
+             {formatearNumero(
+             totales.ventaMovil
+             )}
+          </td>
+
+           <td>
+            {formatearNumero(
+            totales.cortes
+             )}
+          </td>
+
+         <td>
+         {formatearNumero(
+         totales.rx
+          )}
+         </td>
 
               <td>
 
