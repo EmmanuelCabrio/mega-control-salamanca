@@ -2594,348 +2594,6 @@ function leerVentaVsMesAnterior() {
   }
 }
 
-// ==================================================
-// 📈 PRODUCTIVIDAD POR CANAL
-// ==================================================
-//
-// HOJA:
-// KPI´s ventas
-//
-// L = CANAL
-// M = PROD VTA
-//
-// O = CANAL
-// P = PROD VTA + RX
-//
-// R = PLUS RX
-//
-// SOLO SE ACEPTAN:
-// CAM
-// PDV
-// EMP
-// REC
-// POOL
-// TOTAL
-//
-// ==================================================
-
-function leerProductividadPorCanal() {
-
-  try {
-
-    // ==============================================
-    // OBTENER EXCEL
-    // ==============================================
-
-    const workbook =
-      cargarExcel();
-
-
-    // ==============================================
-    // BUSCAR HOJA
-    // ==============================================
-
-    const nombreHoja =
-      workbook.SheetNames.find(
-        (nombre) =>
-          String(nombre)
-            .trim()
-            .toUpperCase() ===
-          "KPI´S VENTAS"
-      );
-
-
-    if (!nombreHoja) {
-
-      throw new Error(
-        'No se encontró la hoja "KPI´s ventas"'
-      );
-
-    }
-
-
-    const hoja =
-      workbook.Sheets[
-        nombreHoja
-      ];
-
-
-    // ==============================================
-    // CONVERTIR A FILAS
-    // ==============================================
-
-    const datos =
-      XLSX.utils.sheet_to_json(
-        hoja,
-        {
-          header: 1,
-          defval: "",
-        }
-      );
-
-
-    // ==============================================
-    // COLUMNAS
-    // ==============================================
-
-    const COLUMNA_CANAL_VTA = 11; // L
-
-    const COLUMNA_PROD_VTA = 12; // M
-
-    const COLUMNA_CANAL_RX = 14; // O
-
-    const COLUMNA_PROD_RX = 15; // P
-
-    const COLUMNA_PLUS_RX = 17; // R
-
-
-    // ==============================================
-    // CANALES VÁLIDOS
-    // ==============================================
-
-    const canalesValidos =
-      new Set([
-        "CAM",
-        "PDV",
-        "EMP",
-        "REC",
-        "POOL",
-        "TOTAL",
-      ]);
-
-
-    // ==============================================
-    // ORDEN FINAL
-    // ==============================================
-
-    const ordenCanales = [
-      "CAM",
-      "PDV",
-      "EMP",
-      "REC",
-      "POOL",
-      "TOTAL",
-    ];
-
-
-    // ==============================================
-    // MAPAS
-    // ==============================================
-
-    const mapaVenta =
-      new Map();
-
-
-    const mapaVentaRx =
-      new Map();
-
-
-    const mapaPlusRx =
-      new Map();
-
-
-    // ==============================================
-    // RECORRER FILAS
-    // ==============================================
-
-    for (
-      let i = 0;
-      i < datos.length;
-      i++
-    ) {
-
-      const fila =
-        datos[i];
-
-
-      // ============================================
-      // TABLA PROD VTA
-      // ============================================
-
-      const canalVenta =
-        limpiarTexto(
-          fila[
-            COLUMNA_CANAL_VTA
-          ]
-        );
-
-
-      if (
-        canalesValidos.has(
-          canalVenta
-        )
-      ) {
-
-        const productividadVenta =
-          Number(
-            fila[
-              COLUMNA_PROD_VTA
-            ]
-          );
-
-
-        if (
-          Number.isFinite(
-            productividadVenta
-          )
-        ) {
-
-          mapaVenta.set(
-            canalVenta,
-            productividadVenta
-          );
-
-        }
-
-      }
-
-
-      // ============================================
-      // TABLA PROD VTA + RX
-      // ============================================
-
-      const canalRx =
-        limpiarTexto(
-          fila[
-            COLUMNA_CANAL_RX
-          ]
-        );
-
-
-      if (
-        canalesValidos.has(
-          canalRx
-        )
-      ) {
-
-        const productividadVentaRx =
-          Number(
-            fila[
-              COLUMNA_PROD_RX
-            ]
-          );
-
-
-        if (
-          Number.isFinite(
-            productividadVentaRx
-          )
-        ) {
-
-          mapaVentaRx.set(
-            canalRx,
-            productividadVentaRx
-          );
-
-        }
-
-
-        // ==========================================
-        // PLUS RX
-        // ==========================================
-
-        const plusRx =
-          Number(
-            fila[
-              COLUMNA_PLUS_RX
-            ]
-          );
-
-
-        if (
-          Number.isFinite(
-            plusRx
-          )
-        ) {
-
-          mapaPlusRx.set(
-            canalRx,
-            plusRx
-          );
-
-        }
-
-      }
-
-    }
-
-
-    // ==============================================
-    // CONSTRUIR RESULTADO
-    // ==============================================
-
-    const registros =
-      ordenCanales
-        .filter(
-          (canal) =>
-            mapaVenta.has(
-              canal
-            ) ||
-            mapaVentaRx.has(
-              canal
-            )
-        )
-        .map(
-          (canal) => {
-
-            const productividadVenta =
-              Number(
-                mapaVenta.get(
-                  canal
-                ) ?? 0
-              );
-
-
-            const productividadVentaRx =
-              Number(
-                mapaVentaRx.get(
-                  canal
-                ) ?? 0
-              );
-
-
-            let plusRx =
-              mapaPlusRx.get(
-                canal
-              );
-
-
-            // ======================================
-            // SI R NO TRAE NÚMERO,
-            // CALCULAR P - M
-            //
-            // Esto también calcula TOTAL,
-            // porque en R7 aparece "TOTAL".
-            // ======================================
-
-            if (
-              !Number.isFinite(
-                plusRx
-              )
-            ) {
-
-              plusRx =
-                productividadVentaRx -
-                productividadVenta;
-
-            }
-
-
-            return {
-
-              canal,
-
-              productividadVenta,
-
-              productividadVentaRx,
-
-              plusRx,
-
-            };
-
-          }
-        );
-
 
     // ==============================================
     // LOG
@@ -8700,14 +8358,6 @@ const resumenPlanTrabajo =
 
 
     // ==================================================
-    // 📈 PRODUCTIVIDAD POR CANAL
-    // ==================================================
-
-    const productividadPorCanal =
-      leerProductividadPorCanal();
-
-
-    // ==================================================
 // 👥 CARTERA POR DÍA
 // ==================================================
 
@@ -8735,8 +8385,6 @@ const carteraPorDia =
       avanceSemanal,
 
       rankingSupervisores,
-
-      productividadPorCanal,
       
       carteraPorDia,
 
@@ -8882,7 +8530,6 @@ function actualizarDatosDesdeSupabase() {
       "USERS",
       "PLANTILLA",
       "VS MES ANTERIOR",
-      "KPI´S VENTAS",
       "CARTERA POR DÍA",
       "PROYECCION",
       "BD ACUMULADO VENTA MES",
@@ -9027,7 +8674,6 @@ function validarExcelParaCarga(buffer) {
     "USERS",
     "PLANTILLA",
     "VS MES ANTERIOR",
-    "KPI´S VENTAS",
     "CARTERA POR DÍA",
     "PROYECCION",
     "BD ACUMULADO VENTA MES",
@@ -9912,8 +9558,6 @@ module.exports = {
   leerVentaVsMesAnterior,
 
   leerPlantilla,
-
-  leerProductividadPorCanal,
 
   leerProductividadAntiguedad,
 
