@@ -401,6 +401,65 @@ function AvancePlanTrabajo() {
 
         </article>
 
+        <article>
+
+  <span>
+    Venta de Apps
+  </span>
+
+  <strong>
+    {formatearNumero(
+      resumen.ventaApps
+    )}
+  </strong>
+
+</article>
+
+
+<article>
+
+  <span>
+    Venta de Móvil
+  </span>
+
+  <strong>
+    {formatearNumero(
+      resumen.ventaMovil
+    )}
+  </strong>
+
+</article>
+
+
+<article>
+
+  <span>
+    Cortes
+  </span>
+
+  <strong>
+    {formatearNumero(
+      resumen.cortes
+    )}
+  </strong>
+
+</article>
+
+
+<article>
+
+  <span>
+    RX
+  </span>
+
+  <strong>
+    {formatearNumero(
+      resumen.rx
+    )}
+  </strong>
+
+</article>
+
       </div>
 
 
