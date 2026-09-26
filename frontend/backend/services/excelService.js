@@ -1135,6 +1135,10 @@ function leerResumenPlanTrabajo(
   const COLUMNA_VENTAS_GENERAL = 5;      // F
   const COLUMNA_META = 6;                // G
   const COLUMNA_DIFERENCIA = 7;          // H
+  const COLUMNA_VENTA_APPS = 8;          // I
+  const COLUMNA_VENTA_MOVIL = 9;         // J
+  const COLUMNA_CORTES = 10;             // K
+  const COLUMNA_RX = 11;                 // L
 
 
   // ==================================================
@@ -1243,6 +1247,34 @@ function leerResumenPlanTrabajo(
             COLUMNA_DIFERENCIA
           ]
         ),
+
+      ventaApps:
+  numeroSeguro(
+    fila[
+      COLUMNA_VENTA_APPS
+    ]
+  ),
+
+ventaMovil:
+  numeroSeguro(
+    fila[
+      COLUMNA_VENTA_MOVIL
+    ]
+  ),
+
+cortes:
+  numeroSeguro(
+    fila[
+      COLUMNA_CORTES
+    ]
+  ),
+
+rx:
+  numeroSeguro(
+    fila[
+      COLUMNA_RX
+    ]
+  ),
 
       avancePorcentaje:
         meta > 0
