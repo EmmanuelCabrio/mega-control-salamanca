@@ -542,10 +542,11 @@ function validarUsuario(
 }
 
 // ==================================================
-// LEER VENTA VS PPTO
+// LEER VENTA VS PPTO DESDE VENTA DIARIA POR SUPERVISOR
 // ==================================================
 
 function leerVentaVsPpto(hoja) {
+
   const datos =
     XLSX.utils.sheet_to_json(
       hoja,
@@ -555,36 +556,41 @@ function leerVentaVsPpto(hoja) {
       }
     );
 
+
   const mapa =
     new Map();
+
 
   for (
     let i = 0;
     i < datos.length;
     i++
   ) {
+
     const fila =
       datos[i];
 
+
+    // C = SUPERVISOR
     const supervisor =
       limpiarTexto(
-        fila[0]
-      );
-
-    const presupuesto =
-      Number(
-        fila[1]
-      );
-
-    const ventas =
-      Number(
         fila[2]
       );
 
-    const restVsPpto =
+
+    // AK = VENTA ACUMULADA
+    const ventas =
       Number(
-        fila[5]
+        fila[36]
       );
+
+
+    // AL = PRESUPUESTO
+    const presupuesto =
+      Number(
+        fila[37]
+      );
+
 
     if (
       esValorInvalido(
@@ -594,69 +600,56 @@ function leerVentaVsPpto(hoja) {
       continue;
     }
 
+
     if (
-      supervisor === "SUPERVISOR" ||
-      supervisor === "TOTAL"
+      supervisor ===
+        "VENTAS POR SUPERVISOR" ||
+      supervisor ===
+        "SUPERVISOR" ||
+      supervisor ===
+        "TOTAL"
     ) {
       continue;
     }
+
 
     if (
       !Number.isFinite(
         presupuesto
-      )
-    ) {
-      continue;
-    }
-
-    if (
+      ) ||
       !Number.isFinite(
         ventas
       )
     ) {
       continue;
     }
+
 
     const clave =
       normalizarNombre(
         supervisor
       );
 
+
     const presupuestoEntero =
       Math.round(
         presupuesto
       );
+
 
     const ventasEnteras =
       Math.round(
         ventas
       );
 
-    let ventasFaltantes =
-      0;
 
-    if (
-      Number.isFinite(
-        restVsPpto
-      )
-    ) {
-      ventasFaltantes =
-        Math.max(
-          Math.round(
-            Math.abs(
-              restVsPpto
-            )
-          ),
-          0
-        );
-    } else {
-      ventasFaltantes =
-        Math.max(
-          presupuestoEntero -
-          ventasEnteras,
-          0
-        );
-    }
+    const ventasFaltantes =
+      Math.max(
+        presupuestoEntero -
+        ventasEnteras,
+        0
+      );
+
 
     mapa.set(
       clave,
@@ -672,9 +665,12 @@ function leerVentaVsPpto(hoja) {
         ventasFaltantes,
       }
     );
+
   }
 
+
   return mapa;
+
 }
 
 // ==================================================
