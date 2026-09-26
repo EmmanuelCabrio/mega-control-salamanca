@@ -2028,16 +2028,17 @@ function leerRankingSupervisores(
   const ranking = [];
 
 
-  // Fila 19 en Excel
-  const FILA_INICIO = 18;
+  // Fila 3 en Excel
+const FILA_INICIO = 2;
 
 
-  // C = índice 2
-  const COLUMNA_SUPERVISOR = 2;
+// AW = índice 48
+const COLUMNA_SUPERVISOR = 48;
 
 
-  // E = índice 4
-  const COLUMNA_PRODUCTIVIDAD = 4;
+// AY = índice 50
+// Productividad individual incluyendo RX
+const COLUMNA_PRODUCTIVIDAD = 50;
 
 
   for (
