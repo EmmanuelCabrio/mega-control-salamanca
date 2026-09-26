@@ -16035,3 +16035,573 @@ small {
   }
 
 }
+
+/* ==================================================
+   TABLA EQUIPO — DISEÑO EJECUTIVO
+================================================== */
+
+.equipo-completo:not(.team-table-recuperacion) {
+  position: relative;
+  overflow: hidden;
+
+  margin-top: 26px;
+  padding: 30px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f5f8ff 100%
+    );
+
+  border: 1px solid #dbe5f3;
+  border-radius: 24px;
+
+  box-shadow:
+    0 14px 35px rgba(15, 23, 42, 0.08);
+}
+
+
+/* Línea superior */
+
+.equipo-completo:not(.team-table-recuperacion)::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 5px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb,
+      #60a5fa,
+      #22c55e
+    );
+}
+
+
+/* Título */
+
+.equipo-completo:not(.team-table-recuperacion) h2 {
+  margin: 0 0 8px;
+
+  font-size: 27px;
+  font-weight: 950;
+
+  color: #0f172a;
+
+  letter-spacing: -0.5px;
+}
+
+
+/* Supervisor */
+
+.equipo-completo:not(.team-table-recuperacion) > p {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  margin: 0 0 22px;
+  padding: 7px 15px;
+
+  color: #64748b;
+  background: #eff6ff;
+
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+.equipo-completo:not(.team-table-recuperacion) > p strong {
+  color: #1d4ed8;
+  font-weight: 900;
+}
+
+
+/* Tabla */
+
+.equipo-completo:not(.team-table-recuperacion) table {
+  overflow: hidden;
+
+  width: 100%;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe5f3;
+  border-radius: 16px;
+}
+
+
+/* Encabezado */
+
+.equipo-completo:not(.team-table-recuperacion) thead th {
+  padding: 15px 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #172554,
+      #2563eb
+    );
+
+  color: #ffffff;
+
+  border: none;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+thead th:first-child {
+  border-radius: 15px 0 0 0;
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+thead th:last-child {
+  border-radius: 0 15px 0 0;
+}
+
+
+/* Celdas */
+
+.equipo-completo:not(.team-table-recuperacion) tbody td {
+  padding: 14px 12px;
+
+  border-bottom: 1px solid #e5ebf3;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color: #334155;
+}
+
+
+/* Nombre */
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody td:first-child {
+  text-align: left;
+
+  font-weight: 900;
+  color: #172033;
+}
+
+
+/* Ventas y RX */
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody td:nth-child(3),
+.equipo-completo:not(.team-table-recuperacion)
+tbody td:nth-child(4) {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+
+/* Productividad */
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody td:last-child {
+  font-size: 17px;
+  font-weight: 950;
+
+  color: #172033;
+}
+
+
+/* Conserva el color del nivel, pero más elegante */
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr.nivel-verde-fuerte {
+  background:
+    linear-gradient(
+      90deg,
+      #dcfce7,
+      #f0fdf4
+    );
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr.nivel-verde {
+  background:
+    linear-gradient(
+      90deg,
+      #ecfdf5,
+      #f8fffb
+    );
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr.nivel-amarillo {
+  background:
+    linear-gradient(
+      90deg,
+      #fef9c3,
+      #fffef0
+    );
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr.nivel-naranja {
+  background:
+    linear-gradient(
+      90deg,
+      #ffedd5,
+      #fffaf5
+    );
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr.nivel-rojo,
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr.nivel-rojo-fuerte {
+  background:
+    linear-gradient(
+      90deg,
+      #fee2e2,
+      #fff7f7
+    );
+}
+
+
+/* Efecto al pasar el cursor */
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr {
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr:hover {
+  transform: scale(1.004);
+  filter: brightness(0.98);
+}
+
+
+.equipo-completo:not(.team-table-recuperacion)
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ==================================================
+   RANKING DE SUPERVISORES — AJUSTE VISUAL
+================================================== */
+
+.ranking-supervisores {
+  position: relative;
+  overflow: hidden;
+
+  padding: 32px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f6f8ff 100%
+    );
+
+  border: 1px solid #dbe5f3;
+  border-radius: 24px;
+
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.09);
+}
+
+
+/* Franja superior */
+
+.ranking-supervisores::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 6px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #f59e0b,
+      #fbbf24,
+      #2563eb
+    );
+}
+
+
+/* Decoración */
+
+.ranking-supervisores::after {
+  content: "";
+
+  position: absolute;
+  top: -90px;
+  right: -90px;
+
+  width: 230px;
+  height: 230px;
+
+  background:
+    rgba(37, 99, 235, 0.05);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+
+.ranking-supervisores h2 {
+  position: relative;
+  z-index: 1;
+
+  font-size: 27px;
+  font-weight: 950;
+
+  color: #0f172a;
+}
+
+
+.ranking-supervisores .ranking-subtitulo {
+  position: relative;
+  z-index: 1;
+
+  margin: 6px 0 24px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  color: #64748b;
+}
+
+
+/* Contorno de tabla */
+
+.ranking-supervisores table {
+  position: relative;
+  z-index: 1;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe5f3;
+  border-radius: 16px;
+
+  box-shadow:
+    0 7px 20px rgba(15, 23, 42, 0.05);
+}
+
+
+/* Encabezado */
+
+.ranking-supervisores thead th {
+  padding: 16px 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0f172a,
+      #172554
+    );
+
+  font-size: 12px;
+  font-weight: 900;
+
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+}
+
+
+/* Filas */
+
+.ranking-supervisores tbody td {
+  padding: 15px 20px;
+
+  font-size: 14px;
+}
+
+
+.ranking-supervisores tbody td:nth-child(1) {
+  font-size: 19px;
+}
+
+
+.ranking-supervisores tbody td:nth-child(2) {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+
+.ranking-supervisores tbody td:nth-child(3) {
+  font-size: 18px;
+  font-weight: 950;
+
+  color: #2563eb;
+}
+
+
+/* Top 3 con color más limpio */
+
+.ranking-supervisores tbody tr:nth-child(1) {
+  background:
+    linear-gradient(
+      90deg,
+      #fff8d7,
+      #fffdf5
+    );
+}
+
+
+.ranking-supervisores tbody tr:nth-child(2) {
+  background:
+    linear-gradient(
+      90deg,
+      #f1f5f9,
+      #ffffff
+    );
+}
+
+
+.ranking-supervisores tbody tr:nth-child(3) {
+  background:
+    linear-gradient(
+      90deg,
+      #ffedd5,
+      #fffaf5
+    );
+}
+
+
+/* Supervisor actual */
+
+.ranking-supervisores tbody tr.supervisor-actual {
+  background:
+    linear-gradient(
+      90deg,
+      #dbeafe,
+      #eff6ff
+    );
+
+  box-shadow:
+    inset 5px 0 0 #2563eb;
+}
+
+
+.ranking-supervisores
+tbody tr.supervisor-actual
+td {
+  color: #172554;
+}
+
+
+/* Etiqueta tú estás aquí */
+
+.ranking-supervisores .tu-posicion {
+  margin-left: 10px;
+  padding: 5px 11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #3b82f6
+    );
+
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: 950;
+
+  box-shadow:
+    0 5px 12px rgba(37, 99, 235, 0.25);
+}
+
+
+/* Hover */
+
+.ranking-supervisores tbody tr:hover {
+  transform: translateX(3px);
+
+  box-shadow:
+    0 6px 15px rgba(15, 23, 42, 0.07);
+}
+
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 700px) {
+
+  .equipo-completo:not(.team-table-recuperacion),
+  .ranking-supervisores {
+    padding: 20px 14px;
+    border-radius: 19px;
+  }
+
+
+  .equipo-completo:not(.team-table-recuperacion) {
+    overflow-x: auto;
+  }
+
+
+  .equipo-completo:not(.team-table-recuperacion) table {
+    min-width: 720px;
+  }
+
+
+  .equipo-completo:not(.team-table-recuperacion) h2,
+  .ranking-supervisores h2 {
+    font-size: 21px;
+  }
+
+
+  .equipo-completo:not(.team-table-recuperacion) > p {
+    display: flex;
+    width: fit-content;
+    margin: 0 auto 18px;
+  }
+
+
+  .ranking-supervisores {
+    overflow-x: auto;
+  }
+
+
+  .ranking-supervisores table {
+    min-width: 650px;
+  }
+
+
+  .ranking-supervisores tbody td {
+    padding: 13px 10px;
+  }
+
+}
