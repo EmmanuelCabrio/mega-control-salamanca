@@ -121,6 +121,32 @@ function normalizarSupervisor(
 
 
 // ==================================================
+// NORMALIZAR CLAVE PARA CONTROL DE LOGIN
+// ==================================================
+
+function normalizarClaveLogin(
+  supervisor
+) {
+
+  return String(
+    supervisor || ""
+  )
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .replace(
+      /\s+/g,
+      " "
+    );
+
+}
+
+
+// ==================================================
 // NORMALIZAR ROL
 // ==================================================
 
@@ -585,10 +611,10 @@ app.get(
           ).trim();
 
 
-        const clave =
-          normalizarSupervisor(
+           const clave =
+            normalizarClaveLogin(
             supervisor
-          );
+            );
 
 
         if (
