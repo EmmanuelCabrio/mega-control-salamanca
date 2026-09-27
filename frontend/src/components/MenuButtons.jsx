@@ -37,6 +37,25 @@ function MenuButtons({ setVista }) {
       </button>
 
 
+
+            {/* ==========================================
+          RESULTADO DIARIO DEL EQUIPO
+      ========================================== */}
+
+      <button
+        className="boton"
+        onClick={() =>
+          setVista(
+            "detalleEquipoDiario"
+          )
+        }
+      >
+
+        📅 Resultado diario del equipo
+
+      </button>
+
+
       {/* ==========================================
           PENETRACIÓN POR COLONIA
       ========================================== */}
