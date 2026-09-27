@@ -48,6 +48,8 @@ import MetaSemanaAnteriorDireccion
 import EstadoLoginSupervisores
   from "./EstadoLoginSupervisores";
 
+import HistorialChecklistsDireccion
+  from "./HistorialChecklistsDireccion";
 
 
 
@@ -627,6 +629,8 @@ return (
 
 
  <Fragment key={versionDatos}>
+   
+   <HistorialChecklistsDireccion />
 
    <MetaSemanaAnteriorDireccion />
 
