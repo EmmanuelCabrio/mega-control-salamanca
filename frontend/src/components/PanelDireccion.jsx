@@ -30,6 +30,9 @@ import ProyeccionDireccion
 import DetalledeVentaMensual
   from "./DetalledeVentaMensual";
 
+import DetalleEquipoDiario
+  from "./DetalleEquipoDiario";
+
 import ResumenVsMesAnteriorSupervisores
   from "./ResumenVsMesAnteriorSupervisores";
 
@@ -76,6 +79,11 @@ function PanelDireccion({
 
   const [versionDatos, setVersionDatos] =
     useState(0);
+
+    const [
+    supervisorSeleccionado,
+    setSupervisorSeleccionado,
+  ] = useState(null);
 
   // Bloqueo inmediato para evitar doble clic.
   const bloqueoActualizacion =
@@ -369,6 +377,34 @@ async function subirExcel(
   }
 
 
+  // ================================================
+// DETALLE DIARIO DEL SUPERVISOR SELECCIONADO
+// ================================================
+
+if (
+  supervisorSeleccionado
+) {
+
+  return (
+
+    <DetalleEquipoDiario
+
+      supervisor={
+        supervisorSeleccionado
+      }
+
+      onRegresar={() =>
+        setSupervisorSeleccionado(
+          null
+        )
+      }
+
+    />
+
+  );
+
+}
+
 
 // ================================================
 // PANEL
@@ -642,7 +678,13 @@ return (
 
    <CeroVentasPorCanal />
 
-  <DetalledeVentaMensual />
+  <DetalledeVentaMensual
+
+  onSeleccionarSupervisor={
+    setSupervisorSeleccionado
+  }
+
+/>
 
   <ResumenVsMesAnteriorSupervisores />
 
