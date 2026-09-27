@@ -490,17 +490,19 @@ function prepararChecklistParaSupervisor(
 
   const {
 
-    inicio,
+  inicio,
 
-    fin,
+  fin,
 
-    fechaHora,
+  fechaHora,
 
-    sesionId,
+  sesionId,
 
-    ...datosVisibles
+  duracionSegundos,
 
-  } = registro;
+  ...datosVisibles
+
+} = registro;
 
 
   const fechaRegistro =
