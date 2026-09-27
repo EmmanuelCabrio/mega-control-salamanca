@@ -2,12 +2,8 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
 
-import {
-  fetchProtegido,
-} from "../services/authService";
 
 import {
   obtenerNivelProductividad,
@@ -16,34 +12,23 @@ import {
 import "./PromotorRankingCompleto.css";
 
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:3001";
-
-
 function PromotorRankingCompleto({
+  rankingInicial = [],
+  nombrePromotorInicial = "",
   onCerrarSesion,
 }) {
 
-  const [
-    ranking,
-    setRanking,
-  ] = useState([]);
+  const ranking =
+  Array.isArray(rankingInicial)
+    ? rankingInicial
+    : [];
 
-  const [
-    nombrePromotor,
-    setNombrePromotor,
-  ] = useState("");
+const nombrePromotor =
+  nombrePromotorInicial;
 
-  const [
-    cargando,
-    setCargando,
-  ] = useState(true);
+const cargando = false;
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+const error = "";
 
 
   const filaPromotorRef =
@@ -78,125 +63,7 @@ function PromotorRankingCompleto({
     );
 
 
-  // ==================================================
-  // CARGAR RANKING + IDENTIDAD DEL PROMOTOR
-  // ==================================================
-
-  useEffect(() => {
-
-    async function cargarDatos() {
-
-      try {
-
-        setCargando(true);
-        setError("");
-
-
-        const [
-          respuestaRanking,
-          respuestaResumen,
-        ] =
-          await Promise.all([
-
-            fetchProtegido(
-              `${API_URL}/api/ranking-cl-completo`
-            ),
-
-            fetchProtegido(
-              `${API_URL}/api/promotor/resumen`
-            ),
-
-          ]);
-
-
-        const [
-          datosRanking,
-          datosResumen,
-        ] =
-          await Promise.all([
-
-            respuestaRanking.json(),
-
-            respuestaResumen.json(),
-
-          ]);
-
-
-        // ==========================================
-        // VALIDAR RANKING
-        // ==========================================
-
-        if (
-          !respuestaRanking.ok ||
-          !datosRanking.correcto
-        ) {
-
-          throw new Error(
-            datosRanking.mensaje ||
-            "No se pudo cargar el Ranking Cluster"
-          );
-
-        }
-
-
-        // ==========================================
-        // VALIDAR PROMOTOR
-        // ==========================================
-
-        if (
-          !respuestaResumen.ok ||
-          !datosResumen.correcto
-        ) {
-
-          throw new Error(
-            datosResumen.mensaje ||
-            "No se pudo identificar al promotor"
-          );
-
-        }
-
-
-        // ==========================================
-        // GUARDAR
-        // ==========================================
-
-        setRanking(
-          datosRanking.ranking || []
-        );
-
-
-        setNombrePromotor(
-          datosResumen.promotor?.nombre ||
-          ""
-        );
-
-
-      } catch (errorCarga) {
-
-        console.error(
-          "❌ Error cargando ranking del promotor:",
-          errorCarga
-        );
-
-
-        setError(
-          errorCarga.message ||
-          "No se pudo cargar el ranking"
-        );
-
-
-      } finally {
-
-        setCargando(false);
-
-      }
-
-    }
-
-
-    cargarDatos();
-
-  }, []);
+ 
 
 
   // ==================================================
