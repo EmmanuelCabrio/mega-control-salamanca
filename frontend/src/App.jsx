@@ -8,6 +8,7 @@ import WelcomeCard from "./components/WelcomeCard";
 import MenuButtons from "./components/MenuButtons";
 import KPICard from "./components/KPICard";
 import FocusAlerts from "./components/FocusAlerts";
+import TablaSeguimientoFocosRojos from "./components/TablaSeguimientoFocosRojos";
 import HonorBoard from "./components/HonorBoard";
 import TeamTable from "./components/TeamTable";
 import RankingCluster from "./components/RankingCluster";
@@ -2414,6 +2415,36 @@ if (
 
 />
 
+
+          {/* ========================================
+    TABLA DE SEGUIMIENTO DE FOCOS ROJOS
+======================================== */}
+
+<TablaSeguimientoFocosRojos
+
+  registros={
+    registros
+  }
+
+  supervisorSeleccionado={
+    supervisorSeleccionado
+  }
+
+  onIniciarSeguimiento={(promotor) => {
+
+    setPromotorEnSeguimiento(
+      promotor
+    );
+
+    setVista(
+      "checklistFocoRojo"
+    );
+
+  }}
+
+/>
+
+          
 
           {/* ========================================
               RANKINGS
