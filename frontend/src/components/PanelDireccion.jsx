@@ -54,6 +54,9 @@ import EstadoLoginSupervisores
 import HistorialChecklistsDireccion
   from "./HistorialChecklistsDireccion";
 
+import HistorialChecklistsDireccion
+  from "./HistorialChecklistsDireccion";
+
 
 
 // ==================================================
@@ -665,7 +668,9 @@ return (
 
 
  <Fragment key={versionDatos}>
-   
+
+   <MinutasDireccion />
+
    <HistorialChecklistsDireccion />
 
    <MetaSemanaAnteriorDireccion />
