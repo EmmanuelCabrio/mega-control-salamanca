@@ -54,8 +54,8 @@ import EstadoLoginSupervisores
 import HistorialChecklistsDireccion
   from "./HistorialChecklistsDireccion";
 
-import HistorialChecklistsDireccion
-  from "./HistorialChecklistsDireccion";
+import MinutasDireccion
+  from "./MinutasDireccion";
 
 
 
