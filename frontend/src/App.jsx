@@ -1430,13 +1430,21 @@ if (
 
   return (
 
-    <PromotorRankingCompleto
+   <PromotorRankingCompleto
 
-      onCerrarSesion={
-        cerrarSesion
-      }
+  rankingInicial={
+    rankingCL
+  }
 
-    />
+  nombrePromotorInicial={
+    empleadoPromotor
+  }
+
+  onCerrarSesion={
+    cerrarSesion
+  }
+
+/>
 
   );
 
