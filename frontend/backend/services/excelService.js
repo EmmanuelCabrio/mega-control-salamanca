@@ -270,39 +270,13 @@ function cargarExcel() {
 // ==================================================
 
 function cargarExcelUsuarios() {
-  try {
-    const workbook =
-      XLSX.readFile(
-        (
-          process.env.SUPABASE_URL &&
-          process.env.SUPABASE_SECRET_KEY &&
-          fs.existsSync(RUTA_EXCEL_SUPABASE)
-        )
-          ? RUTA_EXCEL_SUPABASE
-          : RUTA_EXCEL,
-        {
-          dense: true,
-          sheetRows: 100,
-          cellHTML: false,
-          cellFormula: false,
-          cellStyles: false,
-          cellNF: false,
-        }
-      );
 
-    return workbook;
+  // USERS utilizará el mismo workbook general.
+  // Si todavía no existe, cargarExcel lo abre una
+  // sola vez y lo conserva para todo el sistema.
 
-  } catch (error) {
-    console.error(
-      "❌ Error al abrir USERS:"
-    );
+  return cargarExcel();
 
-    console.error(
-      error.message
-    );
-
-    throw error;
-  }
 }
 
 // ==================================================
