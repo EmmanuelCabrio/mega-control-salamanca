@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import SignaturePad  from "./SignaturePad";
+import {
+  fetchProtegido,
+} from "../services/authService";
 
 function ChecklistFocoRojo({
   promotor,
@@ -27,6 +30,337 @@ function ChecklistFocoRojo({
   const [accionCorrectiva, setAccionCorrectiva] = useState("");
   const [evidenciaDescargada, setEvidenciaDescargada] =
     useState(false);
+
+
+
+  // =========================================================
+// HISTORIAL Y REGISTRO DEL CHECKLIST
+// =========================================================
+
+const [
+  historial,
+  setHistorial,
+] = useState([]);
+
+const [
+  comparativa,
+  setComparativa,
+] = useState(null);
+
+const [
+  totalChecklists,
+  setTotalChecklists,
+] = useState(0);
+
+const [
+  sesionId,
+  setSesionId,
+] = useState(null);
+
+const [
+  cargandoHistorial,
+  setCargandoHistorial,
+] = useState(true);
+
+const [
+  guardandoChecklist,
+  setGuardandoChecklist,
+] = useState(false);
+
+const [
+  checklistGuardado,
+  setChecklistGuardado,
+] = useState(false);
+
+const [
+  errorSeguimiento,
+  setErrorSeguimiento,
+] = useState("");
+
+
+  // Evita abrir dos sesiones del mismo checklist,
+// incluso durante las validaciones de React.
+
+const inicioChecklistRef =
+  useRef("");
+
+
+// =========================================================
+// INICIAR REGISTRO Y CARGAR HISTORIAL
+// =========================================================
+
+useEffect(
+  () => {
+
+    const nombrePromotor =
+      String(
+        promotor?.nombre ?? ""
+      ).trim();
+
+
+    const nombreSupervisor =
+      String(
+        supervisor ?? ""
+      ).trim();
+
+
+    if (
+      !nombrePromotor ||
+      !nombreSupervisor
+    ) {
+
+      setCargandoHistorial(
+        false
+      );
+
+      return;
+
+    }
+
+
+    const claveChecklist =
+      `${nombreSupervisor}::${nombrePromotor}`;
+
+
+    let componenteActivo =
+      true;
+
+
+    // ===============================================
+    // CARGAR HISTORIAL
+    // ===============================================
+
+    async function cargarHistorial() {
+
+      try {
+
+        setCargandoHistorial(
+          true
+        );
+
+        setErrorSeguimiento(
+          ""
+        );
+
+
+        const respuesta =
+          await fetchProtegido(
+            `/api/checklists-foco-rojo?supervisor=${encodeURIComponent(
+              nombreSupervisor
+            )}&promotor=${encodeURIComponent(
+              nombrePromotor
+            )}`
+          );
+
+
+        const datos =
+          await respuesta.json();
+
+
+        if (
+          !respuesta.ok
+        ) {
+
+          throw new Error(
+            datos.mensaje ||
+            "No se pudo consultar el historial"
+          );
+
+        }
+
+
+        if (
+          !componenteActivo
+        ) {
+
+          return;
+
+        }
+
+
+        setHistorial(
+          datos.historial || []
+        );
+
+        setTotalChecklists(
+          Number(
+            datos.totalChecklists || 0
+          )
+        );
+
+        setComparativa(
+          datos.comparativa || null
+        );
+
+      } catch (
+        error
+      ) {
+
+        console.error(
+          "❌ Error al cargar historial del checklist:",
+          error
+        );
+
+
+        if (
+          componenteActivo
+        ) {
+
+          setErrorSeguimiento(
+            "No se pudo consultar el historial del promotor."
+          );
+
+        }
+
+      } finally {
+
+        if (
+          componenteActivo
+        ) {
+
+          setCargandoHistorial(
+            false
+          );
+
+        }
+
+      }
+
+    }
+
+
+    // ===============================================
+    // REGISTRAR HORA DE INICIO
+    // ===============================================
+
+    async function registrarInicio() {
+
+      // React puede ejecutar el efecto dos veces
+      // durante desarrollo. Esta validación evita
+      // crear dos sesiones para el mismo checklist.
+
+      if (
+        inicioChecklistRef.current ===
+        claveChecklist
+      ) {
+
+        return;
+
+      }
+
+
+      inicioChecklistRef.current =
+        claveChecklist;
+
+
+      try {
+
+        const respuesta =
+          await fetchProtegido(
+            "/api/checklists-foco-rojo/iniciar",
+            {
+
+              method:
+                "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "application/json",
+
+              },
+
+              body:
+                JSON.stringify({
+
+                  supervisor:
+                    nombreSupervisor,
+
+                  promotor:
+                    nombrePromotor,
+
+                }),
+
+            }
+          );
+
+
+        const datos =
+          await respuesta.json();
+
+
+        if (
+          !respuesta.ok
+        ) {
+
+          throw new Error(
+            datos.mensaje ||
+            "No se pudo iniciar el checklist"
+          );
+
+        }
+
+
+        if (
+          componenteActivo
+        ) {
+
+          setSesionId(
+            datos.sesionId
+          );
+
+        }
+
+      } catch (
+        error
+      ) {
+
+        console.error(
+          "❌ Error al iniciar el registro del checklist:",
+          error
+        );
+
+
+        if (
+          componenteActivo
+        ) {
+
+          setErrorSeguimiento(
+            "No se pudo iniciar el registro. Recarga la página antes de llenar el checklist."
+          );
+
+        }
+
+
+        // Permite volver a intentarlo si el
+        // componente se carga nuevamente.
+
+        inicioChecklistRef.current =
+          "";
+
+      }
+
+    }
+
+
+    cargarHistorial();
+
+    registrarInicio();
+
+
+    return () => {
+
+      componenteActivo =
+        false;
+
+    };
+
+  },
+  [
+    promotor?.nombre,
+    supervisor,
+  ]
+);
 
   // =========================================================
   // FIRMAS
@@ -272,7 +606,203 @@ function ChecklistFocoRojo({
     rankingDiagnostico[0]?.area ||
     "Sin áreas de oportunidad detectadas";
 
-  
+  // =========================================================
+// GUARDAR SEGUIMIENTO DEL CHECKLIST
+// =========================================================
+
+const guardarSeguimiento =
+  async () => {
+
+    if (
+      checklistGuardado ||
+      guardandoChecklist
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      !evidenciaDescargada
+    ) {
+
+      alert(
+        "Primero debes descargar la evidencia HTML del checklist."
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !sesionId
+    ) {
+
+      alert(
+        "No se encontró una sesión activa del checklist. Recarga la página antes de intentarlo nuevamente."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      setGuardandoChecklist(
+        true
+      );
+
+
+      const respuesta =
+        await fetchProtegido(
+          "/api/checklists-foco-rojo",
+          {
+
+            method:
+              "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json",
+
+            },
+
+            body:
+              JSON.stringify({
+
+                sesionId,
+
+                supervisor,
+
+                promotor:
+                  vendedor,
+
+                checks,
+
+                otraArea,
+
+                accionCorrectiva,
+
+                diagnostico:
+                  resultadosDiagnostico,
+
+              }),
+
+          }
+        );
+
+
+      const datos =
+        await respuesta.json();
+
+
+      if (
+        !respuesta.ok
+      ) {
+
+        throw new Error(
+          datos.mensaje ||
+          "No se pudo guardar el checklist"
+        );
+
+      }
+
+
+      // Desde este punto el checklist ya quedó
+      // guardado definitivamente.
+
+      setChecklistGuardado(
+        true
+      );
+
+
+      // =============================================
+      // ACTUALIZAR CONTEO Y COMPARATIVA
+      // =============================================
+
+      try {
+
+        const respuestaHistorial =
+          await fetchProtegido(
+            `/api/checklists-foco-rojo?supervisor=${encodeURIComponent(
+              supervisor
+            )}&promotor=${encodeURIComponent(
+              vendedor
+            )}`
+          );
+
+
+        const datosHistorial =
+          await respuestaHistorial.json();
+
+
+        if (
+          respuestaHistorial.ok
+        ) {
+
+          setHistorial(
+            datosHistorial.historial || []
+          );
+
+          setTotalChecklists(
+            Number(
+              datosHistorial.totalChecklists ||
+              0
+            )
+          );
+
+          setComparativa(
+            datosHistorial.comparativa ||
+            null
+          );
+
+        }
+
+      } catch (
+        errorHistorial
+      ) {
+
+        console.error(
+          "⚠️ El checklist se guardó, pero no se pudo actualizar el historial:",
+          errorHistorial
+        );
+
+      }
+
+
+      alert(
+        "✅ Checklist guardado correctamente.\n\nEl seguimiento ya quedó registrado."
+      );
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al guardar el seguimiento:",
+        error
+      );
+
+
+      alert(
+        `No se pudo guardar el checklist.\n\n${
+          error.message
+        }`
+      );
+
+    } finally {
+
+      setGuardandoChecklist(
+        false
+      );
+
+    }
+
+  };
 
   // =========================================================
   // EXPORTAR EVIDENCIA HTML
@@ -1010,6 +1540,543 @@ ${copia.outerHTML}
 
           </div>
         </header>
+
+        {/* =================================================
+    HISTORIAL DEL FOCO ROJO
+================================================= */}
+
+<section
+  style={{
+    ...styles.section,
+
+    background:
+      "linear-gradient(135deg, #f8fafc 0%, #eef4fb 100%)",
+
+    border:
+      "1px solid #d7e2ef",
+  }}
+>
+
+  <div style={styles.sectionHeader}>
+
+    <div style={styles.number}>
+      📈
+    </div>
+
+    <h2 style={styles.sectionTitle}>
+      SEGUIMIENTO DEL FOCO ROJO
+    </h2>
+
+  </div>
+
+
+  {cargandoHistorial ? (
+
+    <div
+      style={{
+        padding:
+          "18px",
+
+        textAlign:
+          "center",
+
+        color:
+          "#64748b",
+
+        fontWeight:
+          "700",
+      }}
+    >
+      Cargando historial del promotor...
+    </div>
+
+  ) : (
+
+    <>
+
+      {/* ===========================================
+          CONTADOR
+      =========================================== */}
+
+      <div
+        style={{
+          display:
+            "grid",
+
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(170px, 1fr))",
+
+          gap:
+            "14px",
+
+          marginBottom:
+            "18px",
+        }}
+      >
+
+        <div
+          style={{
+            padding:
+              "18px",
+
+            borderRadius:
+              "14px",
+
+            background:
+              "#ffffff",
+
+            border:
+              "1px solid #dbe4ee",
+
+            boxShadow:
+              "0 6px 18px rgba(15, 23, 42, 0.06)",
+          }}
+        >
+
+          <div
+            style={{
+              color:
+                "#64748b",
+
+              fontSize:
+                "12px",
+
+              fontWeight:
+                "800",
+
+              textTransform:
+                "uppercase",
+
+              letterSpacing:
+                "0.5px",
+            }}
+          >
+            Checklists realizados
+          </div>
+
+          <div
+            style={{
+              marginTop:
+                "6px",
+
+              color:
+                "#0f172a",
+
+              fontSize:
+                "32px",
+
+              fontWeight:
+                "900",
+            }}
+          >
+            {totalChecklists}
+          </div>
+
+        </div>
+
+
+        <div
+          style={{
+            padding:
+              "18px",
+
+            borderRadius:
+              "14px",
+
+            background:
+              "#ffffff",
+
+            border:
+              "1px solid #dbe4ee",
+
+            boxShadow:
+              "0 6px 18px rgba(15, 23, 42, 0.06)",
+          }}
+        >
+
+          <div
+            style={{
+              color:
+                "#64748b",
+
+              fontSize:
+                "12px",
+
+              fontWeight:
+                "800",
+
+              textTransform:
+                "uppercase",
+
+              letterSpacing:
+                "0.5px",
+            }}
+          >
+            Productividad inicial
+          </div>
+
+          <div
+            style={{
+              marginTop:
+                "6px",
+
+              color:
+                "#0f172a",
+
+              fontSize:
+                "30px",
+
+              fontWeight:
+                "900",
+            }}
+          >
+            {comparativa?.productividadInicial !== null &&
+            comparativa?.productividadInicial !== undefined
+              ? Number(
+                  comparativa.productividadInicial
+                ).toFixed(
+                  2
+                )
+              : "—"}
+          </div>
+
+        </div>
+
+
+        <div
+          style={{
+            padding:
+              "18px",
+
+            borderRadius:
+              "14px",
+
+            background:
+              "#ffffff",
+
+            border:
+              "1px solid #dbe4ee",
+
+            boxShadow:
+              "0 6px 18px rgba(15, 23, 42, 0.06)",
+          }}
+        >
+
+          <div
+            style={{
+              color:
+                "#64748b",
+
+              fontSize:
+                "12px",
+
+              fontWeight:
+                "800",
+
+              textTransform:
+                "uppercase",
+
+              letterSpacing:
+                "0.5px",
+            }}
+          >
+            Última productividad
+          </div>
+
+          <div
+            style={{
+              marginTop:
+                "6px",
+
+              color:
+                "#0f172a",
+
+              fontSize:
+                "30px",
+
+              fontWeight:
+                "900",
+            }}
+          >
+            {comparativa?.productividadUltima !== null &&
+            comparativa?.productividadUltima !== undefined
+              ? Number(
+                  comparativa.productividadUltima
+                ).toFixed(
+                  2
+                )
+              : "—"}
+          </div>
+
+        </div>
+
+
+        <div
+          style={{
+            padding:
+              "18px",
+
+            borderRadius:
+              "14px",
+
+            background:
+              comparativa?.resultado === "MEJORÓ"
+                ? "#ecfdf5"
+                : comparativa?.resultado === "DISMINUYÓ"
+                  ? "#fef2f2"
+                  : "#f8fafc",
+
+            border:
+              comparativa?.resultado === "MEJORÓ"
+                ? "1px solid #86efac"
+                : comparativa?.resultado === "DISMINUYÓ"
+                  ? "1px solid #fecaca"
+                  : "1px solid #dbe4ee",
+
+            boxShadow:
+              "0 6px 18px rgba(15, 23, 42, 0.06)",
+          }}
+        >
+
+          <div
+            style={{
+              color:
+                "#64748b",
+
+              fontSize:
+                "12px",
+
+              fontWeight:
+                "800",
+
+              textTransform:
+                "uppercase",
+
+              letterSpacing:
+                "0.5px",
+            }}
+          >
+            Evolución
+          </div>
+
+          <div
+            style={{
+              marginTop:
+                "6px",
+
+              color:
+                comparativa?.resultado === "MEJORÓ"
+                  ? "#166534"
+                  : comparativa?.resultado === "DISMINUYÓ"
+                    ? "#991b1b"
+                    : "#334155",
+
+              fontSize:
+                "22px",
+
+              fontWeight:
+                "900",
+            }}
+          >
+            {comparativa?.resultado ||
+              "SIN HISTORIAL"}
+          </div>
+
+          {comparativa?.diferencia !== null &&
+            comparativa?.diferencia !== undefined && (
+
+              <div
+                style={{
+                  marginTop:
+                    "4px",
+
+                  color:
+                    "#475569",
+
+                  fontWeight:
+                    "800",
+                }}
+              >
+                {Number(
+                  comparativa.diferencia
+                ) > 0
+                  ? "+"
+                  : ""}
+
+                {Number(
+                  comparativa.diferencia
+                ).toFixed(
+                  2
+                )}
+              </div>
+
+            )}
+
+        </div>
+
+      </div>
+
+
+      {/* ===========================================
+          FECHAS, SIN HORAS
+      =========================================== */}
+
+      {historial.length > 0 && (
+
+        <details
+          style={{
+            padding:
+              "14px 16px",
+
+            borderRadius:
+              "12px",
+
+            background:
+              "#ffffff",
+
+            border:
+              "1px solid #dbe4ee",
+          }}
+        >
+
+          <summary
+            style={{
+              cursor:
+                "pointer",
+
+              color:
+                "#1e3a5f",
+
+              fontWeight:
+                "900",
+            }}
+          >
+            Ver fechas de seguimiento
+          </summary>
+
+          <div
+            style={{
+              display:
+                "grid",
+
+              gap:
+                "8px",
+
+              marginTop:
+                "14px",
+            }}
+          >
+
+            {historial.map(
+              (
+                registro,
+                index
+              ) => (
+
+                <div
+                  key={
+                    registro.id ||
+                    index
+                  }
+                  style={{
+                    display:
+                      "flex",
+
+                    justifyContent:
+                      "space-between",
+
+                    gap:
+                      "12px",
+
+                    padding:
+                      "10px 12px",
+
+                    borderRadius:
+                      "10px",
+
+                    background:
+                      "#f8fafc",
+
+                    color:
+                      "#334155",
+
+                    fontSize:
+                      "13px",
+
+                    fontWeight:
+                      "700",
+                  }}
+                >
+
+                  <span>
+                    Checklist {index + 1}
+                  </span>
+
+                  <span>
+                    {registro.fecha ||
+                      "Fecha no disponible"}
+                  </span>
+
+                  <span>
+                    Productividad:{" "}
+
+                    {Number(
+                      registro.productividad ??
+                      0
+                    ).toFixed(
+                      2
+                    )}
+                  </span>
+
+                </div>
+
+              )
+            )}
+
+          </div>
+
+        </details>
+
+      )}
+
+
+      {errorSeguimiento && (
+
+        <div
+          role="alert"
+          style={{
+            marginTop:
+              "14px",
+
+            padding:
+              "12px 14px",
+
+            borderRadius:
+              "10px",
+
+            background:
+              "#fff7ed",
+
+            color:
+              "#9a3412",
+
+            border:
+              "1px solid #fed7aa",
+
+            fontWeight:
+              "700",
+          }}
+        >
+          ⚠️ {errorSeguimiento}
+        </div>
+
+      )}
+
+    </>
+
+  )}
+
+</section>
 
         {/* =================================================
             01
@@ -2137,39 +3204,43 @@ ${copia.outerHTML}
         >
 
           <button
-            type="button"
-            onClick={() => {
+  type="button"
+  onClick={() => {
 
-              if (!evidenciaDescargada) {
+    if (
+      !checklistGuardado
+    ) {
 
-                alert(
-                  "Primero debes descargar la evidencia HTML del checklist antes de regresar al Dashboard."
-                );
+      alert(
+        "Primero debes descargar la evidencia y guardar el seguimiento antes de regresar al Dashboard."
+      );
 
-                return;
-              }
+      return;
 
-              onRegresar();
-            }}
-            style={{
-              ...styles.backButton,
+    }
 
-              opacity:
-                evidenciaDescargada
-                  ? 1
-                  : 0.55,
 
-              cursor:
-                evidenciaDescargada
-                  ? "pointer"
-                  : "not-allowed",
-            }}
-          >
-            {evidenciaDescargada
-              ? "↩️ Regresar al Dashboard"
-              : "🔒 Descarga la evidencia para continuar"}
-          </button>
+    onRegresar();
 
+  }}
+  style={{
+    ...styles.backButton,
+
+    opacity:
+      checklistGuardado
+        ? 1
+        : 0.55,
+
+    cursor:
+      checklistGuardado
+        ? "pointer"
+        : "not-allowed",
+  }}
+>
+  {checklistGuardado
+    ? "↩️ Regresar al Dashboard"
+    : "🔒 Guarda el seguimiento para continuar"}
+</button>
 
           <button
         type="button"
@@ -2196,6 +3267,49 @@ ${copia.outerHTML}
           >
             📄 Descargar CheckList
           </button>
+
+          <button
+  type="button"
+  onClick={
+    guardarSeguimiento
+  }
+  disabled={
+    !evidenciaDescargada ||
+    !sesionId ||
+    guardandoChecklist ||
+    checklistGuardado
+  }
+  style={{
+    ...styles.exportButton,
+
+    background:
+      checklistGuardado
+        ? "#15803d"
+        : "#0f766e",
+
+    opacity:
+      evidenciaDescargada &&
+      sesionId &&
+      !guardandoChecklist &&
+      !checklistGuardado
+        ? 1
+        : 0.55,
+
+    cursor:
+      evidenciaDescargada &&
+      sesionId &&
+      !guardandoChecklist &&
+      !checklistGuardado
+        ? "pointer"
+        : "not-allowed",
+  }}
+>
+  {guardandoChecklist
+    ? "⏳ Guardando..."
+    : checklistGuardado
+      ? "✅ Seguimiento guardado"
+      : "💾 Guardar seguimiento"}
+</button>
 
         </div>
 
