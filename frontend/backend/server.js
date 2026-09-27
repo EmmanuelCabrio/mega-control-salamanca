@@ -5736,7 +5736,7 @@ app.get(
 
 
 // ==================================================
-// DETALLE DIARIO DEL EQUIPO — DIRECCIÓN
+// DETALLE DIARIO DEL EQUIPO — DIRECCIÓN Y SUPERVISOR
 // ==================================================
 
 app.get(
@@ -5749,8 +5749,8 @@ app.get(
 
     try {
 
-      // ============================================
-      // ACCESO EXCLUSIVO PARA DIRECCIÓN
+            // ============================================
+      // VALIDAR ROL Y DETERMINAR SUPERVISOR
       // ============================================
 
       const rol =
@@ -5760,36 +5760,37 @@ app.get(
 
 
       if (
-        rol !== "DIRECCIÓN"
+        rol !== "DIRECCIÓN" &&
+        rol !== "SUPERVISOR"
       ) {
 
         return res
-          .status(
-            403
-          )
+          .status(403)
           .json({
 
-            correcto:
-              false,
+            correcto: false,
 
             mensaje:
-              "Acceso exclusivo de Dirección",
+              "No tienes autorización para consultar este detalle",
 
           });
 
       }
 
 
-      // ============================================
-      // SUPERVISOR SOLICITADO
-      // ============================================
+      // Dirección puede seleccionar cualquier supervisor.
+      // El supervisor solamente puede consultar su propio equipo.
 
       const supervisor =
-        String(
-          req.query.supervisor ??
-          ""
-        )
-          .trim();
+        rol === "DIRECCIÓN"
+
+          ? String(
+              req.query.supervisor ?? ""
+            ).trim()
+
+          : String(
+              req.supervisor ?? ""
+            ).trim();
 
 
       if (
@@ -5798,21 +5799,19 @@ app.get(
       ) {
 
         return res
-          .status(
-            400
-          )
+          .status(400)
           .json({
 
-            correcto:
-              false,
+            correcto: false,
 
             mensaje:
-              "Selecciona un supervisor válido",
+              "No se encontró un supervisor válido",
 
           });
 
       }
 
+   
 
       // ============================================
       // CONSULTAR DETALLE
