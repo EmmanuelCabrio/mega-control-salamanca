@@ -60,6 +60,8 @@ import PromotorAvanceSemanal
 import PromotorRankingCompleto
   from "./components/PromotorRankingCompleto";
 
+import MinutasSupervisor
+  from "./components/MinutasSupervisor";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -2118,6 +2120,12 @@ if (
           }
 
         />
+
+        {/* ==========================================
+    MINUTAS ENVIADAS POR DIRECCIÓN
+========================================== */}
+
+<MinutasSupervisor />
 
 
         {/* ==========================================
