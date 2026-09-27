@@ -63,6 +63,11 @@ import PromotorRankingCompleto
 import MinutasSupervisor
   from "./components/MinutasSupervisor";
 
+
+import DetalleEquipoDiario
+  from "./components/DetalleEquipoDiario";
+
+
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:3001";
@@ -1807,6 +1812,36 @@ const maxMes =
   Number(
     avanceServiciosSupervisor?.max ?? 0
   );
+
+
+
+    // ==================================================
+  // 📅 DETALLE DIARIO DEL EQUIPO
+  // ==================================================
+
+  if (
+    vista === "detalleEquipoDiario"
+  ) {
+
+    return (
+
+      <DetalleEquipoDiario
+
+        supervisor={
+          supervisorSeleccionado
+        }
+
+        onRegresar={() =>
+          setVista(
+            "supervisor"
+          )
+        }
+
+      />
+
+    );
+
+  }
 
 
   
