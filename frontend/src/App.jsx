@@ -2028,7 +2028,11 @@ if (
 
     <PanelRecuperacion
 
-      supervisor={
+  registros={
+    registros
+  }
+
+  supervisor={
         rolUsuario === "DIRECCIÓN"
           ? SUPERVISOR_RECUPERACION
           : supervisorSeleccionado
