@@ -8390,6 +8390,152 @@ const carteraPorDia =
 // solicitudes simultáneas.
 let actualizacionEnCurso = null;
 
+
+// ==================================================
+// VALIDAR EXCEL SIN ABRIRLO COMPLETO EN MEMORIA
+// ==================================================
+
+function validarExcelLigero(buffer) {
+
+  if (
+    !Buffer.isBuffer(buffer) ||
+    buffer.length === 0
+  ) {
+
+    throw new Error(
+      "No se recibió un archivo Excel"
+    );
+
+  }
+
+
+  // Solo lee las primeras 68 filas de cada hoja.
+  // Permite validar el archivo sin crear otro
+  // workbook completo dentro de la memoria.
+
+  const workbookValidacion =
+    XLSX.read(
+      buffer,
+      {
+
+        type: "buffer",
+        dense: true,
+        sheetRows: 68,
+        cellHTML: false,
+        cellFormula: false,
+        cellStyles: false,
+        cellNF: false,
+
+      }
+    );
+
+
+  const hojasNecesarias = [
+
+    "PRODUCTIVIDAD",
+    "BD SIN VENTA",
+    "BD PLAN DE TRABAJO",
+    "PLAN DE TRABAJO",
+    "BD AVANCE SEMANAL",
+    "VENTA DIARIA POR SUPERVISOR",
+    "USERS",
+    "PLANTILLA",
+    "VS MES ANTERIOR",
+    "CARTERA POR DÍA",
+    "PROYECCION",
+    "BD ACUMULADO VENTA MES",
+    "ACUMULADO VENTA MES ANTERIOR",
+    "BD ACUMULADO RX MES",
+    "BD RX MES ANTERIOR",
+    "PANEL RECUPERACION",
+
+  ];
+
+
+  for (
+    const nombre
+    of hojasNecesarias
+  ) {
+
+    const encontrada =
+      workbookValidacion
+        .SheetNames
+        .find(
+          (hoja) =>
+            hoja
+              .trim()
+              .toUpperCase() ===
+            nombre
+        );
+
+
+    if (
+      !encontrada ||
+      !workbookValidacion
+        .Sheets[encontrada]
+        ?.["!ref"]
+    ) {
+
+      throw new Error(
+        `Falta información en la hoja "${nombre}"`
+      );
+
+    }
+
+  }
+
+
+  const nombreProyeccion =
+    workbookValidacion
+      .SheetNames
+      .find(
+        (hoja) =>
+          hoja
+            .trim()
+            .toUpperCase() ===
+          "PROYECCION"
+      );
+
+
+  const hojaProyeccion =
+    workbookValidacion
+      .Sheets[nombreProyeccion];
+
+
+  // Al recortar la lectura con sheetRows,
+  // SheetJS conserva el rango original
+  // del Excel dentro de !fullref.
+
+  const referenciaProyeccion =
+    hojaProyeccion["!fullref"] ||
+    hojaProyeccion["!ref"];
+
+
+  const rangoProyeccion =
+    XLSX.utils.decode_range(
+      referenciaProyeccion
+    );
+
+
+  // Fila 68 = índice 67.
+  // Columna X = índice 23.
+
+  if (
+    rangoProyeccion.e.r < 67 ||
+    rangoProyeccion.e.c < 23
+  ) {
+
+    throw new Error(
+      "La hoja PROYECCION no alcanza el rango N8:X68"
+    );
+
+  }
+
+}
+
+
+
+
 function actualizarDatosDesdeSupabase() {
 
   if (actualizacionEnCurso) {
@@ -8471,66 +8617,13 @@ function actualizarDatosDesdeSupabase() {
 
     }
 
-    // ==============================================
-    // ABRIR EL ARCHIVO NUEVO ANTES DE REEMPLAZAR
-    // ==============================================
+// ==============================================
+// VALIDAR SIN DUPLICAR EL WORKBOOK COMPLETO
+// ==============================================
 
-    const nuevoWorkbook = XLSX.read(buffer, {
-
-      type: "buffer",
-      dense: true,
-      cellHTML: false,
-      cellFormula: false,
-      cellStyles: false,
-      cellNF: false,
-
-    });
-
-    // ==============================================
-    // VALIDAR LAS PESTAÑAS QUE USA EL SISTEMA
-    // ==============================================
-
-    const hojasNecesarias = [
-
-      "PRODUCTIVIDAD",
-      "BD SIN VENTA",
-      "BD PLAN DE TRABAJO",
-      "PLAN DE TRABAJO",
-      "BD AVANCE SEMANAL",
-      "VENTA DIARIA POR SUPERVISOR",
-      "USERS",
-      "PLANTILLA",
-      "VS MES ANTERIOR",
-      "CARTERA POR DÍA",
-      "PROYECCION",
-      "BD ACUMULADO VENTA MES",
-      "ACUMULADO VENTA MES ANTERIOR",
-      "BD ACUMULADO RX MES",
-      "BD RX MES ANTERIOR",
-      "PANEL RECUPERACION",
-
-    ];
-
-    for (const nombre of hojasNecesarias) {
-
-      const encontrada =
-        nuevoWorkbook.SheetNames.find(
-          (hoja) =>
-            hoja.trim().toUpperCase() === nombre
-        );
-
-      if (
-        !encontrada ||
-        !nuevoWorkbook.Sheets[encontrada]?.["!ref"]
-      ) {
-
-        throw new Error(
-          `Falta información en la hoja "${nombre}"`
-        );
-
-      }
-
-    }
+validarExcelLigero(
+  buffer
+);
 
     // ==============================================
     // GUARDAR PRIMERO EN UN ARCHIVO TEMPORAL
@@ -8565,7 +8658,11 @@ function actualizarDatosDesdeSupabase() {
     // RENOVAR LAS TRES CACHÉS
     // ==============================================
 
-    workbookCacheado = nuevoWorkbook;
+   // El workbook nuevo se abrirá una sola vez
+// en la siguiente consulta, cuando el anterior
+// ya no esté referenciado por la caché.
+
+     workbookCacheado = null;
 
     datosCacheados = null;
 
@@ -8592,146 +8689,15 @@ function actualizarDatosDesdeSupabase() {
 // 📤 REEMPLAZAR EXCEL DIRECTAMENTE EN SUPABASE
 // ==================================================
 
-function validarExcelParaCarga(buffer) {
+function validarExcelParaCarga(
+  buffer
+) {
 
-  // ================================================
-  // COMPROBAR QUE RECIBIMOS UN ARCHIVO
-  // ================================================
-
-  if (
-    !Buffer.isBuffer(buffer) ||
-    buffer.length === 0
-  ) {
-
-    throw new Error(
-      "No se recibió un archivo Excel"
-    );
-
-  }
-
-
-  // ================================================
-  // INTENTAR ABRIR EL EXCEL
-  // ================================================
-
-  const nuevoWorkbook = XLSX.read(
-    buffer,
-    {
-
-      type: "buffer",
-      dense: true,
-      cellHTML: false,
-      cellFormula: false,
-      cellStyles: false,
-      cellNF: false,
-
-    }
+  validarExcelLigero(
+    buffer
   );
 
-
-  // ================================================
-  // PESTAÑAS NECESARIAS
-  // ================================================
-
-  const hojasNecesarias = [
-
-    "PRODUCTIVIDAD",
-    "BD SIN VENTA",
-    "BD PLAN DE TRABAJO",
-    "PLAN DE TRABAJO",
-    "BD AVANCE SEMANAL",
-    "VENTA DIARIA POR SUPERVISOR",
-    "USERS",
-    "PLANTILLA",
-    "VS MES ANTERIOR",
-    "CARTERA POR DÍA",
-    "PROYECCION",
-    "BD ACUMULADO VENTA MES",
-    "ACUMULADO VENTA MES ANTERIOR",
-    "BD ACUMULADO RX MES",
-    "BD RX MES ANTERIOR",
-    "PANEL RECUPERACION",
-
-  ];
-
-
-  // ================================================
-  // VALIDAR CADA PESTAÑA
-  // ================================================
-
-  for (
-    const nombre of hojasNecesarias
-  ) {
-
-    const encontrada =
-      nuevoWorkbook.SheetNames.find(
-        (hoja) =>
-          hoja
-            .trim()
-            .toUpperCase() === nombre
-      );
-
-
-    if (
-      !encontrada ||
-      !nuevoWorkbook
-        .Sheets[encontrada]
-        ?.["!ref"]
-    ) {
-
-      throw new Error(
-        `Falta información en la hoja "${nombre}"`
-      );
-
-    }
-
-  }
-
-
-  // ================================================
-  // VALIDAR PROYECCION!N8:X68
-  // ================================================
-
-  const nombreProyeccion =
-    nuevoWorkbook.SheetNames.find(
-      (hoja) =>
-        hoja
-          .trim()
-          .toUpperCase() ===
-        "PROYECCION"
-    );
-
-
-  const rangoProyeccion =
-    XLSX.utils.decode_range(
-      nuevoWorkbook
-        .Sheets[nombreProyeccion]
-        ["!ref"]
-    );
-
-
-  // r = fila y c = columna.
-  // JavaScript cuenta desde cero:
-  // fila 68 = índice 67
-  // columna X = índice 23
-
-  if (
-    rangoProyeccion.e.r < 67 ||
-    rangoProyeccion.e.c < 23
-  ) {
-
-    throw new Error(
-      "La hoja PROYECCION no alcanza el rango N8:X68"
-    );
-
-  }
-
-
-  return nuevoWorkbook;
-
 }
-
-
 // ==================================================
 // SUBIR Y ACTIVAR EL EXCEL
 // ==================================================
@@ -8784,10 +8750,9 @@ function reemplazarExcelEnSupabase(
       // VALIDAR ANTES DE REEMPLAZAR
       // ============================================
 
-      const nuevoWorkbook =
-        validarExcelParaCarga(
-          buffer
-        );
+    validarExcelParaCarga(
+                       buffer
+                          );
 
 
       // ============================================
@@ -8920,8 +8885,12 @@ function reemplazarExcelEnSupabase(
       // RENOVAR TODAS LAS CACHÉS
       // ============================================
 
-      workbookCacheado =
-        nuevoWorkbook;
+     // Liberar la referencia al workbook anterior.
+     // El archivo nuevo se abrirá una sola vez
+     // cuando llegue la siguiente consulta.
+
+       workbookCacheado =
+        null;
 
       datosCacheados =
         null;
