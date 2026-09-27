@@ -16608,149 +16608,357 @@ td {
 
 
 /* =========================================================
-   PANTALLA DE ACCESO / CARGA - MEGA CONTROL
+   =========================================================
+   MEGA CONTROL — LOGIN PREMIUM 2026
+   SEGUIMIENTO 2.0
+   =========================================================
    ========================================================= */
 
-.access-screen {
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
+.login-container {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
-  padding: 24px;
+  padding: 22px;
 
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
 
   background:
     radial-gradient(
-      circle at 50% 15%,
-      rgba(0, 112, 255, 0.25),
+      circle at 50% -10%,
+      rgba(38, 127, 255, 0.34),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(0, 88, 220, 0.20),
       transparent 35%
     ),
     linear-gradient(
       145deg,
-      #020817 0%,
-      #041431 45%,
-      #001b45 100%
+      #020814 0%,
+      #06152f 48%,
+      #031b41 100%
     );
 
   font-family:
     Inter,
-    system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
     sans-serif;
+
+  isolation: isolate;
 }
 
 
 /* =========================================================
-   LUCES DEL FONDO
-   ========================================================= */
+   GRID DE FONDO
+========================================================= */
 
-.access-glow {
-  position: absolute;
+.login-background-grid {
+  position: fixed;
+  inset: 0;
 
-  width: 420px;
-  height: 420px;
+  z-index: -5;
+
+  pointer-events: none;
+
+  opacity: 0.16;
+
+  background-image:
+    linear-gradient(
+      rgba(94, 158, 255, 0.12) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(94, 158, 255, 0.12) 1px,
+      transparent 1px
+    );
+
+  background-size:
+    48px 48px;
+}
+
+
+/* =========================================================
+   GLOWS DE FONDO
+========================================================= */
+
+.login-background-glow {
+  position: fixed;
+
+  width: 500px;
+  height: 500px;
 
   border-radius: 50%;
 
-  filter: blur(90px);
+  filter: blur(110px);
 
-  opacity: 0.35;
+  pointer-events: none;
+
+  z-index: -4;
+}
+
+
+.login-background-glow-1 {
+  top: -260px;
+  left: -220px;
+
+  background:
+    rgba(0, 111, 255, 0.42);
+}
+
+
+.login-background-glow-2 {
+  bottom: -290px;
+  right: -210px;
+
+  background:
+    rgba(0, 89, 220, 0.36);
+}
+
+
+/* =========================================================
+   LÍNEAS DECORATIVAS
+========================================================= */
+
+.login-background-line {
+  position: fixed;
+
+  width: 700px;
+  height: 700px;
+
+  border-radius: 50%;
+
+  border:
+    1px solid
+    rgba(40, 133, 255, 0.14);
+
+  pointer-events: none;
+
+  z-index: -3;
+}
+
+
+.login-background-line-1 {
+  left: -500px;
+  bottom: -250px;
+}
+
+
+.login-background-line-2 {
+  right: -520px;
+  top: -260px;
+}
+
+
+/* =========================================================
+   TARJETA PRINCIPAL
+========================================================= */
+
+.login-container .login-card {
+  position: relative;
+
+  width: 100%;
+  max-width: 440px;
+
+  margin: auto;
+
+  padding:
+    34px
+    38px
+    25px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  text-align: center;
+
+  border-radius: 32px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.75);
+
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.995) 0%,
+      rgba(248, 251, 255, 0.99) 48%,
+      rgba(239, 246, 255, 0.98) 100%
+    );
+
+  box-shadow:
+    0 40px 100px
+    rgba(0, 0, 0, 0.50),
+
+    0 10px 30px
+    rgba(0, 36, 90, 0.22),
+
+    0 0 80px
+    rgba(14, 102, 255, 0.10),
+
+    inset 0 1px 0
+    rgba(255, 255, 255, 1);
+
+  animation:
+    loginCardEntrance
+    0.65s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+
+/* =========================================================
+   DETALLE AZUL SUPERIOR
+========================================================= */
+
+.login-container .login-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: 120px;
+  height: 4px;
+
+  transform:
+    translateX(-50%);
+
+  border-radius:
+    0
+    0
+    10px
+    10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #42a5ff,
+      #0064e8
+    );
+
+  box-shadow:
+    0 4px 16px
+    rgba(0, 105, 255, 0.40);
+}
+
+
+/* =========================================================
+   LUZ INTERIOR DE TARJETA
+========================================================= */
+
+.login-container .login-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 260px;
+  height: 260px;
+
+  top: -170px;
+  right: -100px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(39, 134, 255, 0.10);
+
+  filter: blur(45px);
 
   pointer-events: none;
 }
 
 
-.access-glow-1 {
-  top: -200px;
-  left: -150px;
-
-  background: #0077ff;
-}
-
-
-.access-glow-2 {
-  bottom: -220px;
-  right: -140px;
-
-  background: #0066ff;
-}
-
-
 /* =========================================================
-   TARJETA
-   ========================================================= */
+   HEADER
+========================================================= */
 
-.access-card {
+.login-header {
   position: relative;
 
-  width: min(460px, 100%);
+  z-index: 2;
+}
 
-  padding: 42px 42px 30px;
 
-  border-radius: 32px;
+/* =========================================================
+   LOGO MEGA
+========================================================= */
 
-  text-align: center;
+.login-container .login-logo {
+  margin: 0 0 13px;
 
-  background:
-    linear-gradient(
-      160deg,
-      rgba(255, 255, 255, 0.99),
-      rgba(245, 249, 255, 0.98)
+  color: #1769df;
+
+  font-size:
+    clamp(
+      42px,
+      8vw,
+      56px
     );
 
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  font-weight: 950;
 
-  box-shadow:
-    0 40px 100px rgba(0, 0, 0, 0.45),
-    0 0 80px rgba(0, 102, 255, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+  letter-spacing: -2.5px;
 
-  animation:
-    accessCardIn 0.65s ease-out both;
-}
-
-
-/* =========================================================
-   MARCA MEGA
-   ========================================================= */
-
-.access-brand {
-  margin-bottom: 18px;
-
-  font-size: clamp(40px, 8vw, 58px);
-  font-weight: 900;
-
-  letter-spacing: -2px;
-
-  color: #1769e0;
+  line-height: 1;
 
   text-shadow:
-    0 5px 18px rgba(23, 105, 224, 0.15);
+    0 6px 20px
+    rgba(23, 105, 223, 0.13);
 }
 
 
 /* =========================================================
-   ESCUDO
-   ========================================================= */
+   CONTENEDOR ESCUDO
+========================================================= */
 
-.access-security {
+.login-security-wrapper {
   display: flex;
+
+  align-items: center;
   justify-content: center;
 
-  margin-bottom: 14px;
+  margin:
+    2px
+    0
+    13px;
 }
 
 
-.access-security-ring {
-  width: 94px;
-  height: 94px;
+.login-security-halo {
+  position: relative;
+
+  width: 86px;
+  height: 86px;
 
   display: grid;
   place-items: center;
@@ -16760,88 +16968,118 @@ td {
   background:
     radial-gradient(
       circle,
-      rgba(28, 126, 255, 0.18),
-      rgba(28, 126, 255, 0.03) 70%
+      rgba(40, 139, 255, 0.19),
+      rgba(40, 139, 255, 0.04) 63%,
+      transparent 72%
     );
 
   animation:
-    securityPulse 2.4s ease-in-out infinite;
+    loginSecurityPulse
+    2.8s
+    ease-in-out
+    infinite;
 }
 
 
-.access-shield {
-  width: 68px;
-  height: 68px;
+.login-security-halo::before {
+  content: "";
 
-  display: grid;
-  place-items: center;
+  position: absolute;
 
-  border-radius:
-    22px
-    22px
-    30px
-    30px;
+  inset: 8px;
 
-  font-size: 31px;
+  border-radius: 50%;
 
-  color: white;
+  border:
+    1px solid
+    rgba(41, 133, 255, 0.13);
+}
 
-  background:
-    linear-gradient(
-      145deg,
-      #2e8cff,
-      #0750bf
+
+.login-security-icon {
+  position: relative;
+
+  width: 59px;
+  height: 66px;
+
+  color: #1267d9;
+
+  filter:
+    drop-shadow(
+      0 9px 13px
+      rgba(0, 81, 190, 0.24)
     );
+}
 
-  box-shadow:
-    0 12px 28px rgba(0, 88, 214, 0.3),
-    inset 0 1px 3px rgba(255, 255, 255, 0.6);
+
+.login-security-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 
 /* =========================================================
-   TITULOS
-   ========================================================= */
+   TÍTULO
+========================================================= */
 
-.access-title {
-  margin: 0;
+.login-card .login-title {
+  margin: 0 !important;
 
-  color: #09162f;
+  color: #0a1833 !important;
 
-  font-size: clamp(28px, 6vw, 39px);
-  font-weight: 900;
+  font-size:
+    clamp(
+      29px,
+      6vw,
+      36px
+    );
 
-  letter-spacing: -1px;
+  font-weight: 950;
+
+  line-height: 1.05;
+
+  letter-spacing: -1.2px;
 }
 
 
-.access-location {
-  margin-top: 4px;
+/* =========================================================
+   SUBTÍTULO
+========================================================= */
 
-  color: #727b8c;
+.login-container .login-subtitulo {
+  margin:
+    6px
+    0
+    0;
 
-  font-size: 17px;
-  font-weight: 500;
+  color: #6d7788;
+
+  font-size: 16px;
+
+  font-weight: 550;
+
+  letter-spacing: -0.15px;
 }
 
 
 /* =========================================================
    DIVISOR
-   ========================================================= */
+========================================================= */
 
-.access-divider {
-  width: 150px;
+.login-divider {
+  width: 145px;
 
   margin:
-    22px
+    20px
     auto
-    24px;
+    21px;
 
   display: grid;
 
   grid-template-columns:
     1fr
-    40px
+    38px
     1fr;
 
   align-items: center;
@@ -16850,104 +17088,656 @@ td {
 }
 
 
-.access-divider span {
-  height: 2px;
+.login-divider span {
+  height: 1px;
 
-  border-radius: 10px;
-
-  background: #dbe4f0;
+  background:
+    #d8e1ef;
 }
 
 
-.access-divider strong {
-  height: 4px;
+.login-divider strong {
+  height: 3px;
 
   border-radius: 10px;
 
   background:
     linear-gradient(
       90deg,
-      #4ba1ff,
-      #0067ff
+      #55aeff,
+      #0068ef
     );
 
   box-shadow:
-    0 0 12px rgba(0, 103, 255, 0.35);
+    0 3px 10px
+    rgba(0, 105, 239, 0.25);
 }
 
 
 /* =========================================================
-   LOADER CIRCULAR
-   ========================================================= */
+   FORMULARIO
+========================================================= */
 
-.access-loader-wrapper {
-  display: flex;
-  justify-content: center;
-
-  margin:
-    8px
-    0
-    24px;
-}
-
-
-.access-loader {
+.login-form-wrapper {
   position: relative;
 
-  width: 132px;
-  height: 132px;
+  z-index: 2;
 }
 
 
-.access-loader-track,
-.access-loader-progress {
+.login-container .login-form {
+  width: 100%;
+
+  margin: 0;
+
+  text-align: left;
+}
+
+
+/* =========================================================
+   BIENVENIDA
+========================================================= */
+
+.login-welcome {
+  margin-bottom: 23px;
+
+  text-align: center;
+}
+
+
+.login-welcome h2 {
+  margin:
+    0
+    0
+    5px;
+
+  color: #0c1b35;
+
+  font-size: 23px;
+
+  font-weight: 850;
+
+  letter-spacing: -0.5px;
+}
+
+
+.login-welcome p {
+  margin: 0;
+
+  color: #8a94a5;
+
+  font-size: 14px;
+
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   CAMPO
+========================================================= */
+
+.login-field {
+  margin-bottom: 17px;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.login-card .login-label {
+  display: block;
+
+  margin:
+    0
+    0
+    7px;
+
+  color: #1b2942;
+
+  font-size: 13px;
+
+  font-weight: 750;
+
+  letter-spacing: 0.1px;
+}
+
+
+/* =========================================================
+   INPUT WRAPPER
+========================================================= */
+
+.login-input-wrapper {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  width: 100%;
+}
+
+
+/* =========================================================
+   ICONO DEL INPUT
+========================================================= */
+
+.login-input-icon {
   position: absolute;
 
-  inset: 0;
+  left: 14px;
 
-  border-radius: 50%;
+  width: 21px;
+  height: 21px;
+
+  display: grid;
+  place-items: center;
+
+  color: #8290a5;
+
+  pointer-events: none;
+
+  transition:
+    color
+    0.22s ease;
+
+  z-index: 2;
 }
 
 
-.access-loader-track {
-  border:
-    11px solid
-    #e3e8f0;
+.login-input-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 
-.access-loader-progress {
+/* =========================================================
+   INPUT
+========================================================= */
+
+.login-card
+.login-input-wrapper
+input {
+  width: 100%;
+
+  height: 53px;
+
+  box-sizing: border-box;
+
+  margin: 0;
+
+  padding:
+    0
+    48px
+    0
+    47px;
+
+  outline: none;
+
+  appearance: none;
+
   border:
-    11px solid
-    transparent;
+    1px solid
+    #d8e1ed;
 
-  border-top-color: #1480ff;
-  border-right-color: #0068ee;
+  border-radius: 14px;
 
-  filter:
-    drop-shadow(
-      0 5px 10px
-      rgba(0, 103, 238, 0.25)
-    );
+  background:
+    #f8fafc;
+
+  color: #14213d;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  font-weight: 550;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.login-card
+.login-input-wrapper
+input::placeholder {
+  color: #a4adba;
+
+  font-weight: 450;
+}
+
+
+.login-card
+.login-input-wrapper
+input:hover {
+  border-color:
+    #bdcce0;
+}
+
+
+.login-card
+.login-input-wrapper
+input:focus {
+  border-color:
+    #2a7ff0;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(42, 127, 240, 0.10),
+
+    0 5px 16px
+    rgba(14, 78, 160, 0.07);
+}
+
+
+.login-input-wrapper:focus-within
+.login-input-icon {
+  color:
+    #1871df;
+}
+
+
+/* =========================================================
+   MOSTRAR CONTRASEÑA
+========================================================= */
+
+.login-password-toggle {
+  position: absolute;
+
+  right: 9px;
+
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 10px;
+
+  color: #8390a4;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.login-password-toggle:hover {
+  color:
+    #176dde;
+
+  background:
+    rgba(31, 117, 232, 0.08);
+}
+
+
+.login-password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.login-container .login-error {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin:
+    3px
+    0
+    3px;
+
+  padding:
+    11px
+    13px;
+
+  border:
+    1px solid
+    rgba(220, 38, 38, 0.17);
+
+  border-radius: 12px;
+
+  color:
+    #b42318;
+
+  background:
+    #fff5f4;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  line-height: 1.35;
 
   animation:
-    accessSpin 1.1s
-    linear
-    infinite;
+    loginErrorEntrance
+    0.25s ease;
 }
 
 
-.access-loader-center {
-  position: absolute;
+.login-error-icon {
+  flex:
+    0
+    0
+    22px;
 
-  inset: 24px;
+  width: 22px;
+  height: 22px;
 
   display: grid;
   place-items: center;
 
   border-radius: 50%;
 
-  color: #4980c9;
+  color: white;
+
+  background:
+    #dc2626;
+
+  font-size: 13px;
+
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   BOTÓN PRINCIPAL
+========================================================= */
+
+.login-container .login-button {
+  width: 100%;
+
+  min-height: 52px;
+
+  margin:
+    7px
+    0
+    0;
+
+  padding:
+    0
+    18px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2279e7 0%,
+      #0759c8 100%
+    );
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  font-weight: 850;
+
+  letter-spacing: 0.7px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 13px 25px
+    rgba(5, 82, 185, 0.23),
+
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.23);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+
+.login-container
+.login-button svg {
+  width: 20px;
+  height: 20px;
+
+  transition:
+    transform
+    0.2s ease;
+}
+
+
+.login-container
+.login-button:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #2d86f1 0%,
+      #0754ba 100%
+    );
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 16px 30px
+    rgba(5, 82, 185, 0.30),
+
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.25);
+}
+
+
+.login-container
+.login-button:hover
+svg {
+  transform:
+    translateX(3px);
+}
+
+
+.login-container
+.login-button:active {
+  transform:
+    translateY(0);
+}
+
+
+.login-container
+.login-button:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* =========================================================
+   MENSAJE SEGURIDAD
+========================================================= */
+
+.login-security-text {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  margin-top: 15px;
+
+  color: #8c98a9;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+
+.login-security-text svg {
+  width: 14px;
+  height: 14px;
+
+  color:
+    #5683bd;
+}
+
+
+/* =========================================================
+   =========================================================
+   PANTALLA DE CARGA / VALIDANDO
+   =========================================================
+   ========================================================= */
+
+.login-container .login-validando {
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding:
+    0
+    0
+    5px;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   LOADER WRAPPER
+========================================================= */
+
+.login-loader-wrapper {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    3px
+    0
+    19px;
+}
+
+
+/* =========================================================
+   LOADER
+========================================================= */
+
+.login-loader {
+  position: relative;
+
+  width: 116px;
+  height: 116px;
+}
+
+
+/* =========================================================
+   TRACK
+========================================================= */
+
+.login-loader-track {
+  position: absolute;
+
+  inset: 0;
+
+  box-sizing: border-box;
+
+  border:
+    9px solid
+    #e4e9f1;
+
+  border-radius: 50%;
+}
+
+
+/* =========================================================
+   PROGRESO
+========================================================= */
+
+.login-loader-progress {
+  position: absolute;
+
+  inset: 0;
+
+  box-sizing: border-box;
+
+  border:
+    9px solid
+    transparent;
+
+  border-top-color:
+    #1986ff;
+
+  border-right-color:
+    #0869e8;
+
+  border-radius: 50%;
+
+  filter:
+    drop-shadow(
+      0 4px 6px
+      rgba(0, 105, 232, 0.24)
+    );
+
+  animation:
+    loginLoaderSpin
+    1.05s
+    linear
+    infinite;
+}
+
+
+/* =========================================================
+   CENTRO LOADER
+========================================================= */
+
+.login-loader-center {
+  position: absolute;
+
+  inset: 22px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  color:
+    #4c81c4;
 
   background:
     linear-gradient(
@@ -16956,218 +17746,338 @@ td {
       #edf4fc
     );
 
+  border:
+    1px solid
+    rgba(58, 119, 202, 0.08);
+
   box-shadow:
-    0 12px 28px rgba(42, 76, 120, 0.18),
-    inset 0 1px 2px rgba(255, 255, 255, 1);
+    0 11px 26px
+    rgba(32, 74, 128, 0.16),
+
+    inset 0 1px 1px
+    rgba(255, 255, 255, 1);
+}
+
+
+.login-loader-center svg {
+  width: 31px;
+  height: 31px;
 }
 
 
 /* =========================================================
-   NOMBRE DEL SISTEMA
-   ========================================================= */
+   TÍTULO SEGUIMIENTO
+========================================================= */
 
-.access-system {
+.login-container
+.login-system-title {
   margin:
     0
     0
-    20px;
+    4px !important;
 
-  font-size: clamp(27px, 6vw, 36px);
-  font-weight: 900;
+  color:
+    #091832 !important;
 
-  letter-spacing: -1px;
+  font-size:
+    clamp(
+      27px,
+      6vw,
+      33px
+    ) !important;
 
-  color: #09162f;
+  font-weight:
+    950 !important;
+
+  letter-spacing:
+    -1px;
+
+  line-height: 1.15;
 }
 
 
 /* =========================================================
-   MENSAJE DINÁMICO
-   ========================================================= */
+   SUBTÍTULO SISTEMA
+========================================================= */
 
-.access-message {
-  min-height: 68px;
+.login-system-subtitle {
+  margin:
+    0
+    0
+    18px;
+
+  color:
+    #8b95a5;
+
+  font-size:
+    12px;
+
+  font-weight: 550;
+
+  letter-spacing:
+    0.2px;
+}
+
+
+/* =========================================================
+   MENSAJE DE CARGA
+========================================================= */
+
+.login-loading-message {
+  width: 100%;
+
+  min-height: 62px;
+
+  box-sizing: border-box;
 
   display: flex;
 
-  justify-content: center;
   align-items: center;
+  justify-content: flex-start;
 
-  gap: 13px;
+  gap: 12px;
 
   padding:
-    16px
-    20px;
+    12px
+    15px;
 
-  border-radius: 18px;
+  border:
+    1px solid
+    rgba(54, 132, 235, 0.11);
 
-  color: #1267d9;
-
-  font-size: 17px;
-  font-weight: 750;
+  border-radius: 15px;
 
   background:
     linear-gradient(
       135deg,
-      rgba(226, 239, 255, 0.95),
-      rgba(244, 249, 255, 0.95)
+      rgba(229, 241, 255, 0.92),
+      rgba(245, 249, 255, 0.98)
     );
-
-  border:
-    1px solid
-    rgba(65, 142, 243, 0.12);
 
   box-shadow:
     inset 0 1px 0
-    rgba(255, 255, 255, 0.8);
+    rgba(255, 255, 255, 0.95);
 }
 
 
-.access-message-icon {
-  flex: 0 0 auto;
+/* =========================================================
+   ICONO MENSAJE CARGA
+========================================================= */
 
-  width: 36px;
-  height: 36px;
+.login-loading-icon {
+  flex:
+    0
+    0
+    38px;
+
+  width: 38px;
+  height: 38px;
 
   display: grid;
   place-items: center;
 
-  border-radius: 10px;
+  border-radius: 11px;
 
-  background: rgba(25, 118, 240, 0.08);
+  color:
+    #1870de;
+
+  background:
+    rgba(24, 112, 222, 0.08);
+}
+
+
+.login-loading-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+
+/* =========================================================
+   FRASE
+========================================================= */
+
+.login-container
+.login-validando
+.loading-frase {
+  flex: 1;
+
+  min-height: 0;
+
+  margin: 0;
+
+  color:
+    #1467cf;
+
+  font-size:
+    14px;
+
+  font-weight:
+    750;
+
+  line-height:
+    1.35;
+
+  text-align: left;
+
+  animation:
+    loginPhraseEntrance
+    0.40s ease;
 }
 
 
 /* =========================================================
    ESTADO
-   ========================================================= */
+========================================================= */
 
-.access-status {
-  margin-top: 22px;
+.login-loading-status {
+  display: flex;
 
-  color: #8793a6;
+  align-items: center;
+  justify-content: center;
 
-  font-size: 15px;
-  font-weight: 600;
+  gap: 7px;
 
-  letter-spacing: 0.1px;
+  margin-top: 17px;
+
+  color:
+    #7e899a;
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
 }
 
 
 /* =========================================================
-   INDICADOR DE PUNTOS
-   ========================================================= */
+   PUNTO ESTADO
+========================================================= */
 
-.access-dots {
-  display: flex;
-
-  justify-content: center;
-
-  gap: 8px;
-
-  margin-top: 13px;
-}
-
-
-.access-dots span {
+.login-status-dot {
   width: 7px;
   height: 7px;
 
   border-radius: 50%;
 
-  background: #aabedb;
+  background:
+    #1680ef;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(22, 128, 239, 0.10);
 
   animation:
-    accessDots
-    1.4s
+    loginStatusPulse
+    1.5s
     ease-in-out
     infinite;
 }
 
 
-.access-dots span:nth-child(2) {
-  background: #0874ff;
+/* =========================================================
+   DOTS
+========================================================= */
 
-  animation-delay: 0.15s;
+.login-loading-dots {
+  display: flex;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: 15px;
 }
 
 
-.access-dots span:nth-child(3) {
-  animation-delay: 0.30s;
+.login-loading-dots span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background:
+    #9bb6d9;
+
+  animation:
+    loginDots
+    1.3s
+    ease-in-out
+    infinite;
+}
+
+
+.login-loading-dots
+span:nth-child(2) {
+  background:
+    #126ede;
+
+  animation-delay:
+    0.14s;
+}
+
+
+.login-loading-dots
+span:nth-child(3) {
+  animation-delay:
+    0.28s;
 }
 
 
 /* =========================================================
-   PIE
-   ========================================================= */
+   FOOTER
+========================================================= */
 
-.access-footer {
-  margin-top: 26px;
+.login-footer {
+  position: relative;
 
-  padding-top: 18px;
+  z-index: 2;
 
-  border-top:
-    1px solid
-    rgba(14, 44, 83, 0.08);
+  display: flex;
 
-  color: #a1aab8;
+  align-items: center;
+  justify-content: center;
 
-  font-size: 11px;
-  font-weight: 700;
+  gap: 9px;
 
-  letter-spacing: 1.6px;
+  margin-top: 21px;
 
-  text-transform: uppercase;
+  color:
+    #a1abb9;
+
+  font-size:
+    8.5px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    1.25px;
+
+  white-space: nowrap;
+}
+
+
+.login-footer-line {
+  width: 28px;
+  height: 1px;
+
+  background:
+    #d8e1ed;
 }
 
 
 /* =========================================================
    ANIMACIONES
-   ========================================================= */
+========================================================= */
 
-@keyframes accessSpin {
-  from {
-    transform: rotate(0deg);
-  }
+@keyframes loginCardEntrance {
 
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-
-@keyframes securityPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.04);
-  }
-}
-
-
-@keyframes accessDots {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: translateY(0);
-  }
-
-  50% {
-    opacity: 1;
-    transform: translateY(-3px);
-  }
-}
-
-
-@keyframes accessCardIn {
   from {
     opacity: 0;
 
     transform:
-      translateY(18px)
+      translateY(20px)
       scale(0.97);
   }
 
@@ -17178,181 +18088,589 @@ td {
       translateY(0)
       scale(1);
   }
+
+}
+
+
+@keyframes loginSecurityPulse {
+
+  0%,
+  100% {
+    transform:
+      scale(1);
+
+    opacity: 1;
+  }
+
+  50% {
+    transform:
+      scale(1.045);
+
+    opacity: 0.94;
+  }
+
+}
+
+
+@keyframes loginLoaderSpin {
+
+  from {
+    transform:
+      rotate(0deg);
+  }
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+@keyframes loginPhraseEntrance {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
+}
+
+
+@keyframes loginStatusPulse {
+
+  0%,
+  100% {
+    opacity: 0.55;
+
+    transform:
+      scale(0.90);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      scale(1.08);
+  }
+
+}
+
+
+@keyframes loginDots {
+
+  0%,
+  100% {
+    opacity: 0.35;
+
+    transform:
+      translateY(0);
+  }
+
+  50% {
+    opacity: 1;
+
+    transform:
+      translateY(-3px);
+  }
+
+}
+
+
+@keyframes loginErrorEntrance {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
 }
 
 
 /* =========================================================
-   CELULARES
-   ========================================================= */
+   TABLET / CELULAR
+========================================================= */
 
 @media (max-width: 600px) {
 
-  .access-screen {
-    padding: 14px;
+  .login-container {
+    padding:
+      14px;
   }
 
 
-  .access-card {
-    width: 100%;
+  .login-container
+  .login-card {
+    max-width:
+      400px;
 
     padding:
-      32px
+      27px
       24px
-      24px;
+      21px;
 
-    border-radius: 28px;
+    border-radius:
+      27px;
   }
 
 
-  .access-brand {
-    margin-bottom: 12px;
+  .login-container
+  .login-logo {
+    font-size:
+      41px;
+
+    margin-bottom:
+      10px;
   }
 
 
-  .access-security-ring {
-    width: 80px;
-    height: 80px;
+  .login-security-halo {
+    width:
+      73px;
+
+    height:
+      73px;
   }
 
 
-  .access-shield {
-    width: 58px;
-    height: 58px;
+  .login-security-icon {
+    width:
+      49px;
 
-    font-size: 26px;
+    height:
+      56px;
   }
 
 
-  .access-location {
-    font-size: 15px;
+  .login-card
+  .login-title {
+    font-size:
+      28px;
   }
 
 
-  .access-loader {
-    width: 112px;
-    height: 112px;
+  .login-container
+  .login-subtitulo {
+    font-size:
+      14px;
   }
 
 
-  .access-loader-track {
-    border-width: 9px;
+  .login-divider {
+    margin:
+      16px
+      auto
+      18px;
   }
 
 
-  .access-loader-progress {
-    border-width: 9px;
+  .login-welcome {
+    margin-bottom:
+      18px;
   }
 
 
-  .access-loader-center {
-    inset: 21px;
+  .login-welcome h2 {
+    font-size:
+      21px;
   }
 
 
-  .access-message {
-    min-height: 62px;
+  .login-card
+  .login-input-wrapper
+  input {
+    height:
+      50px;
+
+    font-size:
+      14px;
+  }
+
+
+  .login-container
+  .login-button {
+    min-height:
+      50px;
+  }
+
+
+  .login-loader {
+    width:
+      103px;
+
+    height:
+      103px;
+  }
+
+
+  .login-loader-track {
+    border-width:
+      8px;
+  }
+
+
+  .login-loader-progress {
+    border-width:
+      8px;
+  }
+
+
+  .login-loader-center {
+    inset:
+      20px;
+  }
+
+
+  .login-container
+  .login-system-title {
+    font-size:
+      27px !important;
+  }
+
+
+  .login-loading-message {
+    min-height:
+      58px;
 
     padding:
-      14px
-      16px;
-
-    font-size: 15px;
+      11px
+      13px;
   }
 
 
-  .access-footer {
-    margin-top: 20px;
+  .login-container
+  .login-validando
+  .loading-frase {
+    font-size:
+      13px;
+  }
+
+
+  .login-footer {
+    margin-top:
+      17px;
+
+    letter-spacing:
+      0.9px;
+
+    font-size:
+      7.5px;
   }
 
 }
 
 
 /* =========================================================
-   PANTALLAS MUY BAJAS
-   ========================================================= */
+   PANTALLAS BAJAS
+   IMPORTANTE PARA APK
+========================================================= */
 
 @media (max-height: 760px) {
 
-  .access-card {
-    padding-top: 24px;
-    padding-bottom: 20px;
+  .login-container {
+    align-items:
+      flex-start;
+
+    padding-top:
+      12px;
+
+    padding-bottom:
+      12px;
   }
 
 
-  .access-brand {
-    font-size: 38px;
-  }
-
-
-  .access-security-ring {
-    width: 68px;
-    height: 68px;
-  }
-
-
-  .access-shield {
-    width: 50px;
-    height: 50px;
-
-    font-size: 22px;
-  }
-
-
-  .access-divider {
+  .login-container
+  .login-card {
     margin:
-      14px
+      auto;
+
+    padding-top:
+      21px;
+
+    padding-bottom:
+      17px;
+  }
+
+
+  .login-container
+  .login-logo {
+    font-size:
+      37px;
+
+    margin-bottom:
+      7px;
+  }
+
+
+  .login-security-wrapper {
+    margin-bottom:
+      8px;
+  }
+
+
+  .login-security-halo {
+    width:
+      63px;
+
+    height:
+      63px;
+  }
+
+
+  .login-security-icon {
+    width:
+      42px;
+
+    height:
+      48px;
+  }
+
+
+  .login-card
+  .login-title {
+    font-size:
+      25px;
+  }
+
+
+  .login-container
+  .login-subtitulo {
+    font-size:
+      13px;
+  }
+
+
+  .login-divider {
+    margin:
+      11px
       auto
-      15px;
+      13px;
   }
 
 
-  .access-loader {
-    width: 94px;
-    height: 94px;
+  .login-welcome {
+    margin-bottom:
+      13px;
   }
 
 
-  .access-loader-track,
-  .access-loader-progress {
-    border-width: 8px;
+  .login-welcome h2 {
+    font-size:
+      19px;
   }
 
 
-  .access-loader-center {
-    inset: 18px;
+  .login-welcome p {
+    font-size:
+      12px;
   }
 
 
-  .access-loader-wrapper {
-    margin-bottom: 15px;
+  .login-field {
+    margin-bottom:
+      11px;
   }
 
 
-  .access-system {
-    margin-bottom: 13px;
-
-    font-size: 28px;
+  .login-card
+  .login-input-wrapper
+  input {
+    height:
+      46px;
   }
 
 
-  .access-message {
-    min-height: 55px;
+  .login-container
+  .login-button {
+    min-height:
+      46px;
+  }
 
+
+  .login-security-text {
+    margin-top:
+      10px;
+  }
+
+
+  .login-footer {
+    margin-top:
+      12px;
+  }
+
+
+  /* CARGA */
+
+
+  .login-loader-wrapper {
+    margin:
+      0
+      0
+      11px;
+  }
+
+
+  .login-loader {
+    width:
+      86px;
+
+    height:
+      86px;
+  }
+
+
+  .login-loader-track,
+  .login-loader-progress {
+    border-width:
+      7px;
+  }
+
+
+  .login-loader-center {
+    inset:
+      17px;
+  }
+
+
+  .login-loader-center svg {
+    width:
+      26px;
+
+    height:
+      26px;
+  }
+
+
+  .login-container
+  .login-system-title {
+    font-size:
+      25px !important;
+  }
+
+
+  .login-system-subtitle {
+    margin-bottom:
+      11px;
+  }
+
+
+  .login-loading-message {
+    min-height:
+      53px;
+  }
+
+
+  .login-loading-status {
+    margin-top:
+      11px;
+  }
+
+
+  .login-loading-dots {
+    margin-top:
+      10px;
+  }
+
+}
+
+
+/* =========================================================
+   PANTALLAS MUY PEQUEÑAS
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .login-container {
     padding:
-      12px
-      15px;
+      9px;
   }
 
 
-  .access-status {
-    margin-top: 14px;
+  .login-container
+  .login-card {
+    padding:
+      23px
+      18px
+      18px;
+
+    border-radius:
+      24px;
   }
 
 
-  .access-footer {
-    margin-top: 16px;
+  .login-container
+  .login-logo {
+    font-size:
+      36px;
+  }
 
-    padding-top: 13px;
+
+  .login-card
+  .login-title {
+    font-size:
+      24px;
+  }
+
+
+  .login-container
+  .login-subtitulo {
+    font-size:
+      13px;
+  }
+
+
+  .login-footer-line {
+    width:
+      18px;
+  }
+
+
+  .login-footer {
+    font-size:
+      7px;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCIR MOVIMIENTO SI EL DISPOSITIVO LO PIDE
+========================================================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .login-container *,
+  .login-container *::before,
+  .login-container *::after {
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    scroll-behavior:
+      auto !important;
   }
 
 }
