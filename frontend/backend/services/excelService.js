@@ -9512,6 +9512,883 @@ async function leerPromotoresProductividadBaja() {
   return { resumen, detalle };
 }
 
+// ==================================================
+// DETALLE DIARIO DEL EQUIPO POR SUPERVISOR
+// ==================================================
+//
+// VENTAS DIARIAS:
+// Hoja: BD SIN VENTA
+// F = Promotor
+// G:AK = Días 1 al 31
+//
+// RECUPERACIONES:
+// Hoja: BD ACUMULADO RX MES
+// O = Promotor
+// Q = Fecha
+// T = Supervisor
+//
+// PRODUCTIVIDAD:
+// Hoja: PRODUCTIVIDAD
+// F = Promotor
+// H = Productividad Venta + RX
+// AO = Productividad Venta
+//
+// ==================================================
+
+async function leerDetalleEquipoDiario(
+  supervisorSolicitado
+) {
+
+  const supervisorNormalizado =
+    normalizarNombre(
+      supervisorSolicitado
+    );
+
+
+  if (
+    !supervisorNormalizado
+  ) {
+
+    throw new Error(
+      "No se recibió un supervisor válido"
+    );
+
+  }
+
+
+  // ================================================
+  // OBTENER LOS PROMOTORES DEL SUPERVISOR
+  // ================================================
+
+  const datosGenerales =
+    await leerExcel();
+
+
+  const integrantes =
+    (
+      datosGenerales.registros || []
+    )
+      .filter(
+        (registro) =>
+
+          normalizarNombre(
+            registro.supervisor
+          ) ===
+            supervisorNormalizado &&
+
+          registro.nombre &&
+
+          normalizarNombre(
+            registro.nombre
+          ) !== "0" &&
+
+          !esVacante(
+            registro.nombre
+          )
+      );
+
+
+  // ================================================
+  // CARGAR HOJAS
+  // ================================================
+
+  const workbook =
+    cargarExcel();
+
+
+  const buscarHoja =
+    (nombreBuscado) => {
+
+      const nombreEncontrado =
+        workbook.SheetNames.find(
+          (nombreHoja) =>
+
+            limpiarTexto(
+              nombreHoja
+            ) ===
+            limpiarTexto(
+              nombreBuscado
+            )
+        );
+
+
+      return nombreEncontrado
+        ? workbook.Sheets[
+            nombreEncontrado
+          ]
+        : null;
+
+    };
+
+
+  const hojaSinVenta =
+    buscarHoja(
+      "BD SIN VENTA"
+    );
+
+
+  const hojaRecuperaciones =
+    buscarHoja(
+      "BD ACUMULADO RX MES"
+    );
+
+
+  const hojaProductividad =
+    buscarHoja(
+      "PRODUCTIVIDAD"
+    );
+
+
+  if (
+    !hojaSinVenta ||
+    !hojaRecuperaciones ||
+    !hojaProductividad
+  ) {
+
+    throw new Error(
+      "No se encontraron las hojas necesarias para consultar el detalle diario"
+    );
+
+  }
+
+
+  const convertirFilas =
+    (hoja) =>
+      XLSX.utils.sheet_to_json(
+        hoja,
+        {
+          header: 1,
+          defval: "",
+        }
+      );
+
+
+  const filasSinVenta =
+    convertirFilas(
+      hojaSinVenta
+    );
+
+
+  const filasRecuperaciones =
+    convertirFilas(
+      hojaRecuperaciones
+    );
+
+
+  const filasProductividad =
+    convertirFilas(
+      hojaProductividad
+    );
+
+
+  // ================================================
+  // CONVERTIR FECHA DE EXCEL
+  // ================================================
+
+  const convertirFecha =
+    (valor) => {
+
+      if (
+        valor instanceof Date &&
+        !Number.isNaN(
+          valor.getTime()
+        )
+      ) {
+
+        return {
+
+          anio:
+            valor.getFullYear(),
+
+          mes:
+            valor.getMonth() + 1,
+
+          dia:
+            valor.getDate(),
+
+        };
+
+      }
+
+
+      const numero =
+        Number(
+          valor
+        );
+
+
+      if (
+        Number.isFinite(
+          numero
+        ) &&
+        numero > 0
+      ) {
+
+        const fechaExcel =
+          XLSX.SSF.parse_date_code(
+            numero
+          );
+
+
+        if (
+          fechaExcel
+        ) {
+
+          return {
+
+            anio:
+              fechaExcel.y,
+
+            mes:
+              fechaExcel.m,
+
+            dia:
+              fechaExcel.d,
+
+          };
+
+        }
+
+      }
+
+
+      const texto =
+        String(
+          valor ?? ""
+        ).trim();
+
+
+      let coincidencia =
+        texto.match(
+          /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/
+        );
+
+
+      if (
+        coincidencia
+      ) {
+
+        return {
+
+          dia:
+            Number(
+              coincidencia[1]
+            ),
+
+          mes:
+            Number(
+              coincidencia[2]
+            ),
+
+          anio:
+            Number(
+              coincidencia[3]
+            ),
+
+        };
+
+      }
+
+
+      coincidencia =
+        texto.match(
+          /^(\d{4})-(\d{1,2})-(\d{1,2})/
+        );
+
+
+      if (
+        coincidencia
+      ) {
+
+        return {
+
+          anio:
+            Number(
+              coincidencia[1]
+            ),
+
+          mes:
+            Number(
+              coincidencia[2]
+            ),
+
+          dia:
+            Number(
+              coincidencia[3]
+            ),
+
+        };
+
+      }
+
+
+      return null;
+
+    };
+
+
+  // ================================================
+  // FECHA DE CORTE DE LAS RECUPERACIONES
+  // ================================================
+
+  const COLUMNA_RX_FECHA = 16;       // Q
+  const COLUMNA_RX_PROMOTOR = 14;    // O
+  const COLUMNA_RX_SUPERVISOR = 19;  // T
+
+
+  let fechaCorte =
+    null;
+
+
+  const convertirValorFecha =
+    (fecha) =>
+      fecha.anio * 10000 +
+      fecha.mes * 100 +
+      fecha.dia;
+
+
+  for (
+    let indice = 1;
+    indice < filasRecuperaciones.length;
+    indice++
+  ) {
+
+    const fecha =
+      convertirFecha(
+        filasRecuperaciones[
+          indice
+        ][
+          COLUMNA_RX_FECHA
+        ]
+      );
+
+
+    if (
+      fecha &&
+      (
+        !fechaCorte ||
+        convertirValorFecha(
+          fecha
+        ) >
+        convertirValorFecha(
+          fechaCorte
+        )
+      )
+    ) {
+
+      fechaCorte =
+        fecha;
+
+    }
+
+  }
+
+
+  const fechaActual =
+    new Date();
+
+
+  const anioConsulta =
+    fechaCorte?.anio ??
+    fechaActual.getFullYear();
+
+
+  const mesConsulta =
+    fechaCorte?.mes ??
+    (
+      fechaActual.getMonth() + 1
+    );
+
+
+  const ultimoDia =
+    new Date(
+      anioConsulta,
+      mesConsulta,
+      0
+    ).getDate();
+
+
+  // ================================================
+  // MAPA DE VENTAS DIARIAS
+  // ================================================
+
+  const COLUMNA_VENTA_PROMOTOR = 5;  // F
+  const COLUMNA_VENTA_DIA_1 = 6;     // G
+
+
+  const ventasPorPromotor =
+    new Map();
+
+
+  for (
+    let indice = 0;
+    indice < filasSinVenta.length;
+    indice++
+  ) {
+
+    const fila =
+      filasSinVenta[
+        indice
+      ];
+
+
+    const promotor =
+      limpiarTexto(
+        fila[
+          COLUMNA_VENTA_PROMOTOR
+        ]
+      );
+
+
+    const clavePromotor =
+      normalizarNombre(
+        promotor
+      );
+
+
+    if (
+      !clavePromotor ||
+      clavePromotor === "PROMOTOR" ||
+      clavePromotor === "0" ||
+      esVacante(
+        promotor
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    const dias =
+      Array.from(
+        {
+          length: 31,
+        },
+        (
+          _,
+          indiceDia
+        ) => {
+
+          const valor =
+            Number(
+              fila[
+                COLUMNA_VENTA_DIA_1 +
+                indiceDia
+              ]
+            );
+
+
+          return Number.isFinite(
+            valor
+          )
+            ? Math.round(
+                valor
+              )
+            : 0;
+
+        }
+      );
+
+
+    ventasPorPromotor.set(
+      clavePromotor,
+      dias
+    );
+
+  }
+
+
+  // ================================================
+  // MAPA DE RECUPERACIONES DIARIAS
+  // ================================================
+
+  const recuperacionesPorPromotor =
+    new Map();
+
+
+  for (
+    let indice = 1;
+    indice < filasRecuperaciones.length;
+    indice++
+  ) {
+
+    const fila =
+      filasRecuperaciones[
+        indice
+      ];
+
+
+    const supervisorFila =
+      normalizarNombre(
+        fila[
+          COLUMNA_RX_SUPERVISOR
+        ]
+      );
+
+
+    if (
+      supervisorFila !==
+      supervisorNormalizado
+    ) {
+
+      continue;
+
+    }
+
+
+    const fecha =
+      convertirFecha(
+        fila[
+          COLUMNA_RX_FECHA
+        ]
+      );
+
+
+    if (
+      !fecha ||
+      fecha.anio !==
+        anioConsulta ||
+      fecha.mes !==
+        mesConsulta ||
+      fecha.dia < 1 ||
+      fecha.dia > 31
+    ) {
+
+      continue;
+
+    }
+
+
+    const nombrePromotor =
+      limpiarTexto(
+        fila[
+          COLUMNA_RX_PROMOTOR
+        ]
+      );
+
+
+    const clavePromotor =
+      normalizarNombre(
+        nombrePromotor
+      );
+
+
+    if (
+      !clavePromotor ||
+      clavePromotor === "0" ||
+      esVacante(
+        nombrePromotor
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    if (
+      !recuperacionesPorPromotor.has(
+        clavePromotor
+      )
+    ) {
+
+      recuperacionesPorPromotor.set(
+        clavePromotor,
+        Array(
+          31
+        ).fill(
+          0
+        )
+      );
+
+    }
+
+
+    const dias =
+      recuperacionesPorPromotor.get(
+        clavePromotor
+      );
+
+
+    dias[
+      fecha.dia - 1
+    ] += 1;
+
+  }
+
+
+  // ================================================
+  // PRODUCTIVIDADES
+  // ================================================
+
+  const COLUMNA_PRODUCTIVIDAD_PROMOTOR = 5;    // F
+  const COLUMNA_PRODUCTIVIDAD_VENTA_RX = 7;    // H
+  const COLUMNA_PRODUCTIVIDAD_VENTA = 40;      // AO
+
+
+  const productividadesPorPromotor =
+    new Map();
+
+
+  for (
+    let indice = 0;
+    indice < filasProductividad.length;
+    indice++
+  ) {
+
+    const fila =
+      filasProductividad[
+        indice
+      ];
+
+
+    const nombrePromotor =
+      limpiarTexto(
+        fila[
+          COLUMNA_PRODUCTIVIDAD_PROMOTOR
+        ]
+      );
+
+
+    const clavePromotor =
+      normalizarNombre(
+        nombrePromotor
+      );
+
+
+    if (
+      !clavePromotor ||
+      clavePromotor === "PROMOTOR" ||
+      clavePromotor === "0" ||
+      esVacante(
+        nombrePromotor
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    const productividadVenta =
+      Number(
+        fila[
+          COLUMNA_PRODUCTIVIDAD_VENTA
+        ]
+      );
+
+
+    const productividadVentaRx =
+      Number(
+        fila[
+          COLUMNA_PRODUCTIVIDAD_VENTA_RX
+        ]
+      );
+
+
+    productividadesPorPromotor.set(
+      clavePromotor,
+      {
+
+        productividadVenta:
+          Number.isFinite(
+            productividadVenta
+          )
+            ? productividadVenta
+            : 0,
+
+        productividadVentaRx:
+          Number.isFinite(
+            productividadVentaRx
+          )
+            ? productividadVentaRx
+            : 0,
+
+      }
+    );
+
+  }
+
+
+  // ================================================
+  // CONSTRUIR RESULTADO FINAL
+  // ================================================
+
+  const registros =
+    integrantes
+      .map(
+        (integrante) => {
+
+          const nombre =
+            limpiarTexto(
+              integrante.nombre
+            );
+
+
+          const clavePromotor =
+            normalizarNombre(
+              nombre
+            );
+
+
+          const ventas =
+            ventasPorPromotor.get(
+              clavePromotor
+            ) ||
+            Array(
+              31
+            ).fill(
+              0
+            );
+
+
+          const recuperaciones =
+            recuperacionesPorPromotor.get(
+              clavePromotor
+            ) ||
+            Array(
+              31
+            ).fill(
+              0
+            );
+
+
+          const productividades =
+            productividadesPorPromotor.get(
+              clavePromotor
+            ) || {
+
+              productividadVenta:
+                0,
+
+              productividadVentaRx:
+                Number(
+                  integrante.productividad ||
+                  0
+                ),
+
+            };
+
+
+          const dias =
+            Array.from(
+              {
+                length: 31,
+              },
+              (
+                _,
+                indiceDia
+              ) => ({
+
+                dia:
+                  indiceDia + 1,
+
+                venta:
+                  ventas[
+                    indiceDia
+                  ] || 0,
+
+                rx:
+                  recuperaciones[
+                    indiceDia
+                  ] || 0,
+
+              })
+            );
+
+
+          const totalVentas =
+            dias.reduce(
+              (
+                total,
+                dia
+              ) =>
+                total +
+                dia.venta,
+              0
+            );
+
+
+          const totalRx =
+            dias.reduce(
+              (
+                total,
+                dia
+              ) =>
+                total +
+                dia.rx,
+              0
+            );
+
+
+          return {
+
+            nombre,
+
+            supervisor:
+              integrante.supervisor,
+
+            dias,
+
+            totalVentas,
+
+            totalRx,
+
+            productividadVenta:
+              productividades
+                .productividadVenta,
+
+            productividadVentaRx:
+              productividades
+                .productividadVentaRx,
+
+          };
+
+        }
+      )
+      .sort(
+        (
+          integranteA,
+          integranteB
+        ) =>
+
+          integranteB
+            .productividadVentaRx -
+
+          integranteA
+            .productividadVentaRx ||
+
+          integranteA.nombre
+            .localeCompare(
+              integranteB.nombre,
+              "es"
+            )
+      );
+
+
+  return {
+
+    supervisor:
+      supervisorSolicitado,
+
+    anio:
+      anioConsulta,
+
+    mes:
+      mesConsulta,
+
+    ultimoDia,
+
+    fechaCorte,
+
+    registros,
+
+  };
+
+}
+
+
 
 // ==================================================
 // EXPORTACIONES
@@ -9540,6 +10417,8 @@ module.exports = {
   leerProyeccion,
 
   leerDetalleVentaMensual,
+
+  leerDetalleEquipoDiario,
 
   leerComparativaRecuperacionMesAnterior,
 
