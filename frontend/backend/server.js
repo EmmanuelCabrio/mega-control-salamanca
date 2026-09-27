@@ -339,6 +339,851 @@ req.empleado =
 
 
 // ==================================================
+// IDENTIFICAR SUPERVISOR Y PROMOTOR DEL CHECKLIST
+// ==================================================
+
+async function obtenerIdentidadChecklist(
+  req,
+  res
+) {
+
+  const promotor =
+    String(
+      req.method === "GET"
+        ? req.query.promotor
+        : req.body?.promotor ?? ""
+    ).trim();
+
+
+  // El supervisor solamente puede consultar
+  // información correspondiente a su propio equipo.
+  //
+  // Dirección sí puede seleccionar un supervisor.
+
+  const supervisor =
+    req.rol === "DIRECCIÓN"
+      ? String(
+          req.method === "GET"
+            ? req.query.supervisor
+            : req.body?.supervisor ?? ""
+        ).trim()
+      : req.supervisor;
+
+
+  const rolPermitido =
+    req.rol === "SUPERVISOR" ||
+    req.rol === "DIRECCIÓN";
+
+
+  if (
+    !rolPermitido
+  ) {
+
+    res.status(
+      403
+    ).json({
+
+      correcto:
+        false,
+
+      mensaje:
+        "No tienes autorización para consultar checklists",
+
+    });
+
+    return null;
+
+  }
+
+
+  if (
+    !promotor ||
+    !supervisor ||
+    promotor.length > 160 ||
+    supervisor.length > 160
+  ) {
+
+    res.status(
+      400
+    ).json({
+
+      correcto:
+        false,
+
+      mensaje:
+        "Supervisor o promotor no válido",
+
+    });
+
+    return null;
+
+  }
+
+
+  const datos =
+    await leerExcel();
+
+
+  const promotorEncontrado =
+    (
+      datos.registros || []
+    ).find(
+      (registro) =>
+
+        normalizarSupervisor(
+          registro.supervisor
+        ) ===
+        normalizarSupervisor(
+          supervisor
+        ) &&
+
+        normalizarSupervisor(
+          registro.nombre
+        ) ===
+        normalizarSupervisor(
+          promotor
+        )
+    );
+
+
+  if (
+    !promotorEncontrado
+  ) {
+
+    res.status(
+      404
+    ).json({
+
+      correcto:
+        false,
+
+      mensaje:
+        "El promotor no fue encontrado dentro del equipo indicado",
+
+    });
+
+    return null;
+
+  }
+
+
+  return {
+
+    supervisor,
+
+    promotor,
+
+    promotorEncontrado,
+
+  };
+
+}
+
+
+// ==================================================
+// OCULTAR HORARIOS PARA EL SUPERVISOR
+// ==================================================
+
+function prepararChecklistParaSupervisor(
+  registro
+) {
+
+  const {
+
+    inicio,
+
+    fin,
+
+    fechaHora,
+
+    sesionId,
+
+    ...datosVisibles
+
+  } = registro;
+
+
+  const fechaRegistro =
+    fin ||
+    fechaHora;
+
+
+  const fecha =
+    fechaRegistro
+      ? new Intl.DateTimeFormat(
+          "en-CA",
+          {
+
+            timeZone:
+              "America/Mexico_City",
+
+            year:
+              "numeric",
+
+            month:
+              "2-digit",
+
+            day:
+              "2-digit",
+
+          }
+        ).format(
+          new Date(
+            fechaRegistro
+          )
+        )
+      : "";
+
+
+  // No se envían inicio, fin ni duración
+  // cuando la petición pertenece al supervisor.
+
+  return {
+
+    ...datosVisibles,
+
+    fecha,
+
+  };
+
+}
+
+
+// ==================================================
+// INICIAR CHECKLIST DE FOCO ROJO
+// ==================================================
+
+app.post(
+  "/api/checklists-foco-rojo/iniciar",
+  autenticarToken,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const identidad =
+        await obtenerIdentidadChecklist(
+          req,
+          res
+        );
+
+
+      if (
+        !identidad
+      ) {
+
+        return;
+
+      }
+
+
+      const sesionId =
+        await iniciarChecklist({
+
+          supervisor:
+            identidad.supervisor,
+
+          promotor:
+            identidad.promotor,
+
+          usuario:
+            req.usuario,
+
+        });
+
+
+      // Solamente se devuelve el identificador.
+      // La hora de inicio permanece en el servidor.
+
+      return res
+        .status(
+          201
+        )
+        .json({
+
+          correcto:
+            true,
+
+          sesionId,
+
+        });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al iniciar el checklist de foco rojo:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo iniciar el registro del checklist",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// CONSULTAR HISTORIAL DE CHECKLISTS
+// ==================================================
+
+app.get(
+  "/api/checklists-foco-rojo",
+  autenticarToken,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const identidad =
+        await obtenerIdentidadChecklist(
+          req,
+          res
+        );
+
+
+      if (
+        !identidad
+      ) {
+
+        return;
+
+      }
+
+
+      const historialCompleto =
+        await obtenerHistorial({
+
+          supervisor:
+            identidad.supervisor,
+
+          promotor:
+            identidad.promotor,
+
+        });
+
+
+      // Dirección recibe los horarios completos.
+      //
+      // El supervisor recibe el historial sin
+      // hora de inicio, término ni duración.
+
+      const historial =
+        req.rol === "DIRECCIÓN"
+          ? historialCompleto
+          : historialCompleto.map(
+              prepararChecklistParaSupervisor
+            );
+
+
+      const primeraEvaluacion =
+        historial[0] ||
+        null;
+
+
+      const ultimaEvaluacion =
+        historial.length > 0
+          ? historial[
+              historial.length - 1
+            ]
+          : null;
+
+
+      const productividadInicial =
+        primeraEvaluacion
+          ? Number(
+              primeraEvaluacion.productividad ??
+              0
+            )
+          : null;
+
+
+      const productividadUltima =
+        ultimaEvaluacion
+          ? Number(
+              ultimaEvaluacion.productividad ??
+              0
+            )
+          : null;
+
+
+      const diferenciaProductividad =
+        productividadInicial !== null &&
+        productividadUltima !== null
+          ? Number(
+              (
+                productividadUltima -
+                productividadInicial
+              ).toFixed(
+                2
+              )
+            )
+          : null;
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        supervisor:
+          identidad.supervisor,
+
+        promotor:
+          identidad.promotor,
+
+        totalChecklists:
+          historial.length,
+
+        comparativa: {
+
+          productividadInicial,
+
+          productividadUltima,
+
+          diferencia:
+            diferenciaProductividad,
+
+          resultado:
+            diferenciaProductividad === null
+              ? "SIN HISTORIAL"
+              : diferenciaProductividad > 0
+                ? "MEJORÓ"
+                : diferenciaProductividad < 0
+                  ? "DISMINUYÓ"
+                  : "SIN CAMBIO",
+
+        },
+
+        historial,
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al consultar el historial de checklists:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo consultar el historial de checklists",
+
+        });
+
+    }
+
+  }
+);
+
+
+
+// ==================================================
+// GUARDAR CHECKLIST TERMINADO
+// ==================================================
+
+app.post(
+  "/api/checklists-foco-rojo",
+  autenticarToken,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const identidad =
+        await obtenerIdentidadChecklist(
+          req,
+          res
+        );
+
+
+      if (
+        !identidad
+      ) {
+
+        return;
+
+      }
+
+
+      const {
+
+        sesionId,
+
+        checks,
+
+        otraArea,
+
+        accionCorrectiva,
+
+        diagnostico,
+
+      } = req.body || {};
+
+
+      // ============================================
+      // VALIDAR LA SESIÓN QUE INICIÓ EL CHECKLIST
+      // ============================================
+
+      const sesion =
+        await obtenerSesion({
+
+          sesionId,
+
+          supervisor:
+            identidad.supervisor,
+
+          promotor:
+            identidad.promotor,
+
+          usuario:
+            req.usuario,
+
+        });
+
+
+      if (
+        !sesion
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "La sesión del checklist no es válida. Vuelve a abrir el checklist.",
+
+          });
+
+      }
+
+
+      // La sesión no puede permanecer abierta
+      // durante más de 24 horas.
+
+      const antiguedadSesion =
+        Date.now() -
+        Date.parse(
+          sesion.inicio
+        );
+
+
+      const LIMITE_SESION =
+        24 *
+        60 *
+        60 *
+        1000;
+
+
+      if (
+        !Number.isFinite(
+          antiguedadSesion
+        ) ||
+        antiguedadSesion > LIMITE_SESION
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "La sesión del checklist expiró. Vuelve a abrirlo para realizar el registro.",
+
+          });
+
+      }
+
+
+      // ============================================
+      // VALIDAR CONTENIDO DEL CHECKLIST
+      // ============================================
+
+      const checksValidos =
+        checks &&
+        typeof checks === "object" &&
+        !Array.isArray(
+          checks
+        ) &&
+        Object.keys(
+          checks
+        ).length <= 150 &&
+        Object.values(
+          checks
+        ).every(
+          (valor) =>
+            typeof valor === "boolean"
+        );
+
+
+      const textosValidos =
+        typeof otraArea === "string" &&
+        otraArea.length <= 1000 &&
+        typeof accionCorrectiva === "string" &&
+        accionCorrectiva.length <= 3000;
+
+
+      const diagnosticoValido =
+        Array.isArray(
+          diagnostico
+        ) &&
+        diagnostico.length <= 30 &&
+        diagnostico.every(
+          (item) =>
+
+            item &&
+            typeof item.area === "string" &&
+            item.area.length <= 100 &&
+            Number.isInteger(
+              item.oportunidades
+            ) &&
+            item.oportunidades >= 0
+        );
+
+
+      if (
+        !checksValidos ||
+        !textosValidos ||
+        !diagnosticoValido
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "El checklist está incompleto o contiene información inválida",
+
+          });
+
+      }
+
+
+      // ============================================
+      // PRODUCTIVIDAD TOMADA DESDE EL SERVIDOR
+      // ============================================
+
+      const productividad =
+        Number(
+          identidad.promotorEncontrado
+            .productividad
+        );
+
+
+      if (
+        !Number.isFinite(
+          productividad
+        )
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "No se encontró una productividad válida para el promotor",
+
+          });
+
+      }
+
+
+      // ============================================
+      // CALCULAR DURACIÓN
+      // ============================================
+
+      const fin =
+        new Date();
+
+
+      const duracionSegundos =
+        Math.max(
+          0,
+          Math.round(
+            (
+              fin.getTime() -
+              Date.parse(
+                sesion.inicio
+              )
+            ) /
+            1000
+          )
+        );
+
+
+      // ============================================
+      // GUARDAR REGISTRO
+      // ============================================
+
+      const registro =
+        await guardarChecklist({
+
+          sesionId,
+
+          supervisor:
+            identidad.supervisor,
+
+          promotor:
+            identidad.promotor,
+
+          productividad,
+
+          checks,
+
+          otraArea:
+            otraArea.trim(),
+
+          accionCorrectiva:
+            accionCorrectiva.trim(),
+
+          diagnostico:
+            diagnostico.map(
+              (
+                {
+                  area,
+                  oportunidades,
+                }
+              ) => ({
+
+                area,
+
+                oportunidades,
+
+              })
+            ),
+
+          registradoPor:
+            req.usuario,
+
+          inicio:
+            sesion.inicio,
+
+          duracionSegundos,
+
+        });
+
+
+      // Si lo guarda Dirección, recibe el registro
+      // completo. Si lo guarda un supervisor,
+      // recibe una respuesta sin horarios.
+
+      const registroVisible =
+        req.rol === "DIRECCIÓN"
+          ? registro
+          : prepararChecklistParaSupervisor(
+              registro
+            );
+
+
+      return res
+        .status(
+          201
+        )
+        .json({
+
+          correcto:
+            true,
+
+          mensaje:
+            "Checklist registrado correctamente",
+
+          registro:
+            registroVisible,
+
+        });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al guardar el checklist:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo guardar el checklist",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
 // RUTA PRINCIPAL
 // ==================================================
 
