@@ -19350,3 +19350,803 @@ tr:hover
   }
 
 }
+
+
+
+/* =========================================================
+   MINUTAS DE COMPROMISO
+========================================================= */
+
+.minutas-panel {
+  margin:
+    24px
+    0;
+
+  padding:
+    28px;
+
+  border:
+    1px solid
+    #dbe3ee;
+
+  border-radius:
+    24px;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(31, 101, 196, 0.11),
+      transparent 32%
+    ),
+    #ffffff;
+
+  color:
+    #17233d;
+
+  box-shadow:
+    0 16px 44px
+    rgba(20, 35, 61, 0.1);
+}
+
+
+.minutas-header,
+.minuta-card-top,
+.minutas-historial-titulo,
+.minuta-firma-recibida,
+.minuta-resolver {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    16px;
+}
+
+
+.minutas-header h2,
+.minutas-historial-titulo h3 {
+  margin:
+    4px
+    0;
+
+  color:
+    #14213d;
+}
+
+
+.minutas-header p,
+.minuta-card-top p {
+  margin:
+    4px
+    0
+    0;
+
+  color:
+    #6b778c;
+}
+
+
+.minutas-kicker {
+  color:
+    #1769c2;
+
+  font-size:
+    11px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    1.6px;
+}
+
+
+.minutas-recargar,
+.minuta-firma-recibida button {
+  padding:
+    10px
+    14px;
+
+  border:
+    1px solid
+    #bfd0e6;
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+
+  color:
+    #174b8f;
+
+  font:
+    inherit;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+}
+
+
+.minutas-aviso {
+  margin-top:
+    16px;
+
+  padding:
+    12px
+    15px;
+
+  border-radius:
+    11px;
+
+  font-weight:
+    700;
+}
+
+
+.minutas-aviso-error {
+  border:
+    1px solid
+    #ffc6cd;
+
+  background:
+    #fff0f0;
+
+  color:
+    #a51d2d;
+}
+
+
+.minutas-aviso-ok {
+  border:
+    1px solid
+    #a8ecd2;
+
+  background:
+    #edfff6;
+
+  color:
+    #08734d;
+}
+
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
+
+.minuta-formulario {
+  margin-top:
+    22px;
+
+  padding:
+    22px;
+
+  border:
+    1px solid
+    #dce5f0;
+
+  border-radius:
+    18px;
+
+  background:
+    #f4f7fb;
+}
+
+
+.minuta-campos {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap:
+    16px;
+}
+
+
+.minuta-campos label,
+.minuta-compromiso-campo {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    7px;
+
+  color:
+    #33435f;
+
+  font-size:
+    13px;
+
+  font-weight:
+    800;
+}
+
+
+.minuta-campos select,
+.minuta-compromiso-campo textarea {
+  width:
+    100%;
+
+  padding:
+    12px
+    14px;
+
+  border:
+    1px solid
+    #c9d5e5;
+
+  border-radius:
+    12px;
+
+  background:
+    #ffffff;
+
+  color:
+    #14213d;
+
+  font:
+    inherit;
+}
+
+
+.minuta-compromiso-campo {
+  margin-top:
+    18px;
+}
+
+
+.minuta-compromiso-campo textarea {
+  min-height:
+    110px;
+
+  resize:
+    vertical;
+
+  line-height:
+    1.5;
+}
+
+
+.minuta-compromiso-campo > span {
+  align-self:
+    flex-end;
+
+  color:
+    #7d889a;
+
+  font-size:
+    11px;
+}
+
+
+/* =========================================================
+   INDICADORES
+========================================================= */
+
+.minuta-metricas {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0, 1fr)
+    );
+
+  gap:
+    10px;
+
+  margin-top:
+    18px;
+}
+
+
+.minuta-metrica {
+  padding:
+    13px
+    8px;
+
+  border:
+    1px solid
+    #d8e2ef;
+
+  border-radius:
+    13px;
+
+  background:
+    #ffffff;
+
+  text-align:
+    center;
+}
+
+
+.minuta-metrica span {
+  display:
+    block;
+
+  color:
+    #718096;
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  text-transform:
+    uppercase;
+}
+
+
+.minuta-metrica strong {
+  display:
+    block;
+
+  margin-top:
+    4px;
+
+  color:
+    #14213d;
+
+  font-size:
+    22px;
+}
+
+
+/* =========================================================
+   BOTÓN ENVIAR
+========================================================= */
+
+.minuta-enviar {
+  width:
+    100%;
+
+  margin-top:
+    18px;
+
+  padding:
+    14px
+    18px;
+
+  border:
+    0;
+
+  border-radius:
+    13px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #174b8f,
+      #1976d2
+    );
+
+  color:
+    #ffffff;
+
+  font:
+    inherit;
+
+  font-weight:
+    900;
+
+  cursor:
+    pointer;
+
+  box-shadow:
+    0 9px 20px
+    rgba(23, 75, 143, 0.24);
+}
+
+
+.minuta-enviar:disabled {
+  opacity:
+    0.5;
+
+  cursor:
+    not-allowed;
+}
+
+
+/* =========================================================
+   HISTORIAL
+========================================================= */
+
+.minutas-historial-titulo {
+  margin:
+    26px
+    0
+    13px;
+}
+
+
+.minutas-historial-titulo span {
+  color:
+    #66758c;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+}
+
+
+.minutas-lista {
+  display:
+    grid;
+
+  gap:
+    15px;
+}
+
+
+.minutas-vacio {
+  padding:
+    30px;
+
+  border:
+    1px dashed
+    #bcc9da;
+
+  border-radius:
+    14px;
+
+  color:
+    #77849a;
+
+  text-align:
+    center;
+}
+
+
+.minuta-card {
+  padding:
+    20px;
+
+  border:
+    1px solid
+    #dce4ef;
+
+  border-radius:
+    17px;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 7px 20px
+    rgba(21, 37, 65, 0.06);
+}
+
+
+.minuta-card h4 {
+  margin:
+    9px
+    0
+    0;
+
+  font-size:
+    18px;
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.minuta-estado {
+  display:
+    inline-block;
+
+  padding:
+    6px
+    10px;
+
+  border-radius:
+    999px;
+
+  font-size:
+    10px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.5px;
+
+  text-transform:
+    uppercase;
+}
+
+
+.minuta-estado-pendiente_firma {
+  background:
+    #fff3d4;
+
+  color:
+    #895a00;
+}
+
+
+.minuta-estado-firmada {
+  background:
+    #e6f1ff;
+
+  color:
+    #14549d;
+}
+
+
+.minuta-estado-resuelta {
+  background:
+    #e8faef;
+
+  color:
+    #087344;
+}
+
+
+/* =========================================================
+   COMPROMISO
+========================================================= */
+
+.minuta-compromiso {
+  margin-top:
+    16px;
+
+  padding:
+    16px;
+
+  border-left:
+    4px solid
+    #1976d2;
+
+  border-radius:
+    0 12px 12px 0;
+
+  background:
+    #f3f7fc;
+}
+
+
+.minuta-compromiso span,
+.minuta-firma-recibida span {
+  color:
+    #5f6f86;
+
+  font-size:
+    10px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.8px;
+
+  text-transform:
+    uppercase;
+}
+
+
+.minuta-compromiso p {
+  margin:
+    7px
+    0
+    0;
+
+  color:
+    #1f2d47;
+
+  font-weight:
+    700;
+
+  line-height:
+    1.55;
+
+  white-space:
+    pre-wrap;
+}
+
+
+/* =========================================================
+   FIRMA RECIBIDA
+========================================================= */
+
+.minuta-firma-recibida {
+  margin-top:
+    16px;
+
+  padding:
+    12px
+    15px;
+
+  border:
+    1px solid
+    #cfe0ee;
+
+  border-radius:
+    13px;
+
+  background:
+    #f8fbff;
+}
+
+
+.minuta-firma-recibida > div {
+  min-width:
+    115px;
+}
+
+
+.minuta-firma-recibida small {
+  display:
+    block;
+
+  margin-top:
+    4px;
+
+  color:
+    #77849a;
+}
+
+
+.minuta-firma-recibida img {
+  width:
+    210px;
+
+  height:
+    65px;
+
+  border-bottom:
+    1px solid
+    #718096;
+
+  object-fit:
+    contain;
+}
+
+
+/* =========================================================
+   RESULTADO
+========================================================= */
+
+.minuta-resolver {
+  margin-top:
+    16px;
+
+  justify-content:
+    flex-end;
+}
+
+
+.minuta-resolver button {
+  padding:
+    11px
+    15px;
+
+  border:
+    0;
+
+  border-radius:
+    10px;
+
+  color:
+    #ffffff;
+
+  font:
+    inherit;
+
+  font-weight:
+    900;
+
+  cursor:
+    pointer;
+}
+
+
+.minuta-resolver button:first-child {
+  background:
+    #098454;
+}
+
+
+.minuta-resolver button:last-child {
+  background:
+    #bd2638;
+}
+
+
+/* =========================================================
+   DISEÑO MÓVIL
+========================================================= */
+
+@media (
+  max-width:
+  720px
+) {
+
+  .minutas-panel {
+    padding:
+      18px;
+
+    border-radius:
+      18px;
+  }
+
+
+  .minutas-header,
+  .minuta-firma-recibida {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+
+  .minuta-campos {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .minuta-metricas {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+
+  .minuta-metrica:last-child {
+    grid-column:
+      span 2;
+  }
+
+
+  .minuta-firma-recibida img {
+    width:
+      100%;
+  }
+
+
+  .minuta-firma-recibida button {
+    width:
+      100%;
+  }
+
+
+  .minuta-resolver {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .minuta-resolver button {
+    width:
+      100%;
+  }
+
+}
