@@ -141,12 +141,10 @@ function formatearDuracion(
 // HISTORIAL PRIVADO DE CHECKLISTS
 // ==================================================
 
-function HistorialChecklistsDireccion() {
+function HistorialChecklistsDireccion({
+  registros = [],
+}) {
 
-  const [
-    registros,
-    setRegistros,
-  ] = useState([]);
 
   const [
     supervisorSeleccionado,
@@ -168,10 +166,10 @@ function HistorialChecklistsDireccion() {
     setComparativa,
   ] = useState(null);
 
-  const [
-    cargandoEquipo,
-    setCargandoEquipo,
-  ] = useState(true);
+  // El equipo ya llega cargado desde App.jsx.
+
+const cargandoEquipo =
+  false;
 
   const [
     cargandoHistorial,
@@ -183,113 +181,6 @@ function HistorialChecklistsDireccion() {
     setError,
   ] = useState("");
 
-
-  // ==================================================
-  // CARGAR EQUIPO COMPLETO PARA LOS FILTROS
-  // ==================================================
-
-  useEffect(
-    () => {
-
-      let componenteActivo =
-        true;
-
-
-      async function cargarEquipo() {
-
-        try {
-
-          setCargandoEquipo(
-            true
-          );
-
-          setError(
-            ""
-          );
-
-
-          const respuesta =
-            await fetchProtegido(
-              "/api/registros"
-            );
-
-
-          const datos =
-            await respuesta.json();
-
-
-          if (
-            !respuesta.ok
-          ) {
-
-            throw new Error(
-              datos.mensaje ||
-              "No se pudo cargar el equipo"
-            );
-
-          }
-
-
-          if (
-            componenteActivo
-          ) {
-
-            setRegistros(
-              datos.registros || []
-            );
-
-          }
-
-        } catch (
-          errorCarga
-        ) {
-
-          console.error(
-            "❌ Error al cargar equipo para checklists:",
-            errorCarga
-          );
-
-
-          if (
-            componenteActivo
-          ) {
-
-            setError(
-              "No se pudo cargar la lista de supervisores y promotores."
-            );
-
-          }
-
-        } finally {
-
-          if (
-            componenteActivo
-          ) {
-
-            setCargandoEquipo(
-              false
-            );
-
-          }
-
-        }
-
-      }
-
-
-      cargarEquipo();
-
-
-      return () => {
-
-        componenteActivo =
-          false;
-
-      };
-
-    },
-    []
-  );
 
 
   // ==================================================
