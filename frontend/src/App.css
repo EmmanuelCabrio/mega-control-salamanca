@@ -20150,3 +20150,218 @@ tr:hover
   }
 
 }
+
+
+/* =========================================================
+   FIRMA DIGITAL DE LA MINUTA
+========================================================= */
+
+.minuta-card-pendiente {
+  border-color:
+    #edb74e;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(237, 183, 78, 0.12);
+}
+
+
+.minuta-firma-editor {
+  margin-top:
+    17px;
+
+  padding:
+    17px;
+
+  border:
+    1px solid
+    #dce4ef;
+
+  border-radius:
+    14px;
+
+  background:
+    #f7f9fc;
+}
+
+
+.minuta-firma-editor > span {
+  color:
+    #5f6f86;
+
+  font-size:
+    10px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.8px;
+
+  text-transform:
+    uppercase;
+}
+
+
+.minuta-firma-editor > p {
+  margin:
+    6px
+    0
+    12px;
+
+  color:
+    #68778e;
+
+  font-size:
+    12px;
+}
+
+
+.minuta-firma-editor canvas {
+  display:
+    block;
+
+  width:
+    100%;
+
+  height:
+    150px;
+
+  border:
+    1px dashed
+    #97a8bf;
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+
+  touch-action:
+    none;
+}
+
+
+.minuta-firma-acciones {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    12px;
+
+  margin-top:
+    12px;
+}
+
+
+.minuta-firma-acciones button {
+  padding:
+    10px
+    14px;
+
+  border:
+    1px solid
+    #c4d0df;
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+
+  color:
+    #34445f;
+
+  font:
+    inherit;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+}
+
+
+.minuta-firma-acciones button:last-child {
+  border-color:
+    #1261af;
+
+  background:
+    #1261af;
+
+  color:
+    #ffffff;
+}
+
+
+.minuta-firma-acciones button:disabled {
+  opacity:
+    0.5;
+
+  cursor:
+    not-allowed;
+}
+
+
+.minuta-descargar {
+  width:
+    100%;
+
+  margin-top:
+    15px;
+
+  padding:
+    11px
+    15px;
+
+  border:
+    1px solid
+    #bfd0e6;
+
+  border-radius:
+    11px;
+
+  background:
+    #ffffff;
+
+  color:
+    #174b8f;
+
+  font:
+    inherit;
+
+  font-weight:
+    900;
+
+  cursor:
+    pointer;
+}
+
+
+@media (
+  max-width:
+  720px
+) {
+
+  .minuta-firma-acciones {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+
+  .minuta-firma-acciones button {
+    width:
+      100%;
+  }
+
+}
