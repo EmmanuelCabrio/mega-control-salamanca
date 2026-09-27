@@ -17,6 +17,7 @@ const {
   leerCarteraPorDia,
   leerProyeccion,
   leerDetalleVentaMensual,
+  leerDetalleEquipoDiario,
   leerComparativaRecuperacionMesAnterior,
   leerGestionOdc,
   leerRecuperacionYCortes,
@@ -4592,6 +4593,138 @@ app.get(
   }
 );
 
+
+// ==================================================
+// DETALLE DIARIO DEL EQUIPO — DIRECCIÓN
+// ==================================================
+
+app.get(
+  "/api/detalle-equipo-diario",
+  autenticarToken,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      // ============================================
+      // ACCESO EXCLUSIVO PARA DIRECCIÓN
+      // ============================================
+
+      const rol =
+        normalizarRol(
+          req.rol
+        );
+
+
+      if (
+        rol !== "DIRECCIÓN"
+      ) {
+
+        return res
+          .status(
+            403
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Acceso exclusivo de Dirección",
+
+          });
+
+      }
+
+
+      // ============================================
+      // SUPERVISOR SOLICITADO
+      // ============================================
+
+      const supervisor =
+        String(
+          req.query.supervisor ??
+          ""
+        )
+          .trim();
+
+
+      if (
+        !supervisor ||
+        supervisor.length > 160
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Selecciona un supervisor válido",
+
+          });
+
+      }
+
+
+      // ============================================
+      // CONSULTAR DETALLE
+      // ============================================
+
+      const detalle =
+        await leerDetalleEquipoDiario(
+          supervisor
+        );
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        ...detalle,
+
+      });
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error en /api/detalle-equipo-diario:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            error.message ||
+            "No se pudo cargar el detalle diario del equipo",
+
+        });
+
+    }
+
+  }
+);
 
 // ==================================================
 // ACTUALIZAR DATOS — SOLO DIRECCIÓN
