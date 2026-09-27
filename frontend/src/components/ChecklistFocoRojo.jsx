@@ -445,11 +445,16 @@ useEffect(
     ],
 
     "Personalización de la presentación": [
-      "servicio-internet",
-      "servicio-tv",
-      "servicio-apps",
-      "servicio-casa",
-      "servicio-movil",
+      {
+        tipo: "grupo",
+        ids: [
+          "servicio-internet",
+          "servicio-tv",
+          "servicio-apps",
+          "servicio-casa",
+          "servicio-movil",
+        ],
+      },
       "presentacion-sondeo",
       "presentacion-beneficios",
       "presentacion-necesidad",
@@ -462,9 +467,14 @@ useEffect(
     ],
 
     "Apoyo visual / herramientas": [
-      "herramienta-folleto",
-      "herramienta-carpeta",
-      "herramienta-xview",
+      {
+        tipo: "grupo",
+        ids: [
+          "herramienta-folleto",
+          "herramienta-carpeta",
+          "herramienta-xview",
+        ],
+      },
     ],
 
     "Preparación del cierre": [
