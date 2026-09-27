@@ -64,10 +64,13 @@ import MinutasDireccion
 // ==================================================
 
 function PanelDireccion({
+  registros = [],
   onCerrarSesion,
   onAbrirRecuperacion,
-}) {
+})
+{
 
+  
   const [actualizando, setActualizando] =
     useState(false);
 
@@ -691,7 +694,11 @@ return (
 
 />
 
-  <ResumenVsMesAnteriorSupervisores />
+  <ResumenVsMesAnteriorSupervisores
+  registros={
+    registros
+  }
+/>
 
    <ResumenRxSupervisores />
 
