@@ -25,6 +25,11 @@ const RUTA_EXCEL_SUPABASE = path.join(
 let datosCacheados = null;
 let workbookCacheado = null;
 let usuariosCacheados = null;
+filasPanelRecuperacionCacheadas = null;
+
+// Filas convertidas de PANEL RECUPERACION.
+// Se comparten entre sus distintos lectores.
+let filasPanelRecuperacionCacheadas = null;
 
 // ==================================================
 // NOMBRE DE HOJA
@@ -6153,11 +6158,19 @@ const comparativaCanales =
 }
 
 
+
 // ==================================================
-// GESTIÓN DE ÓRDENES DE COBRANZA
+// FILAS COMPARTIDAS — PANEL RECUPERACION
 // ==================================================
 
-function leerGestionOdc() {
+function obtenerFilasPanelRecuperacion() {
+
+  if (filasPanelRecuperacionCacheadas) {
+
+    return filasPanelRecuperacionCacheadas;
+
+  }
+
 
   const workbook =
     cargarExcel();
@@ -6180,7 +6193,7 @@ function leerGestionOdc() {
   }
 
 
-  const datos =
+  filasPanelRecuperacionCacheadas =
     XLSX.utils.sheet_to_json(
       workbook.Sheets[nombreHoja],
       {
@@ -6188,6 +6201,20 @@ function leerGestionOdc() {
         defval: "",
       }
     );
+
+
+  return filasPanelRecuperacionCacheadas;
+
+}
+
+// ==================================================
+// GESTIÓN DE ÓRDENES DE COBRANZA
+// ==================================================
+
+function leerGestionOdc() {
+
+  const datos =
+  obtenerFilasPanelRecuperacion();
 
 
   const filaEncabezados =
@@ -6428,36 +6455,8 @@ function leerGestionOdc() {
 
 function leerRecuperacionYCortes() {
 
-  const workbook =
-    cargarExcel();
-
-
-  const nombreHoja =
-    workbook.SheetNames.find(
-      (nombre) =>
-        limpiarTexto(nombre) ===
-        "PANEL RECUPERACION"
-    );
-
-
-  if (!nombreHoja) {
-
-    throw new Error(
-      'No se encontró la hoja "PANEL RECUPERACION"'
-    );
-
-  }
-
-
   const datos =
-    XLSX.utils.sheet_to_json(
-      workbook.Sheets[nombreHoja],
-      {
-        header: 1,
-        defval: "",
-      }
-    );
-
+  obtenerFilasPanelRecuperacion();
 
   // ==================================================
   // COLUMNAS EXACTAS DEL EXCEL
@@ -8641,6 +8640,8 @@ validarExcelLigero(
     datosCacheados = null;
 
     usuariosCacheados = null;
+    
+    filasPanelRecuperacionCacheadas = null;
 
     return {
       actualizadoEn: new Date().toISOString(),
