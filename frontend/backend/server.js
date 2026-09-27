@@ -35,6 +35,24 @@ const {
   "./services/loginTrackerService"
 );
 
+
+// ==================================================
+// HISTORIAL DE CHECKLISTS DE FOCO ROJO
+// ==================================================
+
+const {
+
+  iniciarChecklist,
+
+  obtenerSesion,
+
+  guardarChecklist,
+
+  obtenerHistorial,
+
+} = require(
+  "./services/checklistHistoryService"
+);
 // ==================================================
 // CONFIGURACIÓN
 // ==================================================
