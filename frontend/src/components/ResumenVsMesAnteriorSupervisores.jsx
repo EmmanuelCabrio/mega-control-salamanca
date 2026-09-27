@@ -1,126 +1,24 @@
-import {
-  useEffect,
+    import {
   useMemo,
-  useState,
 } from "react";
-
-import {
-  fetchProtegido,
-} from "../services/authService";
 
 
 // ==================================================
 // 📊 VS MISMO DÍA MES ANTERIOR — SUPERVISORES
 // ==================================================
 
-function ResumenVsMesAnteriorSupervisores() {
+function ResumenVsMesAnteriorSupervisores({
+  registros = [],
+}) {
 
-  // ==================================================
-  // ESTADOS
-  // ==================================================
+  // Los registros ya fueron descargados por App.jsx.
+  // Este componente solamente los procesa y muestra.
 
-  const [
-    registros,
-    setRegistros,
-  ] = useState([]);
+  const cargando =
+    false;
 
-
-  const [
-    cargando,
-    setCargando,
-  ] = useState(true);
-
-
-  const [
-    error,
-    setError,
-  ] = useState("");
-
-
-  // ==================================================
-  // CARGAR REGISTROS
-  // ==================================================
-
-  useEffect(() => {
-
-    async function cargarDatos() {
-
-      try {
-
-        setCargando(true);
-
-        setError("");
-
-
-        const respuesta =
-          await fetchProtegido(
-            "/api/registros"
-          );
-
-
-        // ============================================
-        // VALIDAR HTTP
-        // ============================================
-
-        if (!respuesta.ok) {
-
-          throw new Error(
-            `Error HTTP ${respuesta.status}`
-          );
-
-        }
-
-
-        // ============================================
-        // LEER RESPUESTA
-        // ============================================
-
-        const datos =
-          await respuesta.json();
-
-
-        if (!datos.correcto) {
-
-          throw new Error(
-            datos.mensaje ||
-            "No se pudo cargar la comparativa"
-          );
-
-        }
-
-
-        setRegistros(
-          datos.registros || []
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "❌ Error comparativa supervisores:",
-          error
-        );
-
-
-        setError(
-          "No se pudo cargar la comparativa vs mes anterior"
-        );
-
-
-      } finally {
-
-        setCargando(false);
-
-      }
-
-    }
-
-
-    cargarDatos();
-
-  }, []);
-
-
+  const error =
+    "";
   // ==================================================
   // NORMALIZAR TEXTO
   // ==================================================
