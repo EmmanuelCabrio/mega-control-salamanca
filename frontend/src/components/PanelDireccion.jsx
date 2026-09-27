@@ -674,7 +674,11 @@ return (
 
    <MinutasDireccion />
 
-   <HistorialChecklistsDireccion />
+   <HistorialChecklistsDireccion
+  registros={
+    registros
+  }
+/>
 
    <MetaSemanaAnteriorDireccion />
 
