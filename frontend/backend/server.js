@@ -54,6 +54,29 @@ const {
 } = require(
   "./services/checklistHistoryService"
 );
+
+
+// ==================================================
+// MINUTAS DE COMPROMISO
+// ==================================================
+
+const {
+
+  normalizarTexto:
+    normalizarTextoMinuta,
+
+  crearMinuta,
+
+  listarMinutas,
+
+  firmarMinuta,
+
+  resolverMinuta,
+
+} = require(
+  "./services/minutaService"
+);
+
 // ==================================================
 // CONFIGURACIÓN
 // ==================================================
@@ -118,7 +141,15 @@ app.use(
 
 
 app.use(
-  express.json()
+  express.json({
+
+    // Permite recibir la firma digital
+    // del supervisor en formato imagen.
+
+    limit:
+      "1mb",
+
+  })
 );
 
 
@@ -1964,6 +1995,1116 @@ app.get(
   }
 );
 
+
+// ==================================================
+// CATÁLOGO DE FOCOS ROJOS PARA MINUTAS
+// ==================================================
+
+app.get(
+  "/api/minutas/catalogo",
+
+  autenticarToken,
+
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      // ============================================
+      // ACCESO EXCLUSIVO DE DIRECCIÓN
+      // ============================================
+
+      if (
+        req.rol !==
+        "DIRECCIÓN"
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Acceso exclusivo de Dirección",
+
+          });
+
+      }
+
+
+      // ============================================
+      // LEER INFORMACIÓN ACTUAL DEL EXCEL
+      // ============================================
+
+      const datos =
+        await leerExcel();
+
+
+      // ============================================
+      // OBTENER ÚNICAMENTE FOCOS ROJOS
+      // ============================================
+
+      const focosRojos =
+        (
+          datos.registros ||
+          []
+        )
+          .filter(
+            (
+              registro
+            ) => {
+
+              const diasSinVenta =
+                Number(
+                  registro.diasSinVenta
+                ) || 0;
+
+
+              const productividad =
+                Number(
+                  registro.productividad
+                ) || 0;
+
+
+              const recuperaciones =
+                Number(
+                  registro.recuperaciones
+                ) || 0;
+
+
+              return (
+
+                diasSinVenta >= 3 ||
+
+                productividad < 0.8 ||
+
+                recuperaciones === 0
+
+              );
+
+            }
+          )
+
+          // ========================================
+          // EXCLUIR VACANTES Y NOMBRES VACÍOS
+          // ========================================
+
+          .filter(
+            (
+              registro
+            ) => {
+
+              const nombre =
+                normalizarTextoMinuta(
+                  registro.nombre
+                );
+
+
+              return (
+
+                nombre !== "" &&
+
+                nombre !== "0" &&
+
+                !nombre.includes(
+                  "VACANTE"
+                )
+
+              );
+
+            }
+          )
+
+          // ========================================
+          // AGREGAR APPS, RX Y MÓVIL
+          // ========================================
+
+          .map(
+            (
+              registro
+            ) => {
+
+              const avance =
+                (
+                  datos.avanceSemanal ||
+                  []
+                ).find(
+                  (
+                    item
+                  ) =>
+
+                    normalizarTextoMinuta(
+                      item.supervisor
+                    ) ===
+                    normalizarTextoMinuta(
+                      registro.supervisor
+                    ) &&
+
+                    normalizarTextoMinuta(
+                      item.nombre
+                    ) ===
+                    normalizarTextoMinuta(
+                      registro.nombre
+                    )
+                );
+
+
+              const apps =
+
+                Number(
+                  avance?.netflix ||
+                  0
+                ) +
+
+                Number(
+                  avance?.disney ||
+                  0
+                ) +
+
+                Number(
+                  avance?.max ||
+                  0
+                );
+
+
+              return {
+
+                supervisor:
+                  registro.supervisor,
+
+                promotor:
+                  registro.nombre,
+
+                productividad:
+                  Number(
+                    registro.productividad
+                  ) || 0,
+
+                diasSinVenta:
+                  Number(
+                    registro.diasSinVenta
+                  ) || 0,
+
+                apps,
+
+                rx:
+                  Number(
+                    registro.recuperaciones
+                  ) || 0,
+
+                movil:
+                  Number(
+                    avance?.movil
+                  ) || 0,
+
+              };
+
+            }
+          )
+
+          // ========================================
+          // ORDENAR SUPERVISOR Y PROMOTOR
+          // ========================================
+
+          .sort(
+            (
+              registroA,
+              registroB
+            ) =>
+
+              String(
+                registroA.supervisor
+              ).localeCompare(
+                String(
+                  registroB.supervisor
+                )
+              ) ||
+
+              String(
+                registroA.promotor
+              ).localeCompare(
+                String(
+                  registroB.promotor
+                )
+              )
+          );
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        focosRojos,
+
+      });
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al cargar el catálogo de minutas:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo cargar el catálogo de focos rojos",
+
+        });
+
+    }
+
+  }
+);
+
+// ==================================================
+// CONSULTAR MINUTAS
+// ==================================================
+
+app.get(
+  "/api/minutas",
+
+  autenticarToken,
+
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      // ============================================
+      // VALIDAR ROL
+      // ============================================
+
+      const rolPermitido =
+
+        req.rol ===
+          "DIRECCIÓN" ||
+
+        req.rol ===
+          "SUPERVISOR";
+
+
+      if (
+        !rolPermitido
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "No tienes autorización para consultar minutas",
+
+          });
+
+      }
+
+
+      // ============================================
+      // CARGAR TODAS LAS MINUTAS
+      // ============================================
+
+      const minutas =
+        await listarMinutas();
+
+
+      // ============================================
+      // FILTRAR SEGÚN EL USUARIO
+      // ============================================
+
+      const minutasVisibles =
+
+        req.rol ===
+        "DIRECCIÓN"
+
+          // Dirección puede verlas todas.
+
+          ? minutas
+
+          // Cada supervisor solamente puede
+          // ver las minutas de su propio equipo.
+
+          : minutas.filter(
+              (
+                minuta
+              ) =>
+
+                normalizarTextoMinuta(
+                  minuta.supervisor
+                ) ===
+
+                normalizarTextoMinuta(
+                  req.supervisor
+                )
+            );
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        minutas:
+          minutasVisibles,
+
+      });
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al consultar minutas:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudieron consultar las minutas",
+
+        });
+
+    }
+
+  }
+);
+
+// ==================================================
+// CREAR Y ENVIAR MINUTA AL SUPERVISOR
+// ==================================================
+
+app.post(
+  "/api/minutas",
+
+  autenticarToken,
+
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      // ============================================
+      // ACCESO EXCLUSIVO DE DIRECCIÓN
+      // ============================================
+
+      if (
+        req.rol !==
+        "DIRECCIÓN"
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Acceso exclusivo de Dirección",
+
+          });
+
+      }
+
+
+      // ============================================
+      // DATOS RECIBIDOS
+      // ============================================
+
+      const supervisor =
+        String(
+          req.body?.supervisor ??
+          ""
+        ).trim();
+
+
+      const promotor =
+        String(
+          req.body?.promotor ??
+          ""
+        ).trim();
+
+
+      const compromiso =
+        String(
+          req.body?.compromiso ??
+          ""
+        ).trim();
+
+
+      // ============================================
+      // VALIDAR INFORMACIÓN
+      // ============================================
+
+      if (
+        !supervisor ||
+        !promotor ||
+        compromiso.length < 5 ||
+        compromiso.length > 1000
+      ) {
+
+        return res
+          .status(400)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Selecciona supervisor y foco rojo, y captura un compromiso válido",
+
+          });
+
+      }
+
+
+      // ============================================
+      // LEER DATOS ACTUALES
+      // ============================================
+
+      const datos =
+        await leerExcel();
+
+
+      // ============================================
+      // VALIDAR SUPERVISOR Y PROMOTOR
+      // ============================================
+
+      const registro =
+        (
+          datos.registros ||
+          []
+        ).find(
+          (
+            item
+          ) =>
+
+            normalizarTextoMinuta(
+              item.supervisor
+            ) ===
+            normalizarTextoMinuta(
+              supervisor
+            ) &&
+
+            normalizarTextoMinuta(
+              item.nombre
+            ) ===
+            normalizarTextoMinuta(
+              promotor
+            )
+        );
+
+
+      if (
+        !registro
+      ) {
+
+        return res
+          .status(404)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "El promotor no pertenece al supervisor seleccionado",
+
+          });
+
+      }
+
+
+      // ============================================
+      // CONFIRMAR QUE SIGUE SIENDO FOCO ROJO
+      // ============================================
+
+      const esFocoRojo =
+
+        Number(
+          registro.diasSinVenta
+        ) >= 3 ||
+
+        Number(
+          registro.productividad
+        ) < 0.8 ||
+
+        Number(
+          registro.recuperaciones
+        ) === 0;
+
+
+      if (
+        !esFocoRojo
+      ) {
+
+        return res
+          .status(409)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "El promotor ya no aparece como foco rojo en los datos actuales",
+
+          });
+
+      }
+
+
+      // ============================================
+      // BUSCAR APPS Y MÓVIL DEL PROMOTOR
+      // ============================================
+
+      const avance =
+        (
+          datos.avanceSemanal ||
+          []
+        ).find(
+          (
+            item
+          ) =>
+
+            normalizarTextoMinuta(
+              item.supervisor
+            ) ===
+            normalizarTextoMinuta(
+              supervisor
+            ) &&
+
+            normalizarTextoMinuta(
+              item.nombre
+            ) ===
+            normalizarTextoMinuta(
+              promotor
+            )
+        );
+
+
+      const apps =
+
+        Number(
+          avance?.netflix ||
+          0
+        ) +
+
+        Number(
+          avance?.disney ||
+          0
+        ) +
+
+        Number(
+          avance?.max ||
+          0
+        );
+
+
+      // ============================================
+      // GUARDAR MINUTA
+      // ============================================
+
+      const minuta =
+        await crearMinuta({
+
+          supervisor,
+
+          promotor,
+
+          compromiso,
+
+          creadaPor:
+            req.usuario,
+
+          metricas: {
+
+            productividad:
+              registro.productividad,
+
+            diasSinVenta:
+              registro.diasSinVenta,
+
+            apps,
+
+            rx:
+              registro.recuperaciones,
+
+            movil:
+              avance?.movil ||
+              0,
+
+          },
+
+        });
+
+
+      return res
+        .status(201)
+        .json({
+
+          correcto:
+            true,
+
+          mensaje:
+            "Minuta enviada al dashboard del supervisor",
+
+          minuta,
+
+        });
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al crear la minuta:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo crear ni enviar la minuta",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// FIRMAR Y DEVOLVER MINUTA A DIRECCIÓN
+// ==================================================
+
+app.post(
+  "/api/minutas/:id/firmar",
+
+  autenticarToken,
+
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      // ============================================
+      // SOLAMENTE PUEDE FIRMAR UN SUPERVISOR
+      // ============================================
+
+      if (
+        req.rol !==
+        "SUPERVISOR"
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "La firma corresponde al supervisor asignado",
+
+          });
+
+      }
+
+
+      // ============================================
+      // VALIDAR FIRMA
+      // ============================================
+
+      const firma =
+        String(
+          req.body?.firma ??
+          ""
+        );
+
+
+      if (
+        !firma.startsWith(
+          "data:image/png;base64,"
+        ) ||
+        firma.length > 450000
+      ) {
+
+        return res
+          .status(400)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "La firma no es válida",
+
+          });
+
+      }
+
+
+      // ============================================
+      // BUSCAR LA MINUTA
+      // ============================================
+
+      const minutas =
+        await listarMinutas();
+
+
+      const minutaActual =
+        minutas.find(
+          (
+            minuta
+          ) =>
+            minuta.id ===
+            req.params.id
+        );
+
+
+      if (
+        !minutaActual
+      ) {
+
+        return res
+          .status(404)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Minuta no encontrada",
+
+          });
+
+      }
+
+
+      // ============================================
+      // VALIDAR QUE LE PERTENEZCA AL SUPERVISOR
+      // ============================================
+
+      if (
+        normalizarTextoMinuta(
+          minutaActual.supervisor
+        ) !==
+        normalizarTextoMinuta(
+          req.supervisor
+        )
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Esta minuta pertenece a otro supervisor",
+
+          });
+
+      }
+
+
+      // ============================================
+      // GUARDAR FIRMA
+      // ============================================
+
+      const minuta =
+        await firmarMinuta({
+
+          id:
+            req.params.id,
+
+          firmaSupervisor:
+            firma,
+
+        });
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        mensaje:
+          "Minuta firmada y devuelta a Dirección",
+
+        minuta,
+
+      });
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al firmar la minuta:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      const conflicto =
+        /ya fue firmada|resuelta/i.test(
+          error.message
+        );
+
+
+      return res
+        .status(
+          conflicto
+            ? 409
+            : 500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            conflicto
+              ? error.message
+              : "No se pudo guardar la firma",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// RESOLVER COMPROMISO DE LA MINUTA
+// ==================================================
+
+app.post(
+  "/api/minutas/:id/resolver",
+
+  autenticarToken,
+
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      // ============================================
+      // ACCESO EXCLUSIVO DE DIRECCIÓN
+      // ============================================
+
+      if (
+        req.rol !==
+        "DIRECCIÓN"
+      ) {
+
+        return res
+          .status(403)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Acceso exclusivo de Dirección",
+
+          });
+
+      }
+
+
+      // ============================================
+      // RESULTADO RECIBIDO
+      // ============================================
+
+      const resultado =
+        String(
+          req.body?.resultado ??
+          ""
+        )
+          .trim()
+          .toUpperCase();
+
+
+      // ============================================
+      // VALIDAR RESULTADO
+      // ============================================
+
+      if (
+        ![
+          "CUMPLIDO",
+          "NO_CUMPLIDO",
+        ].includes(
+          resultado
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Resultado de la minuta no válido",
+
+          });
+
+      }
+
+
+      // ============================================
+      // GUARDAR RESULTADO
+      // ============================================
+
+      const minuta =
+        await resolverMinuta({
+
+          id:
+            req.params.id,
+
+          resultado,
+
+          usuario:
+            req.usuario,
+
+        });
+
+
+      if (
+        !minuta
+      ) {
+
+        return res
+          .status(404)
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Minuta no encontrada",
+
+          });
+
+      }
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        mensaje:
+          resultado ===
+          "CUMPLIDO"
+
+            ? "Compromiso marcado como cumplido"
+
+            : "Compromiso marcado como no cumplido",
+
+        minuta,
+
+      });
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al resolver la minuta:"
+      );
+
+      console.error(
+        error
+      );
+
+
+      const conflicto =
+        /debe firmar|ya fue resuelta/i.test(
+          error.message
+        );
+
+
+      return res
+        .status(
+          conflicto
+            ? 409
+            : 500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            conflicto
+              ? error.message
+              : "No se pudo actualizar la minuta",
+
+        });
+
+    }
+
+  }
+);
 
 // ==================================================
 // RECUPERACIONES VS MISMO DÍA DEL MES ANTERIOR
