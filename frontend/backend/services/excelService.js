@@ -25,7 +25,6 @@ const RUTA_EXCEL_SUPABASE = path.join(
 let datosCacheados = null;
 let workbookCacheado = null;
 let usuariosCacheados = null;
-filasPanelRecuperacionCacheadas = null;
 
 // Filas convertidas de PANEL RECUPERACION.
 // Se comparten entre sus distintos lectores.
@@ -8642,6 +8641,7 @@ validarExcelLigero(
     usuariosCacheados = null;
     
     filasPanelRecuperacionCacheadas = null;
+    
 
     return {
       actualizadoEn: new Date().toISOString(),
