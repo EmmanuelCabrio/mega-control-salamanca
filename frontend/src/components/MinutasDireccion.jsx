@@ -700,6 +700,11 @@ function MinutasDireccion() {
     promotorAbierto,
     setPromotorAbierto,
   ] = useState("");
+  
+  const [
+  filtroSupervisor,
+  setFiltroSupervisor,
+] = useState("TODOS");
 
 
   // ==================================================
@@ -1023,6 +1028,77 @@ function MinutasDireccion() {
         minutas,
       ]
     );
+
+
+  // ==================================================
+// FILTRAR HISTORIAL POR SUPERVISOR
+// ==================================================
+
+const supervisoresHistorial =
+  useMemo(
+    () =>
+      [
+        ...new Set(
+          minutas
+            .map(
+              (
+                minuta
+              ) =>
+                String(
+                  minuta.supervisor ||
+                  ""
+                ).trim()
+            )
+            .filter(
+              Boolean
+            )
+        ),
+      ].sort(
+        (
+          a,
+          b
+        ) =>
+          a.localeCompare(
+            b,
+            "es-MX"
+          )
+      ),
+
+    [
+      minutas,
+    ]
+  );
+
+
+const seguimientosFiltrados =
+  useMemo(
+    () => {
+
+      if (
+        filtroSupervisor ===
+        "TODOS"
+      ) {
+
+        return seguimientosPorPromotor;
+
+      }
+
+
+      return seguimientosPorPromotor.filter(
+        (
+          seguimiento
+        ) =>
+          seguimiento.ultima?.supervisor ===
+          filtroSupervisor
+      );
+
+    },
+
+    [
+      seguimientosPorPromotor,
+      filtroSupervisor,
+    ]
+  );
 
 
   // ==================================================
@@ -1638,19 +1714,78 @@ function MinutasDireccion() {
       </form>
 
 
-      <div className="minutas-historial-titulo">
+    <div className="minutas-historial-titulo">
 
-        <h3>
-          Seguimiento de minutas
-        </h3>
+  <div>
 
-        <span>
-          {seguimientosPorPromotor.length} promotores
-          {" · "}
-          {minutas.length} minutas
-        </span>
+    <h3>
+      Seguimiento de minutas
+    </h3>
 
-      </div>
+    <span>
+      {seguimientosFiltrados.length} promotores
+      {" · "}
+      {minutas.length} minutas registradas
+    </span>
+
+  </div>
+
+
+  <label className="minutas-filtro">
+
+    <span>
+      Supervisor
+    </span>
+
+    <select
+      value={
+        filtroSupervisor
+      }
+      onChange={
+        (
+          evento
+        ) => {
+
+          setFiltroSupervisor(
+            evento.target.value
+          );
+
+          setPromotorAbierto(
+            ""
+          );
+
+        }
+      }
+    >
+
+      <option value="TODOS">
+        Todos los supervisores
+      </option>
+
+      {supervisoresHistorial.map(
+        (
+          nombre
+        ) => (
+
+          <option
+            key={
+              nombre
+            }
+            value={
+              nombre
+            }
+          >
+            {nombre}
+          </option>
+
+        )
+      )}
+
+    </select>
+
+  </label>
+
+</div>
 
 
       <div className="minutas-lista">
@@ -1665,7 +1800,7 @@ function MinutasDireccion() {
         )}
 
 
-        {seguimientosPorPromotor.map(
+        {seguimientosFiltrados.map(
           (
             seguimiento
           ) => (
