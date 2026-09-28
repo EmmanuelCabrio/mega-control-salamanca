@@ -696,6 +696,12 @@ function MinutasDireccion() {
   ] = useState("");
 
 
+  const [
+    promotorAbierto,
+    setPromotorAbierto,
+  ] = useState("");
+
+
   // ==================================================
   // CARGAR CATÁLOGO E HISTORIAL
   // ==================================================
@@ -893,6 +899,129 @@ function MinutasDireccion() {
       ) =>
         item.promotor ===
         promotor
+    );
+
+
+  // ==================================================
+  // AGRUPAR HISTORIAL POR PROMOTOR
+  // ==================================================
+
+  const seguimientosPorPromotor =
+    useMemo(
+      () => {
+
+        const grupos =
+          new Map();
+
+
+        minutas.forEach(
+          (
+            minuta
+          ) => {
+
+            const clave =
+              String(
+                minuta.promotor ||
+                "SIN NOMBRE"
+              )
+                .trim()
+                .toLocaleUpperCase(
+                  "es-MX"
+                );
+
+
+            if (
+              !grupos.has(
+                clave
+              )
+            ) {
+
+              grupos.set(
+                clave,
+                []
+              );
+
+            }
+
+
+            grupos.get(
+              clave
+            ).push(
+              minuta
+            );
+
+          }
+        );
+
+
+        return [
+          ...grupos.entries(),
+        ]
+          .map(
+            (
+              [
+                clave,
+                historial,
+              ]
+            ) => {
+
+              const ordenado =
+                [
+                  ...historial,
+                ].sort(
+                  (
+                    a,
+                    b
+                  ) =>
+                    new Date(
+                      b.creadaEn ||
+                      0
+                    ).getTime() -
+                    new Date(
+                      a.creadaEn ||
+                      0
+                    ).getTime()
+                );
+
+
+              return {
+
+                clave,
+
+                ultima:
+                  ordenado[0],
+
+                anteriores:
+                  ordenado.slice(
+                    1
+                  ),
+
+                total:
+                  ordenado.length,
+
+              };
+
+            }
+          )
+          .sort(
+            (
+              a,
+              b
+            ) =>
+              new Date(
+                b.ultima?.creadaEn ||
+                0
+              ).getTime() -
+              new Date(
+                a.ultima?.creadaEn ||
+                0
+              ).getTime()
+          );
+
+      },
+      [
+        minutas,
+      ]
     );
 
 
@@ -1104,6 +1233,179 @@ function MinutasDireccion() {
       );
 
     }
+
+  }
+
+
+  // ==================================================
+  // TARJETA INDIVIDUAL DE MINUTA
+  // ==================================================
+
+  function renderizarMinuta(
+    minuta,
+    esAnterior = false
+  ) {
+
+    return (
+
+      <article
+        className={`minuta-card${
+          esAnterior
+            ? " minuta-card-anterior"
+            : ""
+        }`}
+        key={
+          minuta.id
+        }
+      >
+
+        <div className="minuta-card-top">
+
+          <div>
+
+            <span
+              className={`minuta-estado minuta-estado-${String(
+                minuta.estado
+              ).toLowerCase()}`}
+            >
+
+              {minuta.estado ===
+              "PENDIENTE_FIRMA"
+
+                ? "Pendiente de firma"
+
+                : minuta.estado ===
+                  "FIRMADA"
+
+                  ? "Firmada · pendiente de resultado"
+
+                  : minuta.resultado ===
+                    "CUMPLIDO"
+
+                    ? "Compromiso cumplido"
+
+                    : "Compromiso no cumplido"}
+
+            </span>
+
+            <h4>
+              {minuta.promotor}
+            </h4>
+
+            <p>
+              {minuta.supervisor}
+              {" · "}
+              {formatearFecha(
+                minuta.creadaEn
+              )}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <MetricasMinuta
+          datos={
+            minuta.metricas ||
+            {}
+          }
+        />
+
+
+        <div className="minuta-compromiso">
+
+          <span>
+            Compromiso
+          </span>
+
+          <p>
+            {minuta.compromiso}
+          </p>
+
+        </div>
+
+
+        {minuta.firmaSupervisor && (
+
+          <div className="minuta-firma-recibida">
+
+            <div>
+
+              <span>
+                Firma recibida
+              </span>
+
+              <small>
+                {formatearFecha(
+                  minuta.firmadaEn
+                )}
+              </small>
+
+            </div>
+
+            <img
+              src={
+                minuta.firmaSupervisor
+              }
+              alt={`Firma de ${minuta.supervisor}`}
+            />
+
+            <button
+              type="button"
+              onClick={
+                () =>
+                  descargarMinuta(
+                    minuta
+                  )
+              }
+            >
+              ↓ Descargar minuta firmada
+            </button>
+
+          </div>
+
+        )}
+
+
+        {minuta.estado ===
+        "FIRMADA" && (
+
+          <div className="minuta-resolver">
+
+            <button
+              type="button"
+              onClick={
+                () =>
+                  resolverCompromiso(
+                    minuta.id,
+                    "CUMPLIDO"
+                  )
+              }
+            >
+              ✓ Marcar cumplido
+            </button>
+
+            <button
+              type="button"
+              onClick={
+                () =>
+                  resolverCompromiso(
+                    minuta.id,
+                    "NO_CUMPLIDO"
+                  )
+              }
+            >
+              ✕ Marcar no cumplido
+            </button>
+
+          </div>
+
+        )}
+
+      </article>
+
+    );
 
   }
 
@@ -1343,7 +1645,9 @@ function MinutasDireccion() {
         </h3>
 
         <span>
-          {minutas.length} registros
+          {seguimientosPorPromotor.length} promotores
+          {" · "}
+          {minutas.length} minutas
         </span>
 
       </div>
@@ -1361,163 +1665,99 @@ function MinutasDireccion() {
         )}
 
 
-        {minutas.map(
+        {seguimientosPorPromotor.map(
           (
-            minuta
+            seguimiento
           ) => (
 
-            <article
-              className="minuta-card"
+            <div
+              className="minuta-seguimiento"
               key={
-                minuta.id
+                seguimiento.clave
               }
             >
 
-              <div className="minuta-card-top">
-
-                <div>
-
-                  <span
-                    className={`minuta-estado minuta-estado-${String(
-                      minuta.estado
-                    ).toLowerCase()}`}
-                  >
-
-                    {minuta.estado ===
-                    "PENDIENTE_FIRMA"
-
-                      ? "Pendiente de firma"
-
-                      : minuta.estado ===
-                        "FIRMADA"
-
-                        ? "Firmada · pendiente de resultado"
-
-                        : minuta.resultado ===
-                          "CUMPLIDO"
-
-                          ? "Compromiso cumplido"
-
-                          : "Compromiso no cumplido"}
-
-                  </span>
-
-                  <h4>
-                    {minuta.promotor}
-                  </h4>
-
-                  <p>
-                    {minuta.supervisor}
-                    {" · "}
-                    {formatearFecha(
-                      minuta.creadaEn
-                    )}
-                  </p>
-
-                </div>
-
-              </div>
+              {renderizarMinuta(
+                seguimiento.ultima
+              )}
 
 
-              <MetricasMinuta
-                datos={
-                  minuta.metricas ||
-                  {}
-                }
-              />
+              {seguimiento.anteriores.length >
+              0 && (
 
-
-              <div className="minuta-compromiso">
-
-                <span>
-                  Compromiso
-                </span>
-
-                <p>
-                  {minuta.compromiso}
-                </p>
-
-              </div>
-
-
-              {minuta.firmaSupervisor && (
-
-                <div className="minuta-firma-recibida">
-
-                  <div>
-
-                    <span>
-                      Firma recibida
-                    </span>
-
-                    <small>
-                      {formatearFecha(
-                        minuta.firmadaEn
-                      )}
-                    </small>
-
-                  </div>
-
-                  <img
-                    src={
-                      minuta.firmaSupervisor
-                    }
-                    alt={`Firma de ${minuta.supervisor}`}
-                  />
+                <>
 
                   <button
                     type="button"
+                    className="minuta-historial-boton"
+                    aria-expanded={
+                      promotorAbierto ===
+                      seguimiento.clave
+                    }
                     onClick={
                       () =>
-                        descargarMinuta(
+                        setPromotorAbierto(
+                          (
+                            actual
+                          ) =>
+                            actual ===
+                            seguimiento.clave
+
+                              ? ""
+
+                              : seguimiento.clave
+                        )
+                    }
+                  >
+
+                    {promotorAbierto ===
+                    seguimiento.clave
+
+                      ? "Ocultar historial ↑"
+
+                      : `Ver ${seguimiento.anteriores.length} minuta${
+                          seguimiento.anteriores.length ===
+                          1
+                            ? ""
+                            : "s"
+                        } anterior${
+                          seguimiento.anteriores.length ===
+                          1
+                            ? ""
+                            : "es"
+                        } ↓`}
+
+                  </button>
+
+
+                  {promotorAbierto ===
+                  seguimiento.clave && (
+
+                    <div className="minuta-historial-desplegado">
+
+                      <div className="minuta-historial-etiqueta">
+                        Evolución del promotor · {seguimiento.total} minutas
+                      </div>
+
+                      {seguimiento.anteriores.map(
+                        (
                           minuta
-                        )
-                    }
-                  >
-                    ↓ Descargar minuta firmada
-                  </button>
+                        ) =>
+                          renderizarMinuta(
+                            minuta,
+                            true
+                          )
+                      )}
 
-                </div>
+                    </div>
 
-              )}
+                  )}
 
-
-              {minuta.estado ===
-              "FIRMADA" && (
-
-                <div className="minuta-resolver">
-
-                  <button
-                    type="button"
-                    onClick={
-                      () =>
-                        resolverCompromiso(
-                          minuta.id,
-                          "CUMPLIDO"
-                        )
-                    }
-                  >
-                    ✓ Marcar cumplido
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={
-                      () =>
-                        resolverCompromiso(
-                          minuta.id,
-                          "NO_CUMPLIDO"
-                        )
-                    }
-                  >
-                    ✕ Marcar no cumplido
-                  </button>
-
-                </div>
+                </>
 
               )}
 
-            </article>
+            </div>
 
           )
         )}
