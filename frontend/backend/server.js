@@ -370,6 +370,62 @@ req.empleado =
 }
 
 
+
+// ==================================================
+// AUTORIZACIÓN CENTRALIZADA POR ROL
+// ==================================================
+
+function autorizarRoles(
+  ...rolesPermitidos
+) {
+
+  const roles =
+    new Set(
+      rolesPermitidos.map(
+        normalizarRol
+      )
+    );
+
+
+  return (
+    req,
+    res,
+    next
+  ) => {
+
+    const rol =
+      normalizarRol(
+        req.rol
+      );
+
+
+    if (
+      !roles.has(
+        rol
+      )
+    ) {
+
+      return res
+        .status(403)
+        .json({
+
+          correcto: false,
+
+          mensaje:
+            "No tienes autorización para consultar esta información",
+
+        });
+
+    }
+
+
+    next();
+
+  };
+
+}
+
+
 // ==================================================
 // IDENTIFICAR SUPERVISOR Y PROMOTOR DEL CHECKLIST
 // ==================================================
@@ -1698,6 +1754,10 @@ app.get(
 app.get(
   "/api/penetracion",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -1748,6 +1808,10 @@ app.get(
 app.get(
   "/api/avance-semanal",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -1811,6 +1875,10 @@ app.get(
 app.get(
   "/api/ranking-supervisores",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -1909,6 +1977,10 @@ app.get(
 app.get(
   "/api/registros",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -3131,6 +3203,10 @@ app.post(
 app.get(
   "/api/recuperaciones-vs-mes-anterior",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -3802,6 +3878,10 @@ app.get(
 app.get(
   "/api/top3-cl",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -3892,6 +3972,10 @@ app.get(
 app.get(
   "/api/plan-trabajo",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -3953,6 +4037,10 @@ app.get(
 app.get(
   "/api/avance-plan-trabajo",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -4224,6 +4312,10 @@ app.get(
 app.get(
   "/api/meta-semana-anterior",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR"
+  ),
   async (req, res) => {
 
     try {
@@ -4483,6 +4575,11 @@ app.get(
 app.get(
   "/api/ranking-cl",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR",
+    "PROMOTOR"
+  ),
   async (req, res) => {
 
     try {
@@ -4573,6 +4670,11 @@ app.get(
 app.get(
   "/api/ranking-cl-completo",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN",
+    "SUPERVISOR",
+    "PROMOTOR"
+  ),
   async (req, res) => {
 
     try {
@@ -5291,6 +5393,9 @@ app.get(
 app.get(
   "/api/venta-vs-mes-anterior",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
   async (req, res) => {
 
     try {
@@ -5355,6 +5460,9 @@ app.get(
 app.get(
   "/api/plantilla",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
   async (req, res) => {
 
     try {
@@ -5422,6 +5530,9 @@ app.get(
 app.get(
   "/api/productividad-antiguedad",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
   (req, res) => {
     try {
       return res.json({
@@ -5561,6 +5672,9 @@ app.get(
 app.get(
   "/api/cartera-por-dia",
   autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
   async (req, res) => {
 
     try {
