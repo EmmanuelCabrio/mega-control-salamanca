@@ -3585,281 +3585,313 @@ ${copia.outerHTML}
 
         </section>
 
-        {/* =================================================
-            BOTONES
-        ================================================= */}
+       {/* =================================================
+    BOTONES
+================================================= */}
 
-        <div
-          data-export-footer="true"
-          style={styles.footer}
-        >
-
-          <button
-  type="button"
-  disabled={
-    !corporativoAbierto
+<div
+  data-export-footer="true"
+  style={
+    styles.footer
   }
-  onClick={() => {
-
-    if (
-      !corporativoAbierto
-    ) {
-
-      alert(
-        "🔒 Primero debes completar el CheckList local, descargarlo, guardar el seguimiento y abrir el CheckList corporativo."
-      );
-
-      return;
-
-    }
-
-
-    try {
-
-      localStorage.removeItem(
-        "mega_checklist_pendiente"
-      );
-
-    } catch (
-      error
-    ) {
-
-      console.error(
-        "❌ No se pudo liberar el checklist pendiente:",
-        error
-      );
-
-    }
-
-
-    onRegresar();
-
-  }}
-  style={{
-    ...styles.backButton,
-
-    opacity:
-      corporativoAbierto
-        ? 1
-        : 0.5,
-
-    cursor:
-      corporativoAbierto
-        ? "pointer"
-        : "not-allowed",
-  }}
 >
-  {corporativoAbierto
-    ? "↩️ Cerrar seguimiento y regresar"
-    : checklistGuardado
-      ? "🔒 Abre el CheckList corporativo"
-      : evidenciaDescargada
-        ? "🔒 Guarda el seguimiento"
-        : "🔒 Completa y descarga el CheckList"}
-</button>
 
-          <button
-  type="button"
-  disabled={
-    !checklistGuardado
-  }
-  style={{
-    ...styles.corporateButton,
+  {/* =============================================
+      1. DESCARGAR CHECKLIST LOCAL
+  ============================================= */}
 
-    background:
-      corporativoAbierto
-        ? "#15803d"
-        : undefined,
+  <button
+    type="button"
+    onClick={
+      exportarHTML
+    }
+    disabled={
+      !checkLocalCompleto ||
+      evidenciaDescargada
+    }
+    style={{
+      ...styles.exportButton,
 
-    opacity:
+      background:
+        evidenciaDescargada
+          ? "#15803d"
+          : "#174b8f",
+
+      opacity:
+        checkLocalCompleto &&
+        !evidenciaDescargada
+          ? 1
+          : 0.5,
+
+      cursor:
+        checkLocalCompleto &&
+        !evidenciaDescargada
+          ? "pointer"
+          : "not-allowed",
+    }}
+  >
+
+    {evidenciaDescargada
+
+      ? "✅ CheckList descargado"
+
+      : checkLocalCompleto
+
+        ? "📄 Descargar CheckList"
+
+        : "🔒 Completa y firma el CheckList"}
+
+  </button>
+
+
+  {/* =============================================
+      2. GUARDAR SEGUIMIENTO
+  ============================================= */}
+
+  <button
+    type="button"
+    onClick={
+      guardarSeguimiento
+    }
+    disabled={
+      !evidenciaDescargada ||
+      !sesionId ||
+      guardandoChecklist ||
       checklistGuardado
-        ? 1
-        : 0.5,
+    }
+    style={{
+      ...styles.exportButton,
 
-    cursor:
-      checklistGuardado
-        ? "pointer"
-        : "not-allowed",
-  }}
-  onClick={() => {
+      background:
+        checklistGuardado
+          ? "#15803d"
+          : "#0f766e",
 
-    if (
+      opacity:
+        evidenciaDescargada &&
+        sesionId &&
+        !guardandoChecklist &&
+        !checklistGuardado
+          ? 1
+          : 0.55,
+
+      cursor:
+        evidenciaDescargada &&
+        sesionId &&
+        !guardandoChecklist &&
+        !checklistGuardado
+          ? "pointer"
+          : "not-allowed",
+    }}
+  >
+
+    {guardandoChecklist
+
+      ? "⏳ Guardando..."
+
+      : checklistGuardado
+
+        ? "✅ Seguimiento guardado"
+
+        : "💾 Guardar seguimiento"}
+
+  </button>
+
+
+  {/* =============================================
+      3. ABRIR CHECKLIST CORPORATIVO
+  ============================================= */}
+
+  <button
+    type="button"
+    disabled={
       !checklistGuardado
-    ) {
-
-      alert(
-        "🔒 Primero debes descargar el CheckList y guardar el seguimiento."
-      );
-
-      return;
-
     }
+    style={{
+      ...styles.corporateButton,
 
+      background:
+        corporativoAbierto
+          ? "#15803d"
+          : undefined,
 
-    window.open(
-  "https://forms.cloud.microsoft/r/5WKYqP7h3N",
-  "_blank",
-  "noopener,noreferrer"
-);
+      opacity:
+        checklistGuardado
+          ? 1
+          : 0.5,
 
-    if (
-      !ventanaCorporativa
-    ) {
+      cursor:
+        checklistGuardado
+          ? "pointer"
+          : "not-allowed",
+    }}
+    onClick={
+      () => {
 
-      alert(
-        "No se pudo abrir el CheckList corporativo. Revisa si el navegador bloqueó la ventana emergente."
-      );
+        if (
+          !checklistGuardado
+        ) {
 
-      return;
-
-    }
-
-
-    setCorporativoAbierto(
-      true
-    );
-
-
-    try {
-
-      const pendienteGuardado =
-        localStorage.getItem(
-          "mega_checklist_pendiente"
-        );
-
-
-      if (
-        pendienteGuardado
-      ) {
-
-        const pendiente =
-          JSON.parse(
-            pendienteGuardado
+          alert(
+            "🔒 Primero debes descargar el CheckList y guardar el seguimiento."
           );
 
+          return;
 
-        localStorage.setItem(
-          "mega_checklist_pendiente",
-          JSON.stringify({
+        }
 
-            ...pendiente,
 
-            paso:
-              "CORPORATIVO_ABIERTO",
-
-            corporativoAbiertoEn:
-              new Date().toISOString(),
-
-          })
+        window.open(
+          "https://forms.cloud.microsoft/r/5WKYqP7h3N",
+          "_blank",
+          "noopener,noreferrer"
         );
 
+
+        setCorporativoAbierto(
+          true
+        );
+
+
+        try {
+
+          const pendienteGuardado =
+            localStorage.getItem(
+              "mega_checklist_pendiente"
+            );
+
+
+          if (
+            pendienteGuardado
+          ) {
+
+            const pendiente =
+              JSON.parse(
+                pendienteGuardado
+              );
+
+
+            localStorage.setItem(
+              "mega_checklist_pendiente",
+              JSON.stringify({
+
+                ...pendiente,
+
+                paso:
+                  "CORPORATIVO_ABIERTO",
+
+                corporativoAbiertoEn:
+                  new Date().toISOString(),
+
+              })
+            );
+
+          }
+
+        } catch (
+          error
+        ) {
+
+          console.error(
+            "❌ No se pudo guardar el paso corporativo:",
+            error
+          );
+
+        }
+
       }
-
-    } catch (
-      error
-    ) {
-
-      console.error(
-        "❌ No se pudo guardar el paso corporativo:",
-        error
-      );
-
     }
+  >
 
-  }}
->
-  {corporativoAbierto
-    ? "✅ Check list corporativo abierto"
-    : checklistGuardado
-      ? "🏢 Abrir Check list corporativo"
-      : "🔒 Guarda primero el seguimiento"}
-</button>
+    {corporativoAbierto
 
-         <button
-  type="button"
-  onClick={
-    exportarHTML
-  }
-  disabled={
-    !checkLocalCompleto ||
-    evidenciaDescargada
-  }
-  style={{
-    ...styles.exportButton,
+      ? "✅ Check list corporativo abierto"
 
-    background:
-      evidenciaDescargada
-        ? "#15803d"
-        : "#174b8f",
+      : checklistGuardado
 
-    opacity:
-      checkLocalCompleto &&
-      !evidenciaDescargada
-        ? 1
-        : 0.5,
+        ? "🏢 Abrir Check list corporativo"
 
-    cursor:
-      checkLocalCompleto &&
-      !evidenciaDescargada
-        ? "pointer"
-        : "not-allowed",
-  }}
->
-  {evidenciaDescargada
-    ? "✅ CheckList descargado"
-    : checkLocalCompleto
-      ? "📄 Descargar CheckList"
-      : "🔒 Completa y firma el CheckList"}
-</button>
+        : "🔒 Guarda primero el seguimiento"}
 
-          <button
-  type="button"
-  onClick={
-    guardarSeguimiento
-  }
-  disabled={
-    !evidenciaDescargada ||
-    !sesionId ||
-    guardandoChecklist ||
-    checklistGuardado
-  }
-  style={{
-    ...styles.exportButton,
+  </button>
 
-    background:
-      checklistGuardado
-        ? "#15803d"
-        : "#0f766e",
 
-    opacity:
-      evidenciaDescargada &&
-      sesionId &&
-      !guardandoChecklist &&
-      !checklistGuardado
-        ? 1
-        : 0.55,
+  {/* =============================================
+      4. CERRAR SEGUIMIENTO
+  ============================================= */}
 
-    cursor:
-      evidenciaDescargada &&
-      sesionId &&
-      !guardandoChecklist &&
-      !checklistGuardado
-        ? "pointer"
-        : "not-allowed",
-  }}
->
-  {guardandoChecklist
-    ? "⏳ Guardando..."
-    : checklistGuardado
-      ? "✅ Seguimiento guardado"
-      : "💾 Guardar seguimiento"}
-</button>
+  <button
+    type="button"
+    disabled={
+      !corporativoAbierto
+    }
+    onClick={
+      () => {
 
-        </div>
+        if (
+          !corporativoAbierto
+        ) {
 
-      </div>
-    </div>
-  );
-}
+          alert(
+            "🔒 Primero debes completar el CheckList local, descargarlo, guardar el seguimiento y abrir el CheckList corporativo."
+          );
 
-export default ChecklistFocoRojo;
+          return;
+
+        }
+
+
+        try {
+
+          localStorage.removeItem(
+            "mega_checklist_pendiente"
+          );
+
+        } catch (
+          error
+        ) {
+
+          console.error(
+            "❌ No se pudo liberar el checklist pendiente:",
+            error
+          );
+
+        }
+
+
+        onRegresar();
+
+      }
+    }
+    style={{
+      ...styles.backButton,
+
+      opacity:
+        corporativoAbierto
+          ? 1
+          : 0.5,
+
+      cursor:
+        corporativoAbierto
+          ? "pointer"
+          : "not-allowed",
+    }}
+  >
+
+    {corporativoAbierto
+
+      ? "↩️ Cerrar seguimiento y regresar"
+
+      : checklistGuardado
+
+        ? "🔒 Abre el CheckList corporativo"
+
+        : evidenciaDescargada
+
+          ? "🔒 Guarda el seguimiento"
+
+          : "🔒 Completa y descarga el CheckList"}
+
+  </button>
+
+</div>
