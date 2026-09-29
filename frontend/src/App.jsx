@@ -76,6 +76,73 @@ const SUPERVISOR_RECUPERACION =
   "MORALES PEREZ BENJAMIN";
 
 
+// ==================================================
+// RECUPERAR CHECKLIST PENDIENTE
+// ==================================================
+
+function obtenerChecklistPendiente() {
+
+  try {
+
+    const guardado =
+      localStorage.getItem(
+        "mega_checklist_pendiente"
+      );
+
+
+    if (
+      !guardado
+    ) {
+
+      return null;
+
+    }
+
+
+    const pendiente =
+      JSON.parse(
+        guardado
+      );
+
+
+    if (
+      !pendiente?.promotor?.nombre ||
+      !pendiente?.supervisor
+    ) {
+
+      localStorage.removeItem(
+        "mega_checklist_pendiente"
+      );
+
+      return null;
+
+    }
+
+
+    return pendiente;
+
+  } catch (
+    error
+  ) {
+
+    console.error(
+      "❌ No se pudo recuperar el checklist pendiente:",
+      error
+    );
+
+
+    localStorage.removeItem(
+      "mega_checklist_pendiente"
+    );
+
+
+    return null;
+
+  }
+
+}
+
+
 function App() {
 
   // ==================================================
@@ -104,16 +171,31 @@ function App() {
 
 
       if (
-        rolGuardado ===
-        "PROMOTOR"
-      ) {
+  rolGuardado ===
+  "PROMOTOR"
+) {
 
-        return "promotorRanking";
+  return "promotorRanking";
 
-      }
+}
 
 
-      return "supervisor";
+const checklistPendiente =
+  obtenerChecklistPendiente();
+
+
+if (
+  rolGuardado ===
+  "SUPERVISOR" &&
+  checklistPendiente
+) {
+
+  return "checklistFocoRojo";
+
+}
+
+
+return "supervisor";
 
 
     } catch {
@@ -360,7 +442,12 @@ const [
 const [
   promotorEnSeguimiento,
   setPromotorEnSeguimiento
-] = useState(null);
+] = useState(
+  () =>
+    obtenerChecklistPendiente()
+      ?.promotor ||
+    null
+);
 
 
 
@@ -1152,6 +1239,119 @@ if (
 
   }
 
+
+
+  // ==================================================
+// ABRIR CHECKLIST CON CANDADO PERSISTENTE
+// ==================================================
+
+function abrirChecklistFocoRojo(
+  promotor
+) {
+
+  if (
+    !promotor?.nombre ||
+    !supervisorSeleccionado
+  ) {
+
+    return;
+
+  }
+
+
+  const pendienteActual =
+    obtenerChecklistPendiente();
+
+
+  // Si ya existe un checklist pendiente,
+  // siempre se regresa a ese mismo promotor.
+
+  if (
+    pendienteActual
+  ) {
+
+    setPromotorEnSeguimiento(
+      pendienteActual.promotor
+    );
+
+
+    setVista(
+      "checklistFocoRojo"
+    );
+
+
+    if (
+      pendienteActual.promotor.nombre !==
+      promotor.nombre
+    ) {
+
+      alert(
+        `🔒 Ya tienes un checklist pendiente de ${pendienteActual.promotor.nombre}.\n\nDebes finalizarlo antes de abrir otro seguimiento.`
+      );
+
+    }
+
+
+    return;
+
+  }
+
+
+  const nuevoPendiente = {
+
+    supervisor:
+      supervisorSeleccionado,
+
+    promotor,
+
+    abiertoEn:
+      new Date().toISOString(),
+
+    paso:
+      "CHECK_LOCAL",
+
+  };
+
+
+  try {
+
+    localStorage.setItem(
+      "mega_checklist_pendiente",
+      JSON.stringify(
+        nuevoPendiente
+      )
+    );
+
+  } catch (
+    error
+  ) {
+
+    console.error(
+      "❌ No se pudo guardar el candado del checklist:",
+      error
+    );
+
+
+    alert(
+      "No se pudo proteger el checklist. Intenta abrirlo nuevamente."
+    );
+
+
+    return;
+
+  }
+
+
+  setPromotorEnSeguimiento(
+    promotor
+  );
+
+
+  setVista(
+    "checklistFocoRojo"
+  );
+
+}
 
 
 
@@ -2447,17 +2647,9 @@ if (
   // 🔴 INICIAR SEGUIMIENTO
   // ==========================================
 
-  onIniciarSeguimiento={(promotor) => {
-
-    setPromotorEnSeguimiento(
-      promotor
-    );
-
-    setVista(
-      "checklistFocoRojo"
-    );
-
-  }}
+onIniciarSeguimiento={
+  abrirChecklistFocoRojo
+}
 
 
   // ==========================================
@@ -2485,17 +2677,9 @@ if (
     supervisorSeleccionado
   }
 
-  onIniciarSeguimiento={(promotor) => {
-
-    setPromotorEnSeguimiento(
-      promotor
-    );
-
-    setVista(
-      "checklistFocoRojo"
-    );
-
-  }}
+  onIniciarSeguimiento={
+  abrirChecklistFocoRojo
+}
 
 />
 
