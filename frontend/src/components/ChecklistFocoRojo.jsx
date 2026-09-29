@@ -4,6 +4,94 @@ import {
   fetchProtegido,
 } from "../services/authService";
 
+
+// =========================================================
+// RECUPERAR PASO DEL CHECKLIST PENDIENTE
+// =========================================================
+
+function obtenerPasoChecklistPendiente(
+  supervisor,
+  promotor
+) {
+
+  try {
+
+    const guardado =
+      localStorage.getItem(
+        "mega_checklist_pendiente"
+      );
+
+
+    if (
+      !guardado
+    ) {
+
+      return "";
+
+    }
+
+
+    const pendiente =
+      JSON.parse(
+        guardado
+      );
+
+
+    const mismoSupervisor =
+      String(
+        pendiente?.supervisor ||
+        ""
+      ).trim() ===
+      String(
+        supervisor ||
+        ""
+      ).trim();
+
+
+    const mismoPromotor =
+      String(
+        pendiente?.promotor?.nombre ||
+        ""
+      ).trim() ===
+      String(
+        promotor ||
+        ""
+      ).trim();
+
+
+    if (
+      !mismoSupervisor ||
+      !mismoPromotor
+    ) {
+
+      return "";
+
+    }
+
+
+    return String(
+      pendiente.paso ||
+      ""
+    );
+
+  } catch (
+    error
+  ) {
+
+    console.error(
+      "❌ No se pudo recuperar el paso del checklist:",
+      error
+    );
+
+
+    return "";
+
+  }
+
+}
+
+
+
 function ChecklistFocoRojo({
   promotor,
   supervisor,
@@ -17,6 +105,12 @@ function ChecklistFocoRojo({
 
   const vendedor = promotor?.nombre || "—";
 
+  const pasoPendiente =
+  obtenerPasoChecklistPendiente(
+    supervisor,
+    vendedor
+  );
+
   const productividad = Number(
     promotor?.productividad ?? 0
   ).toFixed(2);
@@ -27,10 +121,30 @@ function ChecklistFocoRojo({
 
   const [checks, setChecks] = useState({});
   const [otraArea, setOtraArea] = useState("");
+const [
+  otraTecnicaHielo,
+  setOtraTecnicaHielo,
+] = useState("");
+  
   const [accionCorrectiva, setAccionCorrectiva] = useState("");
   const [evidenciaDescargada, setEvidenciaDescargada] =
-    useState(false);
+  useState(
+    () =>
+      pasoPendiente ===
+        "SEGUIMIENTO_GUARDADO" ||
+      pasoPendiente ===
+        "CORPORATIVO_ABIERTO"
+  );
 
+
+  const [
+  corporativoAbierto,
+  setCorporativoAbierto,
+] = useState(
+  () =>
+    pasoPendiente ===
+    "CORPORATIVO_ABIERTO"
+);
 
 
   // =========================================================
@@ -55,7 +169,45 @@ const [
 const [
   sesionId,
   setSesionId,
-] = useState(null);
+] = useState(
+  () => {
+
+    try {
+
+      const guardado =
+        localStorage.getItem(
+          "mega_checklist_pendiente"
+        );
+
+
+      if (
+        !guardado
+      ) {
+
+        return null;
+
+      }
+
+
+      const pendiente =
+        JSON.parse(
+          guardado
+        );
+
+
+      return (
+        pendiente.sesionId ||
+        null
+      );
+
+    } catch {
+
+      return null;
+
+    }
+
+  }
+);
 
 const [
   cargandoHistorial,
@@ -70,7 +222,13 @@ const [
 const [
   checklistGuardado,
   setChecklistGuardado,
-] = useState(false);
+] = useState(
+  () =>
+    pasoPendiente ===
+      "SEGUIMIENTO_GUARDADO" ||
+    pasoPendiente ===
+      "CORPORATIVO_ABIERTO"
+);
 
 const [
   errorSeguimiento,
@@ -309,6 +467,49 @@ useEffect(
             datos.sesionId
           );
 
+          try {
+
+  const pendienteGuardado =
+    localStorage.getItem(
+      "mega_checklist_pendiente"
+    );
+
+
+  if (
+    pendienteGuardado
+  ) {
+
+    const pendiente =
+      JSON.parse(
+        pendienteGuardado
+      );
+
+
+    localStorage.setItem(
+      "mega_checklist_pendiente",
+      JSON.stringify({
+
+        ...pendiente,
+
+        sesionId:
+          datos.sesionId,
+
+      })
+    );
+
+  }
+
+} catch (
+  error
+) {
+
+  console.error(
+    "❌ No se pudo guardar la sesión pendiente:",
+    error
+  );
+
+}
+
         }
 
       } catch (
@@ -345,7 +546,16 @@ useEffect(
 
     cargarHistorial();
 
-    registrarInicio();
+
+if (
+  !sesionId &&
+  !checklistGuardado
+) {
+
+  registrarInicio();
+
+}
+
 
 
     return () => {
@@ -356,10 +566,12 @@ useEffect(
     };
 
   },
-  [
-    promotor?.nombre,
-    supervisor,
-  ]
+ [
+  promotor?.nombre,
+  supervisor,
+  sesionId,
+  checklistGuardado,
+]
 );
 
   // =========================================================
@@ -374,6 +586,33 @@ useEffect(
 
   const [firmaPromotor, setFirmaPromotor] =
     useState(false);
+
+
+
+  // =========================================================
+// VALIDAR QUE EL CHECK LOCAL ESTÉ COMPLETO
+// =========================================================
+
+const checkLocalCompleto =
+
+  firmaSupervisor &&
+
+  firmaPromotor &&
+
+  accionCorrectiva
+    .trim()
+    .length >= 5 &&
+
+  (
+    !checks["hielo-otra"] ||
+
+    otraTecnicaHielo
+      .trim()
+      .length >= 3
+  );
+
+
+  
 
   // =========================================================
   // MARCAR / DESMARCAR
@@ -693,6 +932,8 @@ const guardarSeguimiento =
 
                 checks,
 
+                otraTecnicaHielo,
+
                 otraArea,
 
                 accionCorrectiva,
@@ -728,6 +969,57 @@ const guardarSeguimiento =
       setChecklistGuardado(
         true
       );
+
+
+      // =============================================
+// ACTUALIZAR PASO DEL CANDADO PERSISTENTE
+// =============================================
+
+try {
+
+  const pendienteGuardado =
+    localStorage.getItem(
+      "mega_checklist_pendiente"
+    );
+
+
+  if (
+    pendienteGuardado
+  ) {
+
+    const pendiente =
+      JSON.parse(
+        pendienteGuardado
+      );
+
+
+    localStorage.setItem(
+      "mega_checklist_pendiente",
+      JSON.stringify({
+
+        ...pendiente,
+
+        paso:
+          "SEGUIMIENTO_GUARDADO",
+
+        seguimientoGuardadoEn:
+          new Date().toISOString(),
+
+      })
+    );
+
+  }
+
+} catch (
+  error
+) {
+
+  console.error(
+    "❌ No se pudo actualizar el paso del checklist:",
+    error
+  );
+
+}
 
 
       // =============================================
@@ -819,6 +1111,18 @@ const guardarSeguimiento =
   // =========================================================
 
   const exportarHTML = () => {
+
+    if (
+  !checkLocalCompleto
+) {
+
+  alert(
+    "🔒 Primero debes completar la acción correctiva y colocar las firmas del supervisor y del promotor."
+  );
+
+  return;
+
+}
     const origen = document.getElementById(
       "checklist-foco-rojo"
     );
@@ -885,45 +1189,81 @@ const guardarSeguimiento =
       checkbox.replaceWith(span);
     });
 
-    // -------------------------------------------------------
-    // INPUT "OTRA ÁREA"
-    // -------------------------------------------------------
 
-    const inputOriginal =
-      origen.querySelector(
-        'input[type="text"]'
+    // -------------------------------------------------------
+// CAMPOS DE TEXTO DEL CHECKLIST
+// -------------------------------------------------------
+
+const inputsOriginales =
+  origen.querySelectorAll(
+    "input[data-checklist-texto]"
+  );
+
+
+const inputsCopia =
+  copia.querySelectorAll(
+    "input[data-checklist-texto]"
+  );
+
+
+inputsCopia.forEach(
+  (
+    input,
+    indice
+  ) => {
+
+    const original =
+      inputsOriginales[
+        indice
+      ];
+
+
+    const texto =
+      original?.value ||
+      "";
+
+
+    const bloque =
+      document.createElement(
+        "div"
       );
 
-    const inputCopia =
-      copia.querySelector(
-        'input[type="text"]'
-      );
 
-    if (inputCopia) {
-      const texto =
-        inputOriginal?.value ||
-        otraArea ||
-        "";
+    bloque.textContent =
+      texto ||
+      "No especificado.";
 
-      const bloque =
-        document.createElement("div");
 
-      bloque.textContent =
-        texto || "No especificado.";
+    bloque.style.padding =
+      "12px";
 
-      bloque.style.padding = "12px";
-      bloque.style.border =
-        "1px solid #d5dce5";
+    bloque.style.border =
+      "1px solid #d5dce5";
 
-      bloque.style.borderRadius =
-        "10px";
+    bloque.style.borderRadius =
+      "10px";
 
-      bloque.style.fontSize = "14px";
-      bloque.style.background = "#fff";
+    bloque.style.fontSize =
+      "14px";
 
-      inputCopia.replaceWith(bloque);
-    }
+    bloque.style.background =
+      "#fff";
 
+    bloque.style.whiteSpace =
+      "pre-wrap";
+
+
+    input.replaceWith(
+      bloque
+    );
+
+  }
+);
+
+
+
+
+    
     // -------------------------------------------------------
     // TEXTAREA
     // -------------------------------------------------------
@@ -2239,8 +2579,48 @@ ${copia.outerHTML}
           </div>
 
           <Check id="hielo-otra">
-            Otra técnica
-          </Check>
+  Otra técnica
+</Check>
+
+
+{checks["hielo-otra"] && (
+
+  <input
+    type="text"
+    data-checklist-texto="hielo-otra"
+    value={
+      otraTecnicaHielo
+    }
+    onChange={
+      (
+        evento
+      ) =>
+        setOtraTecnicaHielo(
+          evento.target.value
+        )
+    }
+    maxLength={
+      300
+    }
+    placeholder="Escribe la técnica que utilizó para romper el hielo..."
+    style={{
+      width: "100%",
+      boxSizing: "border-box",
+      marginTop: "10px",
+      padding: "12px",
+      border:
+        "1px solid #cbd5e1",
+      borderRadius: "10px",
+      background:
+        "#ffffff",
+      color:
+        "#172033",
+      fontSize:
+        "14px",
+    }}
+  />
+
+)}
         </section>
 
         {/* =================================================
@@ -3075,6 +3455,7 @@ ${copia.outerHTML}
 
             <input
               type="text"
+              data-checklist-texto="otra-area"
               value={otraArea}
               onChange={(e) =>
                 setOtraArea(
@@ -3215,17 +3596,38 @@ ${copia.outerHTML}
 
           <button
   type="button"
+  disabled={
+    !corporativoAbierto
+  }
   onClick={() => {
 
     if (
-      !checklistGuardado
+      !corporativoAbierto
     ) {
 
       alert(
-        "Primero debes descargar la evidencia y guardar el seguimiento antes de regresar al Dashboard."
+        "🔒 Primero debes completar el CheckList local, descargarlo, guardar el seguimiento y abrir el CheckList corporativo."
       );
 
       return;
+
+    }
+
+
+    try {
+
+      localStorage.removeItem(
+        "mega_checklist_pendiente"
+      );
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ No se pudo liberar el checklist pendiente:",
+        error
+      );
 
     }
 
@@ -3237,46 +3639,180 @@ ${copia.outerHTML}
     ...styles.backButton,
 
     opacity:
+      corporativoAbierto
+        ? 1
+        : 0.5,
+
+    cursor:
+      corporativoAbierto
+        ? "pointer"
+        : "not-allowed",
+  }}
+>
+  {corporativoAbierto
+    ? "↩️ Cerrar seguimiento y regresar"
+    : checklistGuardado
+      ? "🔒 Abre el CheckList corporativo"
+      : evidenciaDescargada
+        ? "🔒 Guarda el seguimiento"
+        : "🔒 Completa y descarga el CheckList"}
+</button>
+
+          <button
+  type="button"
+  disabled={
+    !checklistGuardado
+  }
+  style={{
+    ...styles.corporateButton,
+
+    background:
+      corporativoAbierto
+        ? "#15803d"
+        : undefined,
+
+    opacity:
       checklistGuardado
         ? 1
-        : 0.55,
+        : 0.5,
 
     cursor:
       checklistGuardado
         ? "pointer"
         : "not-allowed",
   }}
+  onClick={() => {
+
+    if (
+      !checklistGuardado
+    ) {
+
+      alert(
+        "🔒 Primero debes descargar el CheckList y guardar el seguimiento."
+      );
+
+      return;
+
+    }
+
+
+    const ventanaCorporativa =
+      window.open(
+        "https://forms.cloud.microsoft/r/5WKYqP7h3N",
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+
+    if (
+      !ventanaCorporativa
+    ) {
+
+      alert(
+        "No se pudo abrir el CheckList corporativo. Revisa si el navegador bloqueó la ventana emergente."
+      );
+
+      return;
+
+    }
+
+
+    setCorporativoAbierto(
+      true
+    );
+
+
+    try {
+
+      const pendienteGuardado =
+        localStorage.getItem(
+          "mega_checklist_pendiente"
+        );
+
+
+      if (
+        pendienteGuardado
+      ) {
+
+        const pendiente =
+          JSON.parse(
+            pendienteGuardado
+          );
+
+
+        localStorage.setItem(
+          "mega_checklist_pendiente",
+          JSON.stringify({
+
+            ...pendiente,
+
+            paso:
+              "CORPORATIVO_ABIERTO",
+
+            corporativoAbiertoEn:
+              new Date().toISOString(),
+
+          })
+        );
+
+      }
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ No se pudo guardar el paso corporativo:",
+        error
+      );
+
+    }
+
+  }}
 >
-  {checklistGuardado
-    ? "↩️ Regresar al Dashboard"
-    : "🔒 Guarda el seguimiento para continuar"}
+  {corporativoAbierto
+    ? "✅ Check list corporativo abierto"
+    : checklistGuardado
+      ? "🏢 Abrir Check list corporativo"
+      : "🔒 Guarda primero el seguimiento"}
 </button>
 
-          <button
-        type="button"
-        style={styles.corporateButton}
-        onClick={() => {
-         window.open(
-          "https://forms.cloud.microsoft/r/5WKYqP7h3N",
-         "_blank",
-         "noopener,noreferrer"
-          );
-       }}
-      >
-       🏢 Check list corporativo
-     </button>
+         <button
+  type="button"
+  onClick={
+    exportarHTML
+  }
+  disabled={
+    !checkLocalCompleto ||
+    evidenciaDescargada
+  }
+  style={{
+    ...styles.exportButton,
 
-          <button
-            type="button"
-            style={
-              styles.exportButton
-            }
-            onClick={
-              exportarHTML
-            }
-          >
-            📄 Descargar CheckList
-          </button>
+    background:
+      evidenciaDescargada
+        ? "#15803d"
+        : "#174b8f",
+
+    opacity:
+      checkLocalCompleto &&
+      !evidenciaDescargada
+        ? 1
+        : 0.5,
+
+    cursor:
+      checkLocalCompleto &&
+      !evidenciaDescargada
+        ? "pointer"
+        : "not-allowed",
+  }}
+>
+  {evidenciaDescargada
+    ? "✅ CheckList descargado"
+    : checkLocalCompleto
+      ? "📄 Descargar CheckList"
+      : "🔒 Completa y firma el CheckList"}
+</button>
 
           <button
   type="button"
