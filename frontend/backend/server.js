@@ -881,17 +881,19 @@ app.post(
 
       const {
 
-        sesionId,
+  sesionId,
 
-        checks,
+  checks,
 
-        otraArea,
+  otraTecnicaHielo = "",
 
-        accionCorrectiva,
+  otraArea,
 
-        diagnostico,
+  accionCorrectiva,
 
-      } = req.body || {};
+  diagnostico,
+
+} = req.body || {};
 
 
       // ============================================
@@ -999,11 +1001,24 @@ app.post(
 
 
       const textosValidos =
-        typeof otraArea === "string" &&
-        otraArea.length <= 1000 &&
-        typeof accionCorrectiva === "string" &&
-        accionCorrectiva.length <= 3000;
 
+  typeof otraTecnicaHielo ===
+    "string" &&
+
+  otraTecnicaHielo.length <=
+    300 &&
+
+  typeof otraArea ===
+    "string" &&
+
+  otraArea.length <=
+    1000 &&
+
+  typeof accionCorrectiva ===
+    "string" &&
+
+  accionCorrectiva.length <=
+    3000;
 
       const diagnosticoValido =
         Array.isArray(
@@ -1122,11 +1137,14 @@ app.post(
 
           checks,
 
-          otraArea:
-            otraArea.trim(),
+otraTecnicaHielo:
+  otraTecnicaHielo.trim(),
 
-          accionCorrectiva:
-            accionCorrectiva.trim(),
+otraArea:
+  otraArea.trim(),
+
+accionCorrectiva:
+  accionCorrectiva.trim(),
 
           diagnostico:
             diagnostico.map(
