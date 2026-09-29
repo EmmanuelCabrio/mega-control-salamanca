@@ -3707,24 +3707,31 @@ ${copia.outerHTML}
     disabled={
       !checklistGuardado
     }
-    style={{
-      ...styles.corporateButton,
+style={{
+  ...styles.corporateButton,
 
-      background:
-        corporativoAbierto
-          ? "#15803d"
-          : undefined,
+  background:
+    corporativoAbierto
 
-      opacity:
-        checklistGuardado
-          ? 1
-          : 0.5,
+      ? "#15803d"
 
-      cursor:
-        checklistGuardado
-          ? "pointer"
-          : "not-allowed",
-    }}
+      : checklistGuardado
+
+        ? "#17202a"
+
+        : "#94a3b8",
+
+  color:
+    "#ffffff",
+
+  opacity:
+    1,
+
+  cursor:
+    checklistGuardado
+      ? "pointer"
+      : "not-allowed",
+}}
     onClick={
       () => {
 
