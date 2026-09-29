@@ -3895,3 +3895,13 @@ ${copia.outerHTML}
   </button>
 
 </div>
+      </div>
+
+    </div>
+
+  );
+
+}
+
+
+export default ChecklistFocoRojo;
