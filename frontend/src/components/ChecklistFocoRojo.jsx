@@ -3696,13 +3696,11 @@ ${copia.outerHTML}
     }
 
 
-    const ventanaCorporativa =
-      window.open(
-        "https://forms.cloud.microsoft/r/5WKYqP7h3N",
-        "_blank",
-        "noopener,noreferrer"
-      );
-
+    window.open(
+  "https://forms.cloud.microsoft/r/5WKYqP7h3N",
+  "_blank",
+  "noopener,noreferrer"
+);
 
     if (
       !ventanaCorporativa
