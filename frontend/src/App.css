@@ -15121,6 +15121,9 @@ small {
   filter: brightness(1.2);
 }
 
+
+
+
 @media (max-width: 700px) {
   .productividad-baja-direccion {
     padding: 18px;
@@ -15137,6 +15140,118 @@ small {
 
   .productividad-baja-direccion__resumen {
     grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* ==================================================
+   FILTROS EN ENCABEZADOS — PRODUCTIVIDAD BAJA
+================================================== */
+
+.productividad-baja-direccion__encabezado {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.productividad-baja-direccion__encabezado span {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.productividad-baja-direccion__encabezado select,
+.productividad-baja-direccion__encabezado input {
+  width: 100%;
+  min-height: 34px;
+  box-sizing: border-box;
+  padding: 7px 10px;
+
+  color: #10203a;
+  background: #ffffff;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  outline: none;
+
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.productividad-baja-direccion__encabezado select {
+  cursor: pointer;
+}
+
+.productividad-baja-direccion__encabezado input::placeholder {
+  color: #718096;
+  opacity: 1;
+}
+
+.productividad-baja-direccion__encabezado select:hover,
+.productividad-baja-direccion__encabezado input:hover {
+  border-color: #42b7ff;
+}
+
+.productividad-baja-direccion__encabezado select:focus,
+.productividad-baja-direccion__encabezado input:focus {
+  border-color: #42b7ff;
+
+  box-shadow:
+    0 0 0 3px rgba(66, 183, 255, 0.2);
+
+  transform: translateY(-1px);
+}
+
+.productividad-baja-direccion__tabla thead th {
+  vertical-align: top;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+/* Quitar flechas exageradas del campo numérico */
+
+.productividad-baja-direccion__encabezado
+  input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.productividad-baja-direccion__encabezado
+  input[type="number"]::-webkit-inner-spin-button,
+.productividad-baja-direccion__encabezado
+  input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 900px) {
+  .productividad-baja-direccion__tabla {
+    overflow-x: auto;
+  }
+
+  .productividad-baja-direccion__tabla table {
+    min-width: 1050px;
+  }
+
+  .productividad-baja-direccion__encabezado {
+    min-width: 150px;
   }
 }
 
