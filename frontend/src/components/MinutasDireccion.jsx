@@ -49,6 +49,97 @@ function formatearFecha(
 }
 
 
+
+// ==================================================
+// OBTENER FECHA LOCAL DE LA MINUTA
+// ==================================================
+
+function obtenerFechaMinuta(
+  valor
+) {
+
+  if (
+    !valor
+  ) {
+
+    return "";
+
+  }
+
+
+  const partes =
+    new Intl.DateTimeFormat(
+      "en-CA",
+      {
+
+        timeZone:
+          "America/Mexico_City",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+
+      }
+    ).formatToParts(
+      new Date(
+        valor
+      )
+    );
+
+
+  const obtenerParte =
+    (
+      tipo
+    ) =>
+      partes.find(
+        (
+          parte
+        ) =>
+          parte.type ===
+          tipo
+      )?.value ||
+      "";
+
+
+  const anio =
+    obtenerParte(
+      "year"
+    );
+
+
+  const mes =
+    obtenerParte(
+      "month"
+    );
+
+
+  const dia =
+    obtenerParte(
+      "day"
+    );
+
+
+  if (
+    !anio ||
+    !mes ||
+    !dia
+  ) {
+
+    return "";
+
+  }
+
+
+  return `${anio}-${mes}-${dia}`;
+
+}
+
+
 // ==================================================
 // ESCAPAR TEXTO PARA LA DESCARGA
 // ==================================================
@@ -706,6 +797,11 @@ function MinutasDireccion() {
   setFiltroSupervisor,
 ] = useState("TODOS");
 
+  const [
+  filtroFecha,
+  setFiltroFecha,
+] = useState("");
+
 
   // ==================================================
   // CARGAR CATÁLOGO E HISTORIAL
@@ -1070,32 +1166,70 @@ const supervisoresHistorial =
   );
 
 
-const seguimientosFiltrados =
+// ==================================================
+// FILTRAR MINUTAS POR FECHA Y SUPERVISOR
+// ==================================================
+
+const minutasFiltradas =
   useMemo(
     () => {
 
+      // Sin fecha seleccionada no mostramos
+      // ninguna minuta.
+
       if (
-        filtroSupervisor ===
-        "TODOS"
+        !filtroFecha
       ) {
 
-        return seguimientosPorPromotor;
+        return [];
 
       }
 
 
-      return seguimientosPorPromotor.filter(
-        (
-          seguimiento
-        ) =>
-          seguimiento.ultima?.supervisor ===
-          filtroSupervisor
-      );
+      return minutas
+
+        .filter(
+          (
+            minuta
+          ) =>
+            obtenerFechaMinuta(
+              minuta.creadaEn
+            ) ===
+            filtroFecha
+        )
+
+        .filter(
+          (
+            minuta
+          ) =>
+            filtroSupervisor ===
+              "TODOS" ||
+
+            minuta.supervisor ===
+              filtroSupervisor
+        )
+
+        .sort(
+          (
+            a,
+            b
+          ) =>
+            new Date(
+              b.creadaEn ||
+              0
+            ).getTime() -
+
+            new Date(
+              a.creadaEn ||
+              0
+            ).getTime()
+        );
 
     },
 
     [
-      seguimientosPorPromotor,
+      minutas,
+      filtroFecha,
       filtroSupervisor,
     ]
   );
@@ -1723,177 +1857,161 @@ const seguimientosFiltrados =
     </h3>
 
     <span>
-      {seguimientosFiltrados.length} promotores
-      {" · "}
-      {minutas.length} minutas registradas
+
+      {filtroFecha
+
+        ? `${minutasFiltradas.length} minuta${
+            minutasFiltradas.length ===
+            1
+              ? ""
+              : "s"
+          } encontrada${
+            minutasFiltradas.length ===
+            1
+              ? ""
+              : "s"
+          }`
+
+        : "Selecciona una fecha para consultar las minutas"}
+
     </span>
 
   </div>
 
 
-  <label className="minutas-filtro">
+  <div className="minutas-filtros-historial">
 
-    <span>
-      Supervisor
-    </span>
+    <label className="minutas-filtro">
 
-    <select
-      value={
-        filtroSupervisor
-      }
-      onChange={
-        (
-          evento
-        ) => {
+      <span>
+        Fecha
+      </span>
 
-          setFiltroSupervisor(
-            evento.target.value
-          );
-
-          setPromotorAbierto(
-            ""
-          );
-
+      <input
+        type="date"
+        value={
+          filtroFecha
         }
-      }
-    >
+        onChange={
+          (
+            evento
+          ) => {
 
-      <option value="TODOS">
-        Todos los supervisores
-      </option>
+            setFiltroFecha(
+              evento.target.value
+            );
 
-      {supervisoresHistorial.map(
-        (
-          nombre
-        ) => (
+            setPromotorAbierto(
+              ""
+            );
 
-          <option
-            key={
-              nombre
-            }
-            value={
-              nombre
-            }
-          >
-            {nombre}
-          </option>
+          }
+        }
+      />
 
-        )
-      )}
+    </label>
 
-    </select>
 
-  </label>
+    <label className="minutas-filtro">
+
+      <span>
+        Supervisor
+      </span>
+
+      <select
+        value={
+          filtroSupervisor
+        }
+        onChange={
+          (
+            evento
+          ) => {
+
+            setFiltroSupervisor(
+              evento.target.value
+            );
+
+            setPromotorAbierto(
+              ""
+            );
+
+          }
+        }
+      >
+
+        <option value="TODOS">
+          Todos los supervisores
+        </option>
+
+        {supervisoresHistorial.map(
+          (
+            nombre
+          ) => (
+
+            <option
+              key={
+                nombre
+              }
+              value={
+                nombre
+              }
+            >
+              {nombre}
+            </option>
+
+          )
+        )}
+
+      </select>
+
+    </label>
+
+  </div>
 
 </div>
 
 
+      
+
+
       <div className="minutas-lista">
 
-        {!cargando &&
-        minutas.length === 0 && (
+  {!cargando &&
+  !filtroFecha && (
 
-          <div className="minutas-vacio">
-            Aún no hay minutas enviadas.
-          </div>
+    <div className="minutas-vacio">
 
-        )}
+      📅 Selecciona una fecha para consultar las minutas enviadas.
 
+    </div>
 
-        {seguimientosFiltrados.map(
-          (
-            seguimiento
-          ) => (
-
-            <div
-              className="minuta-seguimiento"
-              key={
-                seguimiento.clave
-              }
-            >
-
-              {renderizarMinuta(
-                seguimiento.ultima
-              )}
+  )}
 
 
-              {seguimiento.anteriores.length >
-              0 && (
+  {!cargando &&
+  filtroFecha &&
+  minutasFiltradas.length ===
+  0 && (
 
-                <>
+    <div className="minutas-vacio">
 
-                  <button
-                    type="button"
-                    className="minuta-historial-boton"
-                    aria-expanded={
-                      promotorAbierto ===
-                      seguimiento.clave
-                    }
-                    onClick={
-                      () =>
-                        setPromotorAbierto(
-                          (
-                            actual
-                          ) =>
-                            actual ===
-                            seguimiento.clave
+      No se encontraron minutas para la fecha y supervisor seleccionados.
 
-                              ? ""
+    </div>
 
-                              : seguimiento.clave
-                        )
-                    }
-                  >
-
-                    {promotorAbierto ===
-                    seguimiento.clave
-
-                      ? "Ocultar historial ↑"
-
-                      : `Ver ${seguimiento.anteriores.length} minuta${
-                          seguimiento.anteriores.length ===
-                          1
-                            ? ""
-                            : "s"
-                        } anterior${
-                          seguimiento.anteriores.length ===
-                          1
-                            ? ""
-                            : "es"
-                        } ↓`}
-
-                  </button>
+  )}
 
 
-                  {promotorAbierto ===
-                  seguimiento.clave && (
+  {minutasFiltradas.map(
+    (
+      minuta
+    ) =>
+      renderizarMinuta(
+        minuta
+      )
+  )}
 
-                    <div className="minuta-historial-desplegado">
-
-                      <div className="minuta-historial-etiqueta">
-                        Evolución del promotor · {seguimiento.total} minutas
-                      </div>
-
-                      {seguimiento.anteriores.map(
-                        (
-                          minuta
-                        ) =>
-                          renderizarMinuta(
-                            minuta,
-                            true
-                          )
-                      )}
-
-                    </div>
-
-                  )}
-
-                </>
-
-              )}
-
-            </div>
-
+</div>
           )
         )}
 
