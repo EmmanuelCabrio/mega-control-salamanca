@@ -19811,7 +19811,8 @@ tr:hover
   text-transform: uppercase;
 }
 
-.minutas-filtro select {
+.minutas-filtro select,
+.minutas-filtro input {
   width: 100%;
   padding: 11px 38px 11px 13px;
   border: 1px solid #cdd8e6;
@@ -19825,9 +19826,22 @@ tr:hover
   cursor: pointer;
 }
 
-.minutas-filtro select:focus {
+.minutas-filtro select:focus,
+.minutas-filtro input:focus {
   border-color: #1976d2;
   box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+}
+
+.minutas-filtros-historial {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.minutas-filtros-historial .minutas-filtro {
+  min-width: 220px;
 }
 
 
@@ -20248,6 +20262,17 @@ tr:hover
     width:
       100%;
   }
+
+   .minutas-filtros-historial {
+  width: 100%;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.minutas-filtros-historial .minutas-filtro {
+  width: 100%;
+  min-width: 0;
+}
 
 }
 
