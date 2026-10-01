@@ -2457,101 +2457,573 @@ function leerVentaVsMesAnterior() {
     const workbook =
       cargarExcel();
 
-    const nombreHoja =
-      workbook.SheetNames.find(
-        (nombre) =>
-          String(nombre)
-            .trim()
-            .toUpperCase() ===
-          "VS MES ANTERIOR"
-      );
+    // ==================================================
+    // NORMALIZAR TEXTO PARA BUSCAR HOJAS Y ENCABEZADOS
+    // ==================================================
 
-    if (!nombreHoja) {
+    const normalizarEncabezado = (
+      valor
+    ) =>
+      String(valor ?? "")
+        .trim()
+        .normalize("NFD")
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        )
+        .toUpperCase()
+        .replace(
+          /\s+/g,
+          " "
+        );
+
+    // ==================================================
+    // BUSCAR UNA HOJA ACEPTANDO NOMBRES ALTERNATIVOS
+    // ==================================================
+
+    const buscarHoja = (
+      nombresPermitidos
+    ) => {
+      const permitidos =
+        nombresPermitidos.map(
+          normalizarEncabezado
+        );
+
+      const nombreEncontrado =
+        workbook.SheetNames.find(
+          (nombre) =>
+            permitidos.includes(
+              normalizarEncabezado(
+                nombre
+              )
+            )
+        );
+
+      if (!nombreEncontrado) {
+        return null;
+      }
+
+      return {
+        nombre:
+          nombreEncontrado,
+
+        hoja:
+          workbook.Sheets[
+            nombreEncontrado
+          ],
+      };
+    };
+
+    // Aceptamos ambos nombres para protegernos
+    // si una versión del Excel todavía contiene "BD".
+
+    const hojaActual =
+      buscarHoja([
+        "ACUMULADO VENTA MES",
+        "BD ACUMULADO VENTA MES",
+      ]);
+
+    const hojaAnterior =
+      buscarHoja([
+        "ACUMULADO VENTA MES ANTERIOR",
+        "BD ACUMULADO VENTA MES ANTERIOR",
+      ]);
+
+    if (!hojaActual) {
       throw new Error(
-        'No se encontró la hoja "VS MES ANTERIOR"'
+        'No se encontró la hoja "ACUMULADO VENTA MES"'
       );
     }
 
-    const hoja =
-      workbook.Sheets[
-        nombreHoja
-      ];
+    if (!hojaAnterior) {
+      throw new Error(
+        'No se encontró la hoja "ACUMULADO VENTA MES ANTERIOR"'
+      );
+    }
 
-    const datos =
+    // ==================================================
+    // CONVERTIR LAS DOS HOJAS A MATRICES
+    // ==================================================
+
+    const convertirHoja = (
+      hoja
+    ) =>
       XLSX.utils.sheet_to_json(
         hoja,
         {
           header: 1,
           defval: "",
+          raw: true,
         }
       );
 
-    const registros = [];
+    const datosActuales =
+      convertirHoja(
+        hojaActual.hoja
+      );
 
-    for (
-      let i = 1;
-      i < datos.length;
-      i++
-    ) {
-      const fila =
-        datos[i];
+    const datosAnteriores =
+      convertirHoja(
+        hojaAnterior.hoja
+      );
 
-      const servicio =
-        limpiarTexto(
-          fila[0]
+    // ==================================================
+    // LOCALIZAR ENCABEZADOS AUTOMÁTICAMENTE
+    // ==================================================
+
+    const localizarColumnas = (
+      datos,
+      nombreHoja
+    ) => {
+      const limiteBusqueda =
+        Math.min(
+          datos.length,
+          25
         );
 
-      const canal =
-        limpiarTexto(
-          fila[1]
-        );
-
-      const ventas =
-        Number(
-          fila[2]
-        );
-
-      const mes =
-        limpiarTexto(
-          fila[3]
-        );
-
-      if (
-        !servicio ||
-        !canal ||
-        !mes
+      for (
+        let filaIndex = 0;
+        filaIndex <
+        limiteBusqueda;
+        filaIndex++
       ) {
-        continue;
+        const encabezados =
+          (
+            datos[
+              filaIndex
+            ] || []
+          ).map(
+            normalizarEncabezado
+          );
+
+        const buscarIndice = (
+          opciones
+        ) =>
+          encabezados.findIndex(
+            (encabezado) =>
+              opciones.includes(
+                encabezado
+              )
+          );
+
+        // En estas bases NEGOCIO equivale al servicio.
+        const indiceServicio =
+          buscarIndice([
+            "SERVICIO",
+            "NEGOCIO",
+            "TIPO SERVICIO",
+          ]);
+
+        const indiceCanal =
+          buscarIndice([
+            "CANAL",
+            "CANAL VENTA",
+            "TIPO CANAL",
+          ]);
+
+        const indiceFecha =
+          buscarIndice([
+            "FECHA VENTA",
+            "FECHA DE VENTA",
+            "FECHA",
+          ]);
+
+        if (
+          indiceServicio >= 0 &&
+          indiceCanal >= 0 &&
+          indiceFecha >= 0
+        ) {
+          return {
+            filaEncabezados:
+              filaIndex,
+
+            indiceServicio,
+            indiceCanal,
+            indiceFecha,
+          };
+        }
       }
 
-      if (
-        servicio === "SERVICIO" ||
-        canal === "CANAL" ||
-        mes === "MES"
-      ) {
-        continue;
-      }
+      throw new Error(
+        `No se localizaron las columnas SERVICIO/NEGOCIO, CANAL y FECHA VENTA en "${nombreHoja}"`
+      );
+    };
 
+    const columnasActuales =
+      localizarColumnas(
+        datosActuales,
+        hojaActual.nombre
+      );
+
+    const columnasAnteriores =
+      localizarColumnas(
+        datosAnteriores,
+        hojaAnterior.nombre
+      );
+
+    // ==================================================
+    // CONVERTIR FECHAS DE EXCEL, DATE O TEXTO
+    // ==================================================
+
+    const convertirFecha = (
+      valor
+    ) => {
       if (
-        !Number.isFinite(
-          ventas
+        valor instanceof Date &&
+        !Number.isNaN(
+          valor.getTime()
         )
       ) {
-        continue;
+        return new Date(
+          valor.getFullYear(),
+          valor.getMonth(),
+          valor.getDate()
+        );
       }
 
-      registros.push({
-        servicio,
-        canal,
+      if (
+        typeof valor ===
+          "number" &&
+        Number.isFinite(
+          valor
+        )
+      ) {
+        const fechaExcel =
+          XLSX.SSF.parse_date_code(
+            valor
+          );
 
-        ventas:
-          Math.round(
-            ventas
-          ),
+        if (fechaExcel) {
+          return new Date(
+            fechaExcel.y,
+            fechaExcel.m - 1,
+            fechaExcel.d
+          );
+        }
+      }
 
-        mes,
-      });
+      const texto =
+        String(valor ?? "")
+          .trim();
+
+      if (!texto) {
+        return null;
+      }
+
+      // Formatos:
+      // DD/MM/AAAA
+      // DD-MM-AAAA
+      // DD.MM.AAAA
+
+      const partes =
+        texto.match(
+          /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/
+        );
+
+      if (partes) {
+        const dia =
+          Number(partes[1]);
+
+        const mes =
+          Number(partes[2]);
+
+        let anio =
+          Number(partes[3]);
+
+        if (anio < 100) {
+          anio += 2000;
+        }
+
+        const fecha =
+          new Date(
+            anio,
+            mes - 1,
+            dia
+          );
+
+        if (
+          !Number.isNaN(
+            fecha.getTime()
+          )
+        ) {
+          return fecha;
+        }
+      }
+
+      const fechaDirecta =
+        new Date(texto);
+
+      if (
+        !Number.isNaN(
+          fechaDirecta.getTime()
+        )
+      ) {
+        return new Date(
+          fechaDirecta.getFullYear(),
+          fechaDirecta.getMonth(),
+          fechaDirecta.getDate()
+        );
+      }
+
+      return null;
+    };
+
+    // ==================================================
+    // EXTRAER REGISTROS VÁLIDOS
+    // ==================================================
+
+    const extraerVentas = (
+      datos,
+      columnas
+    ) => {
+      const ventas = [];
+
+      for (
+        let i =
+          columnas.filaEncabezados +
+          1;
+        i < datos.length;
+        i++
+      ) {
+        const fila =
+          datos[i] || [];
+
+        const servicio =
+          limpiarTexto(
+            fila[
+              columnas
+                .indiceServicio
+            ]
+          );
+
+        const canal =
+          limpiarTexto(
+            fila[
+              columnas
+                .indiceCanal
+            ]
+          );
+
+        const fecha =
+          convertirFecha(
+            fila[
+              columnas
+                .indiceFecha
+            ]
+          );
+
+        if (
+          !servicio ||
+          !canal ||
+          !fecha
+        ) {
+          continue;
+        }
+
+        if (
+          servicio ===
+            "SERVICIO" ||
+          servicio ===
+            "NEGOCIO" ||
+          canal ===
+            "CANAL"
+        ) {
+          continue;
+        }
+
+        ventas.push({
+          servicio,
+          canal,
+          fecha,
+        });
+      }
+
+      return ventas;
+    };
+
+    const ventasActuales =
+      extraerVentas(
+        datosActuales,
+        columnasActuales
+      );
+
+    const ventasAnteriores =
+      extraerVentas(
+        datosAnteriores,
+        columnasAnteriores
+      );
+
+    if (
+      ventasActuales.length ===
+      0
+    ) {
+      throw new Error(
+        `La hoja "${hojaActual.nombre}" no contiene ventas válidas`
+      );
     }
+
+    // ==================================================
+    // DETERMINAR EL CORTE DEL MES ACTUAL
+    // ==================================================
+
+    const ultimaFechaActual =
+      ventasActuales.reduce(
+        (
+          fechaMayor,
+          venta
+        ) =>
+          !fechaMayor ||
+          venta.fecha >
+            fechaMayor
+            ? venta.fecha
+            : fechaMayor,
+        null
+      );
+
+    const diaCorte =
+      ultimaFechaActual.getDate();
+
+    /*
+      Ejemplo:
+
+      Si la última venta actual es del día 15,
+      comparamos contra las ventas del mes
+      anterior acumuladas únicamente hasta
+      el día 15.
+    */
+
+    const ventasActualesAlCorte =
+      ventasActuales.filter(
+        (venta) =>
+          venta.fecha.getDate() <=
+          diaCorte
+      );
+
+    const ventasAnterioresAlCorte =
+      ventasAnteriores.filter(
+        (venta) =>
+          venta.fecha.getDate() <=
+          diaCorte
+      );
+
+    // ==================================================
+    // NOMBRES DE LOS MESES
+    // El frontend espera primero anterior y luego actual.
+    // ==================================================
+
+    const formatearMes = (
+      fecha
+    ) => {
+      const texto =
+        new Intl.DateTimeFormat(
+          "es-MX",
+          {
+            month: "long",
+            year: "numeric",
+          }
+        ).format(fecha);
+
+      return texto
+        .charAt(0)
+        .toUpperCase() +
+        texto.slice(1);
+    };
+
+    const fechaMesActual =
+      ultimaFechaActual;
+
+    const fechaReferenciaAnterior =
+      ventasAnteriores.length > 0
+        ? ventasAnteriores[0]
+            .fecha
+        : new Date(
+            fechaMesActual.getFullYear(),
+            fechaMesActual.getMonth() -
+              1,
+            1
+          );
+
+    const mesAnterior =
+      formatearMes(
+        fechaReferenciaAnterior
+      );
+
+    const mesActual =
+      formatearMes(
+        fechaMesActual
+      );
+
+    // ==================================================
+    // AGRUPAR POR SERVICIO + CANAL + MES
+    // ==================================================
+
+    const agrupados =
+      new Map();
+
+    const acumular = (
+      ventas,
+      mes
+    ) => {
+      for (
+        const venta of ventas
+      ) {
+        const clave =
+          `${venta.servicio}||${venta.canal}||${mes}`;
+
+        if (
+          !agrupados.has(
+            clave
+          )
+        ) {
+          agrupados.set(
+            clave,
+            {
+              servicio:
+                venta.servicio,
+
+              canal:
+                venta.canal,
+
+              ventas: 0,
+
+              mes,
+            }
+          );
+        }
+
+        agrupados.get(
+          clave
+        ).ventas += 1;
+      }
+    };
+
+    acumular(
+      ventasAnterioresAlCorte,
+      mesAnterior
+    );
+
+    acumular(
+      ventasActualesAlCorte,
+      mesActual
+    );
+
+    const registros = [
+      ...agrupados.values(),
+    ].sort(
+      (a, b) =>
+        a.servicio.localeCompare(
+          b.servicio,
+          "es"
+        ) ||
+        a.canal.localeCompare(
+          b.canal,
+          "es"
+        ) ||
+        a.mes.localeCompare(
+          b.mes,
+          "es"
+        )
+    );
 
     const servicios = [
       ...new Set(
@@ -2560,7 +3032,16 @@ function leerVentaVsMesAnterior() {
             registro.servicio
         )
       ),
-    ].sort();
+    ].sort(
+      (
+        a,
+        b
+      ) =>
+        a.localeCompare(
+          b,
+          "es"
+        )
+    );
 
     const canales = [
       ...new Set(
@@ -2569,15 +3050,20 @@ function leerVentaVsMesAnterior() {
             registro.canal
         )
       ),
-    ].sort();
+    ].sort(
+      (
+        a,
+        b
+      ) =>
+        a.localeCompare(
+          b,
+          "es"
+        )
+    );
 
     const meses = [
-      ...new Set(
-        registros.map(
-          (registro) =>
-            registro.mes
-        )
-      ),
+      mesAnterior,
+      mesActual,
     ];
 
     console.log(
@@ -2585,11 +3071,36 @@ function leerVentaVsMesAnterior() {
     );
 
     console.log(
-      "📊 VENTA VS MES ANTERIOR"
+      "📊 VENTA VS MES ANTERIOR — CALCULADA"
     );
 
     console.log(
-      "📦 REGISTROS:",
+      "📄 HOJA ACTUAL:",
+      hojaActual.nombre
+    );
+
+    console.log(
+      "📄 HOJA ANTERIOR:",
+      hojaAnterior.nombre
+    );
+
+    console.log(
+      "📅 DÍA DE CORTE:",
+      diaCorte
+    );
+
+    console.log(
+      "📦 VENTAS ANTERIORES AL CORTE:",
+      ventasAnterioresAlCorte.length
+    );
+
+    console.log(
+      "📦 VENTAS ACTUALES AL CORTE:",
+      ventasActualesAlCorte.length
+    );
+
+    console.log(
+      "📦 REGISTROS AGRUPADOS:",
       registros.length
     );
 
@@ -2618,7 +3129,6 @@ function leerVentaVsMesAnterior() {
       canales,
       meses,
     };
-
   } catch (error) {
     console.error(
       "❌ ERROR EN VENTA VS MES ANTERIOR:",
@@ -2633,7 +3143,6 @@ function leerVentaVsMesAnterior() {
     };
   }
 }
-
 
    
 // PRODUCTIVIDAD POR ANTIGÜEDAD
@@ -8445,7 +8954,6 @@ function validarExcelLigero(buffer) {
     "VENTA DIARIA POR SUPERVISOR",
     "USERS",
     "PLANTILLA",
-    "VS MES ANTERIOR",
     "CARTERA POR DÍA",
     "PROYECCION",
     "BD ACUMULADO VENTA MES",
