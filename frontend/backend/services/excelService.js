@@ -887,15 +887,20 @@ const ultimoDiaDisponible =
         ventasMesPromotor
       );
 
-    mapa.set(
-      nombre,
-      {
-        diasSinVenta,
-        recuperaciones,
-        ventasMesPromotor,
-      }
-    );
-  }
+    const clavePromotor =
+  normalizarNombre(
+    nombre
+  );
+
+mapa.set(
+  clavePromotor,
+  {
+    diasSinVenta,
+    recuperaciones,
+    ventasMesPromotor,
+         }
+      );
+    }
 
   return mapa;
 }
@@ -1671,10 +1676,15 @@ function leerRegistros(
       continue;
     }
 
-    const datosPromotor =
-      datosSinVenta.get(
-        nombrePromotor
-      );
+    const clavePromotorSinVenta =
+  normalizarNombre(
+    nombrePromotor
+  );
+
+const datosPromotor =
+  datosSinVenta.get(
+    clavePromotorSinVenta
+  );
 
     const diasSinVenta =
       datosPromotor
