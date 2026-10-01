@@ -2012,10 +2012,7 @@ const minutasFiltradas =
   )}
 
 </div>
-          )
-        )}
-
-      </div>
+      
 
     </section>
 
