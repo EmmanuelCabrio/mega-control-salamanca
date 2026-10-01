@@ -765,23 +765,46 @@ function leerBDSinVenta(hoja) {
     let diasSinVenta =
       0;
 
-    const hoy =
-      new Date();
+   // ==================================================
+// FECHA DEL ÚLTIMO DÍA CERRADO
+// ==================================================
+//
+// Siempre se calcula con el día anterior.
+//
+// Si hoy es día 1, JavaScript retrocede
+// automáticamente al último día del mes anterior.
+//
+// Ejemplo:
+// 1 de octubre → 30 de septiembre
+// 1 de marzo → 28 o 29 de febrero
+//
+// ==================================================
 
-    const año =
-      hoy.getFullYear();
+const fechaCorte =
+  new Date();
 
-    const mes =
-      hoy.getMonth();
+fechaCorte.setHours(
+  12,
+  0,
+  0,
+  0
+);
 
-    const diaActual =
-      hoy.getDate();
+fechaCorte.setDate(
+  fechaCorte.getDate() - 1
+);
 
-    const ultimoDiaDisponible =
-      Math.min(
-        diaActual - 1,
-        31
-      );
+const año =
+  fechaCorte.getFullYear();
+
+const mes =
+  fechaCorte.getMonth();
+
+const ultimoDiaDisponible =
+  Math.min(
+    fechaCorte.getDate(),
+    31
+  );
 
     for (
       let numeroDia =
