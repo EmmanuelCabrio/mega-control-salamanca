@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchProtegido } from "../services/authService";
 
 const nombresCanal = {
@@ -11,6 +11,22 @@ function ProductividadBajaDireccion() {
   const [datos, setDatos] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+
+
+    // ==================================================
+  // FILTROS DE LA TABLA
+  // ==================================================
+
+  const [filtroCanal, setFiltroCanal] = useState("");
+  const [filtroPromotor, setFiltroPromotor] = useState("");
+  const [filtroSupervisor, setFiltroSupervisor] =
+    useState("");
+  const [filtroProductividad, setFiltroProductividad] =
+    useState("");
+  const [filtroDiasCero, setFiltroDiasCero] =
+    useState("");
+
+  
 
   useEffect(() => {
     let activo = true;
@@ -62,6 +78,112 @@ function ProductividadBajaDireccion() {
   const resumen = datos?.resumen || [];
   const detalle = datos?.detalle || [];
 
+
+    // ==================================================
+  // OPCIONES DISPONIBLES PARA LOS FILTROS
+  // ==================================================
+
+  const canalesDisponibles = useMemo(() => {
+    return [
+      ...new Set(
+        detalle
+          .map((promotor) => promotor.canal)
+          .filter(Boolean)
+      ),
+    ].sort();
+  }, [detalle]);
+
+  const supervisoresDisponibles = useMemo(() => {
+    return [
+      ...new Set(
+        detalle
+          .map((promotor) => promotor.supervisor)
+          .filter(Boolean)
+      ),
+    ].sort((a, b) =>
+      String(a).localeCompare(String(b), "es")
+    );
+  }, [detalle]);
+
+  // ==================================================
+  // DETALLE FILTRADO
+  // ==================================================
+
+  const detalleFiltrado = useMemo(() => {
+    return detalle.filter((promotor) => {
+      const canal = String(
+        promotor.canal || ""
+      ).toUpperCase();
+
+      const nombre = String(
+        promotor.nombre || ""
+      ).toUpperCase();
+
+      const supervisor = String(
+        promotor.supervisor || ""
+      ).toUpperCase();
+
+      const productividad = Number(
+        promotor.productividad || 0
+      );
+
+      const diasSinVenta = Number(
+        promotor.diasSinVenta || 0
+      );
+
+      const coincideCanal =
+        !filtroCanal ||
+        canal === filtroCanal.toUpperCase();
+
+      const coincidePromotor =
+        !filtroPromotor ||
+        nombre.includes(
+          filtroPromotor.trim().toUpperCase()
+        );
+
+      const coincideSupervisor =
+        !filtroSupervisor ||
+        supervisor ===
+          filtroSupervisor.toUpperCase();
+
+      const coincideProductividad =
+        !filtroProductividad ||
+        (
+          filtroProductividad === "cero" &&
+          productividad === 0
+        ) ||
+        (
+          filtroProductividad === "baja" &&
+          productividad > 0 &&
+          productividad < 0.6
+        ) ||
+        (
+          filtroProductividad === "media" &&
+          productividad >= 0.6 &&
+          productividad < 0.8
+        );
+
+      const coincideDiasCero =
+        filtroDiasCero === "" ||
+        diasSinVenta === Number(filtroDiasCero);
+
+      return (
+        coincideCanal &&
+        coincidePromotor &&
+        coincideSupervisor &&
+        coincideProductividad &&
+        coincideDiasCero
+      );
+    });
+  }, [
+    detalle,
+    filtroCanal,
+    filtroPromotor,
+    filtroSupervisor,
+    filtroProductividad,
+    filtroDiasCero,
+  ]);
+
   return (
     <section className="productividad-baja-direccion">
       <header className="productividad-baja-direccion__header">
@@ -102,17 +224,119 @@ function ProductividadBajaDireccion() {
           <div className="productividad-baja-direccion__tabla">
             <table>
               <thead>
-                <tr>
-                  <th>Canal</th>
-                  <th>Promotor</th>
-                  <th>Supervisor</th>
-                  <th>Productividad</th>
-                  <th>Días en cero</th>
-                </tr>
-              </thead>
+  <tr>
+    <th>
+      <div className="productividad-baja-direccion__encabezado">
+        <span>Canal</span>
+
+        <select
+          value={filtroCanal}
+          onChange={(evento) =>
+            setFiltroCanal(evento.target.value)
+          }
+          aria-label="Filtrar por canal"
+        >
+          <option value="">Todos</option>
+
+          {canalesDisponibles.map((canal) => (
+            <option key={canal} value={canal}>
+              {nombresCanal[canal] || canal}
+            </option>
+          ))}
+        </select>
+      </div>
+    </th>
+
+    <th>
+      <div className="productividad-baja-direccion__encabezado">
+        <span>Promotor</span>
+
+        <input
+          type="search"
+          value={filtroPromotor}
+          onChange={(evento) =>
+            setFiltroPromotor(evento.target.value)
+          }
+          placeholder="Buscar..."
+          aria-label="Buscar promotor"
+        />
+      </div>
+    </th>
+
+    <th>
+      <div className="productividad-baja-direccion__encabezado">
+        <span>Supervisor</span>
+
+        <select
+          value={filtroSupervisor}
+          onChange={(evento) =>
+            setFiltroSupervisor(evento.target.value)
+          }
+          aria-label="Filtrar por supervisor"
+        >
+          <option value="">Todos</option>
+
+          {supervisoresDisponibles.map(
+            (supervisor) => (
+              <option
+                key={supervisor}
+                value={supervisor}
+              >
+                {supervisor}
+              </option>
+            )
+          )}
+        </select>
+      </div>
+    </th>
+
+    <th>
+      <div className="productividad-baja-direccion__encabezado">
+        <span>Productividad</span>
+
+        <select
+          value={filtroProductividad}
+          onChange={(evento) =>
+            setFiltroProductividad(
+              evento.target.value
+            )
+          }
+          aria-label="Filtrar por productividad"
+        >
+          <option value="">Todas</option>
+          <option value="cero">0.00</option>
+          <option value="baja">
+            0.01 a menos de 0.60
+          </option>
+          <option value="media">
+            0.60 a menos de 0.80
+          </option>
+        </select>
+      </div>
+    </th>
+
+    <th>
+      <div className="productividad-baja-direccion__encabezado">
+        <span>Días en cero</span>
+
+        <input
+          type="number"
+          min="0"
+          step="1"
+          value={filtroDiasCero}
+          onChange={(evento) =>
+            setFiltroDiasCero(evento.target.value)
+          }
+          placeholder="Todos"
+          aria-label="Filtrar por días en cero"
+        />
+      </div>
+    </th>
+  </tr>
+</thead>
 
               <tbody>
-                {detalle.map((promotor, index) => (
+                {detalleFiltrado.map((promotor, index) => (
                   <tr
                     key={`${promotor.canal}-${promotor.nombre}-${index}`}
                     className={
@@ -136,12 +360,12 @@ function ProductividadBajaDireccion() {
                   </tr>
                 ))}
 
-                {detalle.length === 0 && (
+                {detalleFiltrado.length === 0 && (
                   <tr>
-                    <td colSpan="5">
-                      No hay promotores con productividad
-                      menor a 0.80.
-                    </td>
+                   <td colSpan="5">
+                       No hay promotores que coincidan con los
+                       filtros seleccionados.
+                      </td>
                   </tr>
                 )}
               </tbody>
