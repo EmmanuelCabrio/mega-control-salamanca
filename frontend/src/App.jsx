@@ -1175,71 +1175,242 @@ if (
   // 🚪 CERRAR SESIÓN
   // ==================================================
 
-  function cerrarSesion() {
+  async function cerrarSesion() {
 
-    localStorage.removeItem(
-      "mega_sesion"
+  // Primero intentamos liberar la sesión central.
+  // Si no hay conexión o ya expiró, de todas formas
+  // se limpia el acceso local.
+
+  try {
+
+    await fetchProtegido(
+      "/auth/logout",
+      {
+
+        method:
+          "POST",
+
+      }
     );
 
-    localStorage.removeItem(
-      "mega_rol"
+  } catch (
+    error
+  ) {
+
+    console.error(
+      "⚠️ No se pudo cerrar la sesión en el servidor:",
+      error
     );
-
-    localStorage.removeItem(
-      "mega_token"
-    );
-
-
-    setLogueado(
-      false
-    );
-
-
-    setSupervisorSeleccionado(
-      ""
-    );
-
-    setRolUsuario("");
-
-
-    setPromotorEnSeguimiento(
-      null
-    );
-
-
-    setMostrarRankingInicial(
-      false
-    );
-
-
-    setMostrarReconocimientoCL(
-      false
-    );
-
-
-    setMostrarFocosRojosIniciales(
-      false
-    );
-
-    setMostrarRankingSupervisoresIntermedio(
-      false
-    );
-
-
-    setVista(
-      "supervisor"
-    );
-
-
-    setAusencias(
-      {}
-    );
-
-    setFocosAtendidos([]);
 
   }
 
 
+  localStorage.removeItem(
+    "mega_sesion"
+  );
+
+  localStorage.removeItem(
+    "mega_rol"
+  );
+
+  localStorage.removeItem(
+    "mega_token"
+  );
+
+
+  setLogueado(
+    false
+  );
+
+
+  setSupervisorSeleccionado(
+    ""
+  );
+
+  setRolUsuario(
+    ""
+  );
+
+
+  setPromotorEnSeguimiento(
+    null
+  );
+
+
+  setMostrarRankingInicial(
+    false
+  );
+
+
+  setMostrarReconocimientoCL(
+    false
+  );
+
+
+  setMostrarFocosRojosIniciales(
+    false
+  );
+
+  setMostrarRankingSupervisoresIntermedio(
+    false
+  );
+
+
+  setVista(
+    "supervisor"
+  );
+
+
+  setAusencias(
+    {}
+  );
+
+  setFocosAtendidos(
+    []
+  );
+
+}
+
+
+
+  // ==================================================
+// PULSO DE SESIÓN ÚNICA DEL SUPERVISOR
+// ==================================================
+
+useEffect(
+  () => {
+
+    if (
+      !logueado ||
+      rolUsuario !== "SUPERVISOR"
+    ) {
+
+      return;
+
+    }
+
+
+    let componenteActivo =
+      true;
+
+    let cerrandoPorSeguridad =
+      false;
+
+
+    async function mantenerSesionActiva() {
+
+      try {
+
+        const respuesta =
+          await fetchProtegido(
+            "/auth/heartbeat",
+            {
+
+              method:
+                "POST",
+
+            }
+          );
+
+
+        if (
+          respuesta.status !== 401 ||
+          !componenteActivo ||
+          cerrandoPorSeguridad
+        ) {
+
+          return;
+
+        }
+
+
+        cerrandoPorSeguridad =
+          true;
+
+
+        let mensaje =
+          "Tu sesión terminó. Vuelve a iniciar sesión.";
+
+
+        try {
+
+          const datos =
+            await respuesta.json();
+
+
+          if (
+            datos?.mensaje
+          ) {
+
+            mensaje =
+              datos.mensaje;
+
+          }
+
+        } catch {
+
+          // Conserva el mensaje predeterminado.
+
+        }
+
+
+        window.alert(
+          `🔒 ${mensaje}`
+        );
+
+
+        await cerrarSesion();
+
+      } catch (
+        error
+      ) {
+
+        // Una falla temporal de internet no debe
+        // expulsar automáticamente al usuario.
+
+        console.error(
+          "⚠️ No se pudo renovar la sesión:",
+          error
+        );
+
+      }
+
+    }
+
+
+    // Validar inmediatamente al cargar o recargar.
+
+    mantenerSesionActiva();
+
+
+    // Renovar cada dos minutos.
+
+    const intervalo =
+      window.setInterval(
+        mantenerSesionActiva,
+        2 *
+        60 *
+        1000
+      );
+
+
+    return () => {
+
+      componenteActivo =
+        false;
+
+      window.clearInterval(
+        intervalo
+      );
+
+    };
+
+  },
+  [
+    logueado,
+    rolUsuario,
+  ]
+);
 
   // ==================================================
 // ABRIR CHECKLIST CON CANDADO PERSISTENTE
