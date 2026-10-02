@@ -36,6 +36,24 @@ const {
   "./services/loginTrackerService"
 );
 
+// ==================================================
+// SESIÓN ÚNICA POR DISPOSITIVO
+// ==================================================
+
+const {
+
+  crearSesionUnica,
+
+  validarSesionUnica,
+
+  renovarSesionUnica,
+
+  cerrarSesionUnica,
+
+} = require(
+  "./services/singleSessionService"
+);
+
 
 // ==================================================
 // HISTORIAL DE CHECKLISTS DE FOCO ROJO
@@ -1758,9 +1776,14 @@ app.post(
     try {
 
       const {
-        usuario,
-        password,
-      } = req.body;
+
+  usuario,
+
+  password,
+
+  dispositivoId,
+
+} = req.body || {};
 
 
       if (
@@ -1822,6 +1845,89 @@ const empleado =
   );
 
 
+
+
+      // ==========================================
+// VALIDAR SESIÓN ÚNICA DEL SUPERVISOR
+// ==========================================
+
+let sesionId =
+  null;
+
+let dispositivoSesion =
+  "";
+
+
+// El candado se aplica al rol SUPERVISOR.
+// Dirección, Recuperación y Promotor conservan
+// su funcionamiento actual.
+
+if (
+  rol === "SUPERVISOR"
+) {
+
+  const resultadoSesion =
+    await crearSesionUnica({
+
+      usuario,
+
+      dispositivoId,
+
+      rol,
+
+      supervisor,
+
+    });
+
+
+  if (
+    !resultadoSesion.permitida
+  ) {
+
+    const estadoHttp =
+      resultadoSesion.codigo ===
+      "SESION_ACTIVA_OTRO_DISPOSITIVO"
+        ? 409
+        : 400;
+
+
+    return res
+      .status(
+        estadoHttp
+      )
+      .json({
+
+        correcto:
+          false,
+
+        codigo:
+          resultadoSesion.codigo,
+
+        mensaje:
+          resultadoSesion.mensaje,
+
+        sesion:
+          resultadoSesion.sesion ||
+          null,
+
+      });
+
+  }
+
+
+  sesionId =
+    resultadoSesion.sesion.sesionId;
+
+  dispositivoSesion =
+    resultadoSesion.sesion.dispositivoId;
+
+}
+
+
+
+      
+
+
       const token =
   jwt.sign(
 
@@ -1839,9 +1945,14 @@ const empleado =
       empleado,
 
       rol:
-        normalizarRol(
-          resultado.rol
-        ),
+  normalizarRol(
+    resultado.rol
+  ),
+
+sesionId,
+
+dispositivoId:
+  dispositivoSesion,
 
     },
 
