@@ -1661,9 +1661,161 @@ const minutasFiltradas =
       )}
 
 
+
+
+
+      {/* =================================================
+    FILTROS DEL HISTORIAL
+================================================= */}
+
+<div className="minutas-historial-titulo">
+
+  <div>
+
+    <h3>
+      Minutas del equipo
+    </h3>
+
+    <span>
+      {minutasFiltradas.length} minuta{
+        minutasFiltradas.length ===
+        1
+          ? ""
+          : "s"
+      } visible{
+        minutasFiltradas.length ===
+        1
+          ? ""
+          : "s"
+      }
+    </span>
+
+  </div>
+
+
+  <div className="minutas-filtros-historial">
+
+    <label className="minutas-filtro">
+
+      <span>
+        Mes
+      </span>
+
+      <select
+        value={
+          filtroMes
+        }
+        onChange={
+          (
+            evento
+          ) =>
+            setFiltroMes(
+              evento.target.value
+            )
+        }
+      >
+
+        <option value="TODOS">
+          Todos los meses
+        </option>
+
+        {mesesDisponibles.map(
+          (
+            mes
+          ) => (
+
+            <option
+              key={
+                mes
+              }
+              value={
+                mes
+              }
+            >
+              {formatearNombreMes(
+                mes
+              )}
+            </option>
+
+          )
+        )}
+
+      </select>
+
+    </label>
+
+
+    <label className="minutas-filtro">
+
+      <span>
+        Estado
+      </span>
+
+      <select
+        value={
+          filtroEstado
+        }
+        onChange={
+          (
+            evento
+          ) =>
+            setFiltroEstado(
+              evento.target.value
+            )
+        }
+      >
+
+        <option value="TODAS">
+          Todas
+        </option>
+
+        <option value="PENDIENTES">
+          Pendientes de firma
+        </option>
+
+        <option value="FIRMADAS">
+          Firmadas
+        </option>
+
+        <option value="CUMPLIDAS">
+          Cumplidas
+        </option>
+
+        <option value="NO_CUMPLIDAS">
+          No cumplidas
+        </option>
+
+      </select>
+
+    </label>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+      
+
       <div className="minutas-lista">
 
-        {minutas.map(
+        {!cargando &&
+minutasFiltradas.length ===
+0 && (
+
+  <div className="minutas-vacio">
+
+    📅 No hay minutas que coincidan con el mes y estado seleccionados.
+
+  </div>
+
+)}
+
+        {minutasFiltradas.map(
           (
             minuta
           ) => (
