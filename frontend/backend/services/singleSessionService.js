@@ -890,6 +890,296 @@ async function cerrarSesionUnica({
 }
 
 
+
+// ==================================================
+// LISTAR SESIONES PARA DIRECCIÓN
+// ==================================================
+
+async function listarSesionesUnicas() {
+
+  const configuracion =
+    obtenerConfiguracion();
+
+
+  // ================================================
+  // DESARROLLO LOCAL
+  // ================================================
+
+  if (
+    !configuracion
+  ) {
+
+    return [
+      ...sesionesMemoria.values(),
+    ]
+      .map(
+        (sesion) => ({
+
+          usuario:
+            sesion.usuario,
+
+          rol:
+            sesion.rol,
+
+          supervisor:
+            sesion.supervisor,
+
+          inicio:
+            sesion.inicio,
+
+          ultimaActividad:
+            sesion.ultimaActividad,
+
+          activa:
+            sesionEstaActiva(
+              sesion
+            ),
+
+        })
+      )
+      .sort(
+        (a, b) =>
+          String(
+            b.ultimaActividad
+          ).localeCompare(
+            String(
+              a.ultimaActividad
+            )
+          )
+      );
+
+  }
+
+
+  // ================================================
+  // LISTAR ARCHIVOS EN SUPABASE
+  // ================================================
+
+  const urlListado =
+    `${configuracion.supabaseUrl}/storage/v1/object/list/${encodeURIComponent(
+      NOMBRE_BUCKET
+    )}`;
+
+
+  const respuestaListado =
+    await fetch(
+      urlListado,
+      {
+
+        method:
+          "POST",
+
+        headers:
+          crearHeaders(
+            configuracion.clave,
+            {
+
+              "Content-Type":
+                "application/json",
+
+            }
+          ),
+
+        body:
+          JSON.stringify({
+
+            prefix:
+              CARPETA_SESIONES,
+
+            limit:
+              1000,
+
+            offset:
+              0,
+
+            sortBy: {
+
+              column:
+                "updated_at",
+
+              order:
+                "desc",
+
+            },
+
+          }),
+
+      }
+    );
+
+
+  await validarRespuesta(
+    respuestaListado
+  );
+
+
+  const archivos =
+    (
+      await respuestaListado.json()
+    ).filter(
+      (archivo) =>
+        archivo?.name &&
+        String(
+          archivo.name
+        ).endsWith(
+          ".json"
+        )
+    );
+
+
+  const sesiones = [];
+
+
+  for (
+    const archivo
+    of archivos
+  ) {
+
+    const ruta =
+      `${CARPETA_SESIONES}/${archivo.name}`;
+
+
+    const url =
+      `${configuracion.supabaseUrl}/storage/v1/object/authenticated/${encodeURIComponent(
+        NOMBRE_BUCKET
+      )}/${ruta
+        .split("/")
+        .map(
+          encodeURIComponent
+        )
+        .join("/")}`;
+
+
+    const respuesta =
+      await fetch(
+        url,
+        {
+
+          method:
+            "GET",
+
+          headers:
+            crearHeaders(
+              configuracion.clave
+            ),
+
+        }
+      );
+
+
+    if (
+      !respuesta.ok
+    ) {
+
+      continue;
+
+    }
+
+
+    const sesion =
+      await respuesta.json();
+
+
+    if (
+      !sesion?.usuario
+    ) {
+
+      continue;
+
+    }
+
+
+    sesiones.push({
+
+      usuario:
+        sesion.usuario,
+
+      rol:
+        sesion.rol,
+
+      supervisor:
+        sesion.supervisor,
+
+      inicio:
+        sesion.inicio,
+
+      ultimaActividad:
+        sesion.ultimaActividad,
+
+      activa:
+        sesionEstaActiva(
+          sesion
+        ),
+
+    });
+
+  }
+
+
+  return sesiones.sort(
+    (a, b) =>
+      String(
+        b.ultimaActividad
+      ).localeCompare(
+        String(
+          a.ultimaActividad
+        )
+      )
+  );
+
+}
+
+
+// ==================================================
+// LIBERAR SESIÓN DESDE DIRECCIÓN
+// ==================================================
+
+async function cerrarSesionPorDireccion({
+
+  usuario,
+
+}) {
+
+  const usuarioNormalizado =
+    normalizarUsuario(
+      usuario
+    );
+
+
+  if (
+    !usuarioNormalizado
+  ) {
+
+    return false;
+
+  }
+
+
+  const sesion =
+    await leerSesion(
+      usuarioNormalizado
+    );
+
+
+  if (
+    !sesion
+  ) {
+
+    return false;
+
+  }
+
+
+  await eliminarSesion(
+    usuarioNormalizado
+  );
+
+
+  return true;
+
+}
+
+
 // ==================================================
 // EXPORTACIONES
 // ==================================================
@@ -903,5 +1193,9 @@ module.exports = {
   renovarSesionUnica,
 
   cerrarSesionUnica,
+
+  listarSesionesUnicas,
+
+  cerrarSesionPorDireccion,
 
 };
