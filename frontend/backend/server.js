@@ -2066,6 +2066,194 @@ dispositivoId:
   );
 
 
+      // ==================================================
+// MANTENER ACTIVA LA SESIÓN ÚNICA
+// ==================================================
+
+app.post(
+  "/auth/heartbeat",
+  autenticarToken,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      // Solamente los supervisores utilizan
+      // el candado de sesión única.
+
+      if (
+        normalizarRol(
+          req.rol
+        ) !== "SUPERVISOR"
+      ) {
+
+        return res.json({
+
+          correcto:
+            true,
+
+        });
+
+      }
+
+
+      const resultado =
+        await renovarSesionUnica({
+
+          usuario:
+            req.usuario,
+
+          sesionId:
+            req.sesionId,
+
+          dispositivoId:
+            req.dispositivoId,
+
+        });
+
+
+      if (
+        !resultado.valida
+      ) {
+
+        return res
+          .status(
+            401
+          )
+          .json({
+
+            correcto:
+              false,
+
+            codigo:
+              resultado.codigo,
+
+            mensaje:
+              "La sesión ya no está activa.",
+
+          });
+
+      }
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        ultimaActividad:
+          resultado.sesion
+            .ultimaActividad,
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al renovar la sesión única:",
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo renovar la sesión",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// CERRAR SESIÓN ÚNICA
+// ==================================================
+
+app.post(
+  "/auth/logout",
+  autenticarToken,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      if (
+        normalizarRol(
+          req.rol
+        ) === "SUPERVISOR"
+      ) {
+
+        await cerrarSesionUnica({
+
+          usuario:
+            req.usuario,
+
+          sesionId:
+            req.sesionId,
+
+          dispositivoId:
+            req.dispositivoId,
+
+        });
+
+      }
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        mensaje:
+          "Sesión cerrada correctamente",
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al cerrar la sesión única:",
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo cerrar la sesión en el servidor",
+
+        });
+
+    }
+
+  }
+);
+
 
 
 
