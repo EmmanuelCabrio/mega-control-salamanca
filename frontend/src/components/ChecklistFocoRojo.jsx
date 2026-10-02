@@ -243,6 +243,12 @@ const inicioChecklistRef =
   useRef("");
 
 
+  // Evita ejecutar dos veces la liberación automática.
+
+const sesionLiberadaRef =
+  useRef(false);
+
+
 // =========================================================
 // INICIAR REGISTRO Y CARGAR HISTORIAL
 // =========================================================
@@ -572,6 +578,181 @@ if (
   sesionId,
   checklistGuardado,
 ]
+);
+
+
+
+  // =========================================================
+// VERIFICAR SI DIRECCIÓN ABORTÓ EL CHECK PENDIENTE
+// =========================================================
+
+useEffect(
+  () => {
+
+    if (
+      !sesionId ||
+      checklistGuardado
+    ) {
+
+      return;
+
+    }
+
+
+    let componenteActivo =
+      true;
+
+
+    async function verificarEstadoSesion() {
+
+      try {
+
+        const respuesta =
+          await fetchProtegido(
+            `/api/checklists-foco-rojo/sesion/${encodeURIComponent(
+              sesionId
+            )}/estado?supervisor=${encodeURIComponent(
+              supervisor
+            )}&promotor=${encodeURIComponent(
+              vendedor
+            )}`
+          );
+
+
+        // Si venció el login, conservamos el check.
+        // El usuario podrá volver a iniciar sesión
+        // sin perder el seguimiento pendiente.
+
+        if (
+          respuesta.status === 401
+        ) {
+
+          return;
+
+        }
+
+
+        const datos =
+          await respuesta.json();
+
+
+        if (
+          !respuesta.ok ||
+          !componenteActivo
+        ) {
+
+          return;
+
+        }
+
+
+        const debeLiberarse =
+          datos.estado ===
+            "ABORTADA" ||
+          datos.estado ===
+            "EXPIRADA";
+
+
+        if (
+          !debeLiberarse ||
+          sesionLiberadaRef.current
+        ) {
+
+          return;
+
+        }
+
+
+        sesionLiberadaRef.current =
+          true;
+
+
+        try {
+
+          localStorage.removeItem(
+            "mega_checklist_pendiente"
+          );
+
+        } catch (
+          error
+        ) {
+
+          console.error(
+            "❌ No se pudo eliminar el candado del checklist:",
+            error
+          );
+
+        }
+
+
+        const mensaje =
+          datos.estado ===
+          "ABORTADA"
+
+            ? `🛑 Dirección abortó este check pendiente.${
+                datos.motivo
+                  ? `\n\nMotivo: ${datos.motivo}`
+                  : ""
+              }\n\nEl seguimiento fue liberado.`
+
+            : "⌛ La sesión de este check expiró.\n\nEl seguimiento fue liberado para que puedas iniciar uno nuevo.";
+
+
+        alert(
+          mensaje
+        );
+
+
+        onRegresar();
+
+      } catch (
+        error
+      ) {
+
+        console.error(
+          "❌ No se pudo verificar el estado del check pendiente:",
+          error
+        );
+
+      }
+
+    }
+
+
+    // Revisar inmediatamente al entrar.
+
+    verificarEstadoSesion();
+
+
+    // También revisar mientras el usuario
+    // permanece dentro del checklist.
+
+    const intervalo =
+      window.setInterval(
+        verificarEstadoSesion,
+        30000
+      );
+
+
+    return () => {
+
+      componenteActivo =
+        false;
+
+      window.clearInterval(
+        intervalo
+      );
+
+    };
+
+  },
+  [
+    sesionId,
+    checklistGuardado,
+    supervisor,
+    vendedor,
+    onRegresar,
+  ]
 );
 
   // =========================================================
