@@ -1028,19 +1028,95 @@ app.post(
       }
 
 
-      const sesionId =
-        await iniciarChecklist({
+      // ============================================
+// CANDADO CENTRAL ENTRE DISPOSITIVOS
+// ============================================
 
-          supervisor:
-            identidad.supervisor,
+const sesionesPendientes =
+  await listarSesionesPendientes();
 
-          promotor:
-            identidad.promotor,
 
-          usuario:
-            req.usuario,
+const usuarioActual =
+  String(
+    req.usuario ?? ""
+  )
+    .trim()
+    .toUpperCase();
 
-        });
+
+const sesionPendiente =
+  sesionesPendientes.find(
+    (sesion) =>
+      String(
+        sesion.usuario ?? ""
+      )
+        .trim()
+        .toUpperCase() ===
+      usuarioActual
+  );
+
+
+if (
+  sesionPendiente
+) {
+
+  return res
+    .status(
+      409
+    )
+    .json({
+
+      correcto:
+        false,
+
+      codigo:
+        "CHECKLIST_PENDIENTE_OTRO_DISPOSITIVO",
+
+      mensaje:
+        sesionPendiente.expirada
+
+          ? `Ya tienes un check expirado pendiente de liberar con ${sesionPendiente.promotor}. Solicita a Dirección que lo aborte.`
+
+          : `Ya tienes un check abierto con ${sesionPendiente.promotor}. Debes terminarlo antes de iniciar otro.`,
+
+      pendiente: {
+
+        supervisor:
+          sesionPendiente.supervisor,
+
+        promotor:
+          sesionPendiente.promotor,
+
+        inicio:
+          sesionPendiente.inicio,
+
+        expirada:
+          sesionPendiente.expirada,
+
+      },
+
+    });
+
+}
+
+
+// ============================================
+// INICIAR NUEVA SESIÓN
+// ============================================
+
+const sesionId =
+  await iniciarChecklist({
+
+    supervisor:
+      identidad.supervisor,
+
+    promotor:
+      identidad.promotor,
+
+    usuario:
+      req.usuario,
+
+  });
 
 
       // Solamente se devuelve el identificador.
