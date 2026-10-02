@@ -737,6 +737,352 @@ async function abortarSesionChecklist({
 }
 
 
+
+
+// ==================================================
+// LISTAR SESIONES PENDIENTES DE CHECKLIST
+// ==================================================
+
+async function listarSesionesPendientes() {
+
+  const configuracion =
+    obtenerConfiguracion();
+
+
+  // ================================================
+  // DESARROLLO LOCAL
+  // ================================================
+
+  if (
+    !configuracion
+  ) {
+
+    return [
+      ...sesionesMemoria.values(),
+    ]
+      .map(
+        (sesion) => {
+
+          const antiguedad =
+            Date.now() -
+            Date.parse(
+              sesion.inicio
+            );
+
+
+          return {
+
+            id:
+              sesion.id,
+
+            supervisor:
+              sesion.supervisor,
+
+            promotor:
+              sesion.promotor,
+
+            usuario:
+              sesion.usuario,
+
+            inicio:
+              sesion.inicio,
+
+            expirada:
+              !Number.isFinite(
+                antiguedad
+              ) ||
+              antiguedad >
+                24 *
+                60 *
+                60 *
+                1000,
+
+          };
+
+        }
+      )
+      .sort(
+        (a, b) =>
+          String(
+            b.inicio
+          ).localeCompare(
+            String(
+              a.inicio
+            )
+          )
+      );
+
+  }
+
+
+  // ================================================
+  // LISTAR ARCHIVOS DE SESIONES EN SUPABASE
+  // ================================================
+
+  const sesiones = [];
+
+  let offset =
+    0;
+
+
+  while (
+    true
+  ) {
+
+    const urlListado =
+      `${configuracion.supabaseUrl}/storage/v1/object/list/${encodeURIComponent(
+        NOMBRE_BUCKET
+      )}`;
+
+
+    const respuestaListado =
+      await fetch(
+        urlListado,
+        {
+
+          method:
+            "POST",
+
+          headers:
+            crearHeaders(
+              configuracion.clave,
+              {
+
+                "Content-Type":
+                  "application/json",
+
+              }
+            ),
+
+          body:
+            JSON.stringify({
+
+              prefix:
+                CARPETA_SESIONES,
+
+              limit:
+                100,
+
+              offset,
+
+              sortBy: {
+
+                column:
+                  "created_at",
+
+                order:
+                  "desc",
+
+              },
+
+            }),
+
+        }
+      );
+
+
+    await validarRespuesta(
+      respuestaListado
+    );
+
+
+    const archivos =
+      (
+        await respuestaListado.json()
+      ).filter(
+        (archivo) =>
+          archivo?.name &&
+          String(
+            archivo.name
+          ).endsWith(
+            ".json"
+          )
+      );
+
+
+    for (
+      const archivo
+      of archivos
+    ) {
+
+      const rutaSesion =
+        `${CARPETA_SESIONES}/${archivo.name}`;
+
+
+      const urlSesion =
+        `${configuracion.supabaseUrl}/storage/v1/object/authenticated/${encodeURIComponent(
+          NOMBRE_BUCKET
+        )}/${codificarRuta(
+          rutaSesion
+        )}`;
+
+
+      const respuestaSesion =
+        await fetch(
+          urlSesion,
+          {
+
+            method:
+              "GET",
+
+            headers:
+              crearHeaders(
+                configuracion.clave
+              ),
+
+          }
+        );
+
+
+      if (
+        !respuestaSesion.ok
+      ) {
+
+        continue;
+
+      }
+
+
+      const sesion =
+        await respuestaSesion.json();
+
+
+      if (
+        !sesion?.id ||
+        !sesion?.supervisor ||
+        !sesion?.promotor
+      ) {
+
+        continue;
+
+      }
+
+
+      // Verificar si esta sesión ya generó
+      // un checklist terminado.
+
+      const clavePromotor =
+        crearClave(
+          sesion.supervisor,
+          sesion.promotor
+        );
+
+
+      const rutaChecklist =
+        `${CARPETA_CHECKLISTS}/${clavePromotor}/${sesion.id}.json`;
+
+
+      const urlChecklist =
+        `${configuracion.supabaseUrl}/storage/v1/object/authenticated/${encodeURIComponent(
+          NOMBRE_BUCKET
+        )}/${codificarRuta(
+          rutaChecklist
+        )}`;
+
+
+      const respuestaChecklist =
+        await fetch(
+          urlChecklist,
+          {
+
+            method:
+              "GET",
+
+            headers:
+              crearHeaders(
+                configuracion.clave
+              ),
+
+          }
+        );
+
+
+      // Si ya existe un resultado terminado,
+      // la sesión no está pendiente.
+
+      if (
+        respuestaChecklist.ok
+      ) {
+
+        continue;
+
+      }
+
+
+      const antiguedad =
+        Date.now() -
+        Date.parse(
+          sesion.inicio
+        );
+
+
+      sesiones.push({
+
+        id:
+          sesion.id,
+
+        supervisor:
+          normalizarTexto(
+            sesion.supervisor
+          ),
+
+        promotor:
+          normalizarTexto(
+            sesion.promotor
+          ),
+
+        usuario:
+          String(
+            sesion.usuario ?? ""
+          ).trim(),
+
+        inicio:
+          sesion.inicio,
+
+        expirada:
+          !Number.isFinite(
+            antiguedad
+          ) ||
+          antiguedad >
+            24 *
+            60 *
+            60 *
+            1000,
+
+      });
+
+    }
+
+
+    if (
+      archivos.length < 100
+    ) {
+
+      break;
+
+    }
+
+
+    offset +=
+      100;
+
+  }
+
+
+  return sesiones.sort(
+    (a, b) =>
+      String(
+        b.inicio
+      ).localeCompare(
+        String(
+          a.inicio
+        )
+      )
+  );
+
+}
+
+
 // ==================================================
 // GUARDAR CHECKLIST TERMINADO
 // ==================================================
@@ -1097,6 +1443,8 @@ module.exports = {
   obtenerSesion,
 
   abortarSesionChecklist,
+
+  listarSesionesPendientes,
 
   guardarChecklist,
 
