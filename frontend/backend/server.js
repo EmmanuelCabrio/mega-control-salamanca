@@ -47,6 +47,10 @@ const {
 
   obtenerSesion,
 
+  abortarSesionChecklist,
+
+  listarSesionesPendientes,
+
   guardarChecklist,
 
   obtenerHistorial,
@@ -637,6 +641,271 @@ function prepararChecklistParaSupervisor(
   };
 
 }
+
+
+
+// ==================================================
+// CONSULTAR SESIONES PENDIENTES — DIRECCIÓN
+// ==================================================
+
+app.get(
+  "/api/checklists-foco-rojo/pendientes",
+  autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const sesiones =
+        await listarSesionesPendientes();
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        total:
+          sesiones.length,
+
+        sesiones,
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al consultar sesiones pendientes de checklist:",
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudieron consultar los checks pendientes",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// ABORTAR SESIÓN PENDIENTE — DIRECCIÓN
+// ==================================================
+
+app.post(
+  "/api/checklists-foco-rojo/abortar",
+  autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const {
+
+        sesionId,
+
+        motivo = "",
+
+      } = req.body || {};
+
+
+      if (
+        typeof sesionId !== "string" ||
+        !/^[a-f0-9-]{36}$/i.test(
+          sesionId
+        )
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "La sesión seleccionada no es válida",
+
+          });
+
+      }
+
+
+      if (
+        typeof motivo !== "string" ||
+        motivo.trim().length < 3 ||
+        motivo.trim().length > 500
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "Escribe un motivo de entre 3 y 500 caracteres",
+
+          });
+
+      }
+
+
+      // Volvemos a consultar las sesiones pendientes
+      // para impedir abortar un check ya terminado.
+
+      const pendientes =
+        await listarSesionesPendientes();
+
+
+      const sesionPendiente =
+        pendientes.find(
+          (sesion) =>
+            sesion.id ===
+            sesionId
+        );
+
+
+      if (
+        !sesionPendiente
+      ) {
+
+        return res
+          .status(
+            404
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "La sesión ya no está pendiente o ya fue terminada",
+
+          });
+
+      }
+
+
+      const sesionAbortada =
+        await abortarSesionChecklist({
+
+          sesionId,
+
+          abortadoPor:
+            req.usuario,
+
+          motivo:
+            motivo.trim(),
+
+        });
+
+
+      if (
+        !sesionAbortada
+      ) {
+
+        return res
+          .status(
+            404
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "No se encontró la sesión activa",
+
+          });
+
+      }
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        mensaje:
+          "Check pendiente abortado correctamente",
+
+        sesion: {
+
+          id:
+            sesionAbortada.id,
+
+          supervisor:
+            sesionAbortada.supervisor,
+
+          promotor:
+            sesionAbortada.promotor,
+
+          abortadaEn:
+            sesionAbortada.abortadaEn,
+
+        },
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al abortar sesión de checklist:",
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo abortar el check pendiente",
+
+        });
+
+    }
+
+  }
+);
+
 
 
 // ==================================================
