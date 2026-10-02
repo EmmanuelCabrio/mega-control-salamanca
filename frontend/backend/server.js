@@ -50,6 +50,10 @@ const {
 
   cerrarSesionUnica,
 
+  listarSesionesUnicas,
+
+  cerrarSesionPorDireccion,
+
 } = require(
   "./services/singleSessionService"
 );
@@ -2246,6 +2250,187 @@ app.post(
 
           mensaje:
             "No se pudo cerrar la sesión en el servidor",
+
+        });
+
+    }
+
+  }
+);
+
+
+
+
+      // ==================================================
+// CONSULTAR SESIONES DE SUPERVISORES — DIRECCIÓN
+// ==================================================
+
+app.get(
+  "/api/sesiones-activas",
+  autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const sesiones =
+        await listarSesionesUnicas();
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        total:
+          sesiones.length,
+
+        sesiones,
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al consultar sesiones activas:",
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudieron consultar las sesiones activas",
+
+        });
+
+    }
+
+  }
+);
+
+
+// ==================================================
+// LIBERAR SESIÓN DE SUPERVISOR — DIRECCIÓN
+// ==================================================
+
+app.post(
+  "/api/sesiones-activas/liberar",
+  autenticarToken,
+  autorizarRoles(
+    "DIRECCIÓN"
+  ),
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const usuario =
+        String(
+          req.body?.usuario ?? ""
+        )
+          .trim()
+          .toUpperCase();
+
+
+      if (
+        !usuario ||
+        usuario.length > 150
+      ) {
+
+        return res
+          .status(
+            400
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "El usuario seleccionado no es válido",
+
+          });
+
+      }
+
+
+      const liberada =
+        await cerrarSesionPorDireccion({
+
+          usuario,
+
+        });
+
+
+      if (
+        !liberada
+      ) {
+
+        return res
+          .status(
+            404
+          )
+          .json({
+
+            correcto:
+              false,
+
+            mensaje:
+              "La sesión ya no existe o ya fue liberada",
+
+          });
+
+      }
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        mensaje:
+          `La sesión de ${usuario} fue liberada correctamente.`,
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al liberar sesión desde Dirección:",
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo liberar la sesión seleccionada",
 
         });
 
