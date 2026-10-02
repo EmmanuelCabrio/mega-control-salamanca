@@ -740,6 +740,224 @@ async function abortarSesionChecklist({
 
 
 // ==================================================
+// CONSULTAR ESTADO DE UNA SESIÓN DE CHECKLIST
+// ==================================================
+
+async function obtenerEstadoSesionChecklist({
+
+  sesionId,
+
+  supervisor,
+
+  promotor,
+
+  usuario,
+
+}) {
+
+  if (
+    typeof sesionId !== "string" ||
+    !/^[a-f0-9-]{36}$/i.test(
+      sesionId
+    )
+  ) {
+
+    return {
+
+      estado:
+        "NO_ENCONTRADA",
+
+    };
+
+  }
+
+
+  // Primero buscamos la sesión activa usando
+  // todas las validaciones de identidad existentes.
+
+  const sesionActiva =
+    await obtenerSesion({
+
+      sesionId,
+
+      supervisor,
+
+      promotor,
+
+      usuario,
+
+    });
+
+
+  if (
+    sesionActiva
+  ) {
+
+    const antiguedad =
+      Date.now() -
+      Date.parse(
+        sesionActiva.inicio
+      );
+
+
+    const expirada =
+      !Number.isFinite(
+        antiguedad
+      ) ||
+      antiguedad >
+        24 *
+        60 *
+        60 *
+        1000;
+
+
+    return {
+
+      estado:
+        expirada
+          ? "EXPIRADA"
+          : "ACTIVA",
+
+      inicio:
+        sesionActiva.inicio,
+
+      expirada,
+
+    };
+
+  }
+
+
+  const configuracion =
+    obtenerConfiguracion();
+
+
+  // En desarrollo local, las sesiones abortadas
+  // ya no permanecen en el mapa activo.
+
+  if (
+    !configuracion
+  ) {
+
+    return {
+
+      estado:
+        "NO_ENCONTRADA",
+
+    };
+
+  }
+
+
+  // Consultar el respaldo de auditoría para saber
+  // si Dirección abortó esta sesión.
+
+  const rutaAbortada =
+    `${CARPETA_SESIONES_ABORTADAS}/${sesionId}.json`;
+
+
+  const urlAbortada =
+    `${configuracion.supabaseUrl}/storage/v1/object/authenticated/${encodeURIComponent(
+      NOMBRE_BUCKET
+    )}/${codificarRuta(
+      rutaAbortada
+    )}`;
+
+
+  const respuestaAbortada =
+    await fetch(
+      urlAbortada,
+      {
+
+        method:
+          "GET",
+
+        headers:
+          crearHeaders(
+            configuracion.clave
+          ),
+
+      }
+    );
+
+
+  if (
+    respuestaAbortada.status === 400 ||
+    respuestaAbortada.status === 404
+  ) {
+
+    return {
+
+      estado:
+        "NO_ENCONTRADA",
+
+    };
+
+  }
+
+
+  await validarRespuesta(
+    respuestaAbortada
+  );
+
+
+  const sesionAbortada =
+    await respuestaAbortada.json();
+
+
+  const mismaIdentidad =
+    crearClave(
+      sesionAbortada.supervisor,
+      sesionAbortada.promotor
+    ) ===
+    crearClave(
+      supervisor,
+      promotor
+    );
+
+
+  const mismoUsuario =
+    String(
+      sesionAbortada.usuario ?? ""
+    ).trim() ===
+    String(
+      usuario ?? ""
+    ).trim();
+
+
+  if (
+    !mismaIdentidad ||
+    !mismoUsuario
+  ) {
+
+    return {
+
+      estado:
+        "NO_ENCONTRADA",
+
+    };
+
+  }
+
+
+  return {
+
+    estado:
+      "ABORTADA",
+
+    abortadaEn:
+      sesionAbortada.abortadaEn,
+
+    motivo:
+      sesionAbortada.motivo || "",
+
+  };
+
+}
+
+
+
+// ==================================================
 // LISTAR SESIONES PENDIENTES DE CHECKLIST
 // ==================================================
 
@@ -1443,6 +1661,8 @@ module.exports = {
   obtenerSesion,
 
   abortarSesionChecklist,
+
+  obtenerEstadoSesionChecklist,
 
   listarSesionesPendientes,
 
