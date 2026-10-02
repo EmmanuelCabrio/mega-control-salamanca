@@ -49,6 +49,8 @@ const {
 
   abortarSesionChecklist,
 
+  obtenerEstadoSesionChecklist,
+
   listarSesionesPendientes,
 
   guardarChecklist,
@@ -906,6 +908,94 @@ app.post(
   }
 );
 
+
+// ==================================================
+// CONSULTAR ESTADO DE SESIÓN DEL CHECKLIST
+// ==================================================
+
+app.get(
+  "/api/checklists-foco-rojo/sesion/:sesionId/estado",
+  autenticarToken,
+  async (
+    req,
+    res
+  ) => {
+
+    try {
+
+      const identidad =
+        await obtenerIdentidadChecklist(
+          req,
+          res
+        );
+
+
+      if (
+        !identidad
+      ) {
+
+        return;
+
+      }
+
+
+      const estado =
+        await obtenerEstadoSesionChecklist({
+
+          sesionId:
+            String(
+              req.params.sesionId ?? ""
+            ).trim(),
+
+          supervisor:
+            identidad.supervisor,
+
+          promotor:
+            identidad.promotor,
+
+          usuario:
+            req.usuario,
+
+        });
+
+
+      return res.json({
+
+        correcto:
+          true,
+
+        ...estado,
+
+      });
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "❌ Error al consultar el estado de la sesión del checklist:",
+        error
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          correcto:
+            false,
+
+          mensaje:
+            "No se pudo consultar el estado del check pendiente",
+
+        });
+
+    }
+
+  }
+);
 
 
 // ==================================================
