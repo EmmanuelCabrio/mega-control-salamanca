@@ -449,20 +449,79 @@ useEffect(
           );
 
 
-        const datos =
-          await respuesta.json();
+       const datos =
+  await respuesta.json();
 
 
-        if (
-          !respuesta.ok
-        ) {
+// =============================================
+// CHECK YA ABIERTO EN OTRO DISPOSITIVO
+// =============================================
 
-          throw new Error(
-            datos.mensaje ||
-            "No se pudo iniciar el checklist"
-          );
+if (
+  respuesta.status === 409 &&
+  datos.codigo ===
+    "CHECKLIST_PENDIENTE_OTRO_DISPOSITIVO"
+) {
 
-        }
+  try {
+
+    // Eliminamos solamente el candado recién creado
+    // en este navegador. El candado original continúa
+    // protegido en el servidor.
+
+    localStorage.removeItem(
+      "mega_checklist_pendiente"
+    );
+
+  } catch (
+    error
+  ) {
+
+    console.error(
+      "❌ No se pudo limpiar el candado local duplicado:",
+      error
+    );
+
+  }
+
+
+  if (
+    componenteActivo
+  ) {
+
+    sesionLiberadaRef.current =
+      true;
+
+
+    alert(
+      `🔒 ${datos.mensaje}\n\nNo puedes abrir otro check desde este dispositivo o navegador.`
+    );
+
+
+    onRegresar();
+
+  }
+
+
+  return;
+
+}
+
+
+// =============================================
+// OTROS ERRORES
+// =============================================
+
+if (
+  !respuesta.ok
+) {
+
+  throw new Error(
+    datos.mensaje ||
+    "No se pudo iniciar el checklist"
+  );
+
+}
 
 
         if (
