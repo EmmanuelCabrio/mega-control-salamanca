@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -45,6 +46,157 @@ function formatearFecha(
       valor
     )
   );
+
+}
+
+
+
+
+// ==================================================
+// OBTENER MES DE UNA MINUTA
+// ==================================================
+
+function obtenerMesMinuta(
+  valor
+) {
+
+  const fecha =
+    new Date(
+      valor
+    );
+
+
+  if (
+    Number.isNaN(
+      fecha.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+
+  const partes =
+    new Intl.DateTimeFormat(
+      "en-CA",
+      {
+
+        timeZone:
+          "America/Mexico_City",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+      }
+    ).formatToParts(
+      fecha
+    );
+
+
+  const anio =
+    partes.find(
+      (
+        parte
+      ) =>
+        parte.type ===
+        "year"
+    )?.value;
+
+
+  const mes =
+    partes.find(
+      (
+        parte
+      ) =>
+        parte.type ===
+        "month"
+    )?.value;
+
+
+  return anio && mes
+    ? `${anio}-${mes}`
+    : "";
+
+}
+
+
+// ==================================================
+// MES ACTUAL EN MÉXICO
+// ==================================================
+
+function obtenerMesActual() {
+
+  return obtenerMesMinuta(
+    new Date()
+  );
+
+}
+
+
+// ==================================================
+// NOMBRE DEL MES
+// ==================================================
+
+function formatearNombreMes(
+  valor
+) {
+
+  if (
+    !/^\d{4}-\d{2}$/.test(
+      valor
+    )
+  ) {
+
+    return valor;
+  }
+
+
+  const [
+    anio,
+    mes,
+  ] =
+    valor.split("-");
+
+
+  const fecha =
+    new Date(
+      Number(
+        anio
+      ),
+      Number(
+        mes
+      ) - 1,
+      1
+    );
+
+
+  const nombre =
+    new Intl.DateTimeFormat(
+      "es-MX",
+      {
+
+        month:
+          "long",
+
+        year:
+          "numeric",
+
+      }
+    ).format(
+      fecha
+    );
+
+
+  return nombre.charAt(
+    0
+  ).toUpperCase() +
+    nombre.slice(
+      1
+    );
 
 }
 
@@ -1097,6 +1249,21 @@ function MinutasSupervisor() {
     setMensaje,
   ] = useState("");
 
+  const [
+  filtroMes,
+  setFiltroMes,
+] = useState(
+  obtenerMesActual
+);
+
+
+const [
+  filtroEstado,
+  setFiltroEstado,
+] = useState(
+  "TODAS"
+);
+
 
   // ==================================================
   // CARGAR MINUTAS
@@ -1216,6 +1383,208 @@ function MinutasSupervisor() {
         minuta.estado ===
         "PENDIENTE_FIRMA"
     );
+
+
+
+  // ==================================================
+// MESES DISPONIBLES
+// ==================================================
+
+const mesesDisponibles =
+  useMemo(
+    () => {
+
+      return [
+        ...new Set(
+          minutas
+            .map(
+              (
+                minuta
+              ) =>
+                obtenerMesMinuta(
+                  minuta.creadaEn
+                )
+            )
+            .filter(
+              Boolean
+            )
+        ),
+      ].sort(
+        (
+          a,
+          b
+        ) =>
+          b.localeCompare(
+            a
+          )
+      );
+
+    },
+    [
+      minutas,
+    ]
+  );
+
+
+// ==================================================
+// FILTRAR MINUTAS DEL SUPERVISOR
+// ==================================================
+
+const minutasFiltradas =
+  useMemo(
+    () => {
+
+      return minutas
+
+        .filter(
+          (
+            minuta
+          ) => {
+
+            const esPendiente =
+              minuta.estado ===
+              "PENDIENTE_FIRMA";
+
+
+            // Las pendientes siempre permanecen
+            // visibles con el filtro general.
+
+            const coincideMes =
+              filtroMes ===
+                "TODOS" ||
+              obtenerMesMinuta(
+                minuta.creadaEn
+              ) ===
+                filtroMes ||
+              (
+                filtroEstado ===
+                  "TODAS" &&
+                esPendiente
+              );
+
+
+            if (
+              !coincideMes
+            ) {
+
+              return false;
+
+            }
+
+
+            if (
+              filtroEstado ===
+              "TODAS"
+            ) {
+
+              return true;
+
+            }
+
+
+            if (
+              filtroEstado ===
+              "PENDIENTES"
+            ) {
+
+              return esPendiente;
+
+            }
+
+
+            if (
+              filtroEstado ===
+              "FIRMADAS"
+            ) {
+
+              return (
+                minuta.estado ===
+                  "FIRMADA" &&
+                !minuta.resultado
+              );
+
+            }
+
+
+            if (
+              filtroEstado ===
+              "CUMPLIDAS"
+            ) {
+
+              return (
+                minuta.resultado ===
+                "CUMPLIDO"
+              );
+
+            }
+
+
+            if (
+              filtroEstado ===
+              "NO_CUMPLIDAS"
+            ) {
+
+              return (
+                minuta.resultado ===
+                "NO_CUMPLIDO"
+              );
+
+            }
+
+
+            return true;
+
+          }
+        )
+
+        .sort(
+          (
+            a,
+            b
+          ) => {
+
+            const pendienteA =
+              a.estado ===
+              "PENDIENTE_FIRMA";
+
+            const pendienteB =
+              b.estado ===
+              "PENDIENTE_FIRMA";
+
+
+            if (
+              pendienteA !==
+              pendienteB
+            ) {
+
+              return pendienteA
+                ? -1
+                : 1;
+
+            }
+
+
+            return (
+              new Date(
+                b.creadaEn ||
+                0
+              ).getTime() -
+              new Date(
+                a.creadaEn ||
+                0
+              ).getTime()
+            );
+
+          }
+        );
+
+    },
+    [
+      minutas,
+      filtroMes,
+      filtroEstado,
+    ]
+  );
 
 
   // Si no hay minutas, no ocupa espacio
