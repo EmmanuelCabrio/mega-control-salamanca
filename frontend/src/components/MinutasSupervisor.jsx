@@ -1264,6 +1264,13 @@ const [
   "TODAS"
 );
 
+  const [
+  filtroPromotor,
+  setFiltroPromotor,
+] = useState(
+  "TODOS"
+);
+
 
   // ==================================================
   // CARGAR MINUTAS
@@ -1426,6 +1433,48 @@ const mesesDisponibles =
   );
 
 
+  // ==================================================
+// PROMOTORES DISPONIBLES
+// ==================================================
+
+const promotoresDisponibles =
+  useMemo(
+    () => {
+
+      return [
+        ...new Set(
+          minutas
+            .map(
+              (
+                minuta
+              ) =>
+                String(
+                  minuta.promotor ??
+                  ""
+                ).trim()
+            )
+            .filter(
+              Boolean
+            )
+        ),
+      ].sort(
+        (
+          a,
+          b
+        ) =>
+          a.localeCompare(
+            b,
+            "es-MX"
+          )
+      );
+
+    },
+    [
+      minutas,
+    ]
+  );
+
+
 // ==================================================
 // FILTRAR MINUTAS DEL SUPERVISOR
 // ==================================================
@@ -1470,6 +1519,25 @@ const minutasFiltradas =
               return false;
 
             }
+
+
+            const coincidePromotor =
+                filtroPromotor ===
+                         "TODOS" ||
+                            String(
+                               minuta.promotor ??
+                                               ""
+                                     ).trim() ===
+                                    filtroPromotor;
+
+
+                                     if (
+                                     !coincidePromotor
+                                     ) {
+
+              return false;
+
+               }
 
 
             if (
@@ -1581,8 +1649,9 @@ const minutasFiltradas =
     },
     [
       minutas,
-      filtroMes,
-      filtroEstado,
+  filtroMes,
+  filtroEstado,
+  filtroPromotor,
     ]
   );
 
@@ -1788,6 +1857,54 @@ const minutasFiltradas =
       </select>
 
     </label>
+
+
+    <label className="minutas-filtro">
+
+  <span>
+    Promotor
+  </span>
+
+  <select
+    value={
+      filtroPromotor
+    }
+    onChange={
+      (
+        evento
+      ) =>
+        setFiltroPromotor(
+          evento.target.value
+        )
+    }
+  >
+
+    <option value="TODOS">
+      Todos los promotores
+    </option>
+
+    {promotoresDisponibles.map(
+      (
+        promotor
+      ) => (
+
+        <option
+          key={
+            promotor
+          }
+          value={
+            promotor
+          }
+        >
+          {promotor}
+        </option>
+
+      )
+    )}
+
+  </select>
+
+</label>
 
   </div>
 
