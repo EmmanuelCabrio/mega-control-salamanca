@@ -13,6 +13,68 @@ const API_URL =
 
 
 // ==================================================
+// IDENTIFICADOR ÚNICO DEL DISPOSITIVO / NAVEGADOR
+// ==================================================
+
+export function obtenerDispositivoId() {
+
+  const CLAVE_DISPOSITIVO =
+    "mega_dispositivo_id";
+
+
+  try {
+
+    const dispositivoGuardado =
+      localStorage.getItem(
+        CLAVE_DISPOSITIVO
+      );
+
+
+    if (
+      dispositivoGuardado
+    ) {
+
+      return dispositivoGuardado;
+
+    }
+
+
+    const nuevoDispositivoId =
+      globalThis.crypto?.randomUUID
+        ? globalThis.crypto.randomUUID()
+        : `dispositivo-${Date.now()}-${Math.random()
+            .toString(36)
+            .slice(2)}`;
+
+
+    localStorage.setItem(
+      CLAVE_DISPOSITIVO,
+      nuevoDispositivoId
+    );
+
+
+    return nuevoDispositivoId;
+
+  } catch (
+    error
+  ) {
+
+    console.error(
+      "❌ No se pudo obtener el identificador del dispositivo:",
+      error
+    );
+
+
+    return `temporal-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}`;
+
+  }
+
+}
+
+
+// ==================================================
 // VALIDAR LOGIN
 // ==================================================
 
@@ -70,7 +132,8 @@ export async function iniciarSesion(
         `${API_URL}/auth/login`,
         {
 
-          method: "POST",
+          method:
+            "POST",
 
           headers: {
 
@@ -87,6 +150,9 @@ export async function iniciarSesion(
 
               password:
                 passwordNormalizada,
+
+              dispositivoId:
+                obtenerDispositivoId(),
 
             }),
 
@@ -126,7 +192,9 @@ export async function iniciarSesion(
     return resultado;
 
 
-  } catch (error) {
+  } catch (
+    error
+  ) {
 
     console.error(
       "❌ Error conectando con el backend:",
@@ -146,6 +214,7 @@ export async function iniciarSesion(
   }
 
 }
+
 
 // ==================================================
 // TOKEN JWT
