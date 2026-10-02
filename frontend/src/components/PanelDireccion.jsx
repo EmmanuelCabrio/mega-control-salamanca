@@ -54,6 +54,9 @@ import EstadoLoginSupervisores
 import ChecksPendientesDireccion
   from "./ChecksPendientesDireccion";
 
+import SesionesActivasDireccion
+  from "./SesionesActivasDireccion";
+
 import HistorialChecklistsDireccion
   from "./HistorialChecklistsDireccion";
 
@@ -676,6 +679,9 @@ return (
  <Fragment key={versionDatos}>
 
    <MinutasDireccion />
+
+   <SesionesActivasDireccion />
+
 
     <ChecksPendientesDireccion />
 
