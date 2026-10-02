@@ -51,6 +51,9 @@ import MetaSemanaAnteriorDireccion
 import EstadoLoginSupervisores
   from "./EstadoLoginSupervisores";
 
+import ChecksPendientesDireccion
+  from "./ChecksPendientesDireccion";
+
 import HistorialChecklistsDireccion
   from "./HistorialChecklistsDireccion";
 
@@ -673,6 +676,8 @@ return (
  <Fragment key={versionDatos}>
 
    <MinutasDireccion />
+
+    <ChecksPendientesDireccion />
 
    <HistorialChecklistsDireccion
   registros={
