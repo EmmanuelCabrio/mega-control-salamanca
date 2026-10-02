@@ -17,6 +17,8 @@ const CARPETA_CHECKLISTS =
 const CARPETA_SESIONES =
   "checklists-foco-rojo/sesiones";
 
+const CARPETA_SESIONES_ABORTADAS =
+  "checklists-foco-rojo/sesiones-abortadas";
 
 // Respaldo para desarrollo local sin Supabase.
 
@@ -111,7 +113,7 @@ function obtenerConfiguracion() {
   ) {
 
     throw new Error(
-      "Falta la configuración de Supabase para guardar los checklists"
+      "Falta la configuración de Supabase para  los checklists"
     );
 
   }
@@ -474,6 +476,268 @@ async function obtenerSesion({
 
 
 // ==================================================
+// ABORTAR SESIÓN PENDIENTE DEL CHECKLIST
+// ==================================================
+
+async function abortarSesionChecklist({
+
+  sesionId,
+
+  abortadoPor,
+
+  motivo = "",
+
+}) {
+
+  if (
+    typeof sesionId !== "string" ||
+    !/^[a-f0-9-]{36}$/i.test(
+      sesionId
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  const configuracion =
+    obtenerConfiguracion();
+
+
+  // ================================================
+  // DESARROLLO LOCAL
+  // ================================================
+
+  if (
+    !configuracion
+  ) {
+
+    const sesion =
+      sesionesMemoria.get(
+        sesionId
+      );
+
+
+    if (
+      !sesion
+    ) {
+
+      return null;
+
+    }
+
+
+    const sesionAbortada = {
+
+      ...sesion,
+
+      estado:
+        "ABORTADA",
+
+      abortadoPor:
+        String(
+          abortadoPor ?? ""
+        ).trim(),
+
+      motivo:
+        String(
+          motivo ?? ""
+        )
+          .trim()
+          .slice(
+            0,
+            500
+          ),
+
+      abortadaEn:
+        new Date().toISOString(),
+
+    };
+
+
+    sesionesMemoria.delete(
+      sesionId
+    );
+
+
+    return sesionAbortada;
+
+  }
+
+
+  // ================================================
+  // LEER LA SESIÓN ACTIVA
+  // ================================================
+
+  const rutaActiva =
+    `${CARPETA_SESIONES}/${sesionId}.json`;
+
+
+  const urlLectura =
+    `${configuracion.supabaseUrl}/storage/v1/object/authenticated/${encodeURIComponent(
+      NOMBRE_BUCKET
+    )}/${codificarRuta(
+      rutaActiva
+    )}`;
+
+
+  const respuestaLectura =
+    await fetch(
+      urlLectura,
+      {
+
+        method:
+          "GET",
+
+        headers:
+          crearHeaders(
+            configuracion.clave
+          ),
+
+      }
+    );
+
+
+  if (
+    respuestaLectura.status === 400 ||
+    respuestaLectura.status === 404
+  ) {
+
+    return null;
+
+  }
+
+
+  await validarRespuesta(
+    respuestaLectura
+  );
+
+
+  const sesion =
+    await respuestaLectura.json();
+
+
+  // ================================================
+  // CREAR REGISTRO DE AUDITORÍA
+  // ================================================
+
+  const sesionAbortada = {
+
+    ...sesion,
+
+    estado:
+      "ABORTADA",
+
+    abortadoPor:
+      String(
+        abortadoPor ?? ""
+      ).trim(),
+
+    motivo:
+      String(
+        motivo ?? ""
+      )
+        .trim()
+        .slice(
+          0,
+          500
+        ),
+
+    abortadaEn:
+      new Date().toISOString(),
+
+  };
+
+
+  const rutaAbortada =
+    `${CARPETA_SESIONES_ABORTADAS}/${sesionId}.json`;
+
+
+  const urlAbortada =
+    `${configuracion.supabaseUrl}/storage/v1/object/${encodeURIComponent(
+      NOMBRE_BUCKET
+    )}/${codificarRuta(
+      rutaAbortada
+    )}`;
+
+
+  const respuestaAbortada =
+    await fetch(
+      urlAbortada,
+      {
+
+        method:
+          "POST",
+
+        headers:
+          crearHeaders(
+            configuracion.clave,
+            {
+
+              "Content-Type":
+                "application/json",
+
+              "x-upsert":
+                "true",
+
+            }
+          ),
+
+        body:
+          JSON.stringify(
+            sesionAbortada
+          ),
+
+      }
+    );
+
+
+  await validarRespuesta(
+    respuestaAbortada
+  );
+
+
+  // ================================================
+  // ELIMINAR ÚNICAMENTE LA SESIÓN ACTIVA
+  // ================================================
+
+  const urlEliminar =
+    `${configuracion.supabaseUrl}/storage/v1/object/${encodeURIComponent(
+      NOMBRE_BUCKET
+    )}/${codificarRuta(
+      rutaActiva
+    )}`;
+
+
+  const respuestaEliminar =
+    await fetch(
+      urlEliminar,
+      {
+
+        method:
+          "DELETE",
+
+        headers:
+          crearHeaders(
+            configuracion.clave
+          ),
+
+      }
+    );
+
+
+  await validarRespuesta(
+    respuestaEliminar
+  );
+
+
+  return sesionAbortada;
+
+}
+
+
+// ==================================================
 // GUARDAR CHECKLIST TERMINADO
 // ==================================================
 
@@ -831,6 +1095,8 @@ module.exports = {
   iniciarChecklist,
 
   obtenerSesion,
+
+  abortarSesionChecklist,
 
   guardarChecklist,
 
