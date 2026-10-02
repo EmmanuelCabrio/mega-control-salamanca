@@ -263,7 +263,7 @@ function puedeAccederRecuperacion(
 // AUTENTICACIÓN
 // ==================================================
 
-function autenticarToken(
+async function autenticarToken(
   req,
   res,
   next
@@ -349,6 +349,104 @@ if (!tokenValido) {
       "Token inválido",
 
   });
+
+}
+
+
+    // ================================================
+// VALIDAR SESIÓN ÚNICA DEL SUPERVISOR
+// ================================================
+
+if (
+  rol === "SUPERVISOR"
+) {
+
+  const sesionId =
+    String(
+      datos.sesionId ?? ""
+    ).trim();
+
+  const dispositivoId =
+    String(
+      datos.dispositivoId ?? ""
+    ).trim();
+
+
+  // Los tokens creados antes de implementar
+  // la sesión única deben volver a iniciar sesión.
+
+  if (
+    !sesionId ||
+    !dispositivoId
+  ) {
+
+    return res
+      .status(
+        401
+      )
+      .json({
+
+        correcto:
+          false,
+
+        codigo:
+          "SESION_UNICA_REQUERIDA",
+
+        mensaje:
+          "Por seguridad debes volver a iniciar sesión.",
+
+      });
+
+  }
+
+
+  const validacionSesion =
+    await validarSesionUnica({
+
+      usuario:
+        datos.usuario,
+
+      sesionId,
+
+      dispositivoId,
+
+    });
+
+
+  if (
+    !validacionSesion.valida
+  ) {
+
+    return res
+      .status(
+        401
+      )
+      .json({
+
+        correcto:
+          false,
+
+        codigo:
+          validacionSesion.codigo,
+
+        mensaje:
+          validacionSesion.codigo ===
+          "SESION_REEMPLAZADA"
+
+            ? "Tu sesión fue cerrada porque este usuario inició en otro dispositivo."
+
+            : "Tu sesión terminó por inactividad. Vuelve a iniciar sesión.",
+
+      });
+
+  }
+
+
+  req.sesionId =
+    sesionId;
+
+  req.dispositivoId =
+    dispositivoId;
 
 }
 
