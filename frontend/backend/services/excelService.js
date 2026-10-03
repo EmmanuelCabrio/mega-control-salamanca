@@ -8954,7 +8954,6 @@ function validarExcelLigero(buffer) {
     "VENTA DIARIA POR SUPERVISOR",
     "USERS",
     "PLANTILLA",
-    "CARTERA POR DÍA",
     "PROYECCION",
     "BD ACUMULADO VENTA MES",
     "ACUMULADO VENTA MES ANTERIOR",
