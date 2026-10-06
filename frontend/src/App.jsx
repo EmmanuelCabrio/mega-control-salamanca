@@ -868,20 +868,90 @@ console.log(
 }
 
 // ==================================================
+// 🔄 CARGAR ÚNICAMENTE EL EQUIPO DE RECUPERACIÓN
+// ==================================================
+
+async function cargarRegistrosRecuperacion() {
+
+  try {
+
+    const respuesta =
+      await fetchProtegido(
+        `${API_URL}/api/registros`
+      );
+
+
+    if (
+      !respuesta.ok
+    ) {
+
+      throw new Error(
+        `Error HTTP ${respuesta.status} al cargar el equipo de recuperación`
+      );
+
+    }
+
+
+    const datos =
+      await respuesta.json();
+
+
+    if (
+      !datos.correcto
+    ) {
+
+      throw new Error(
+        datos.mensaje ||
+        "No se pudo cargar el equipo de recuperación"
+      );
+
+    }
+
+
+    setRegistros(
+      datos.registros || []
+    );
+
+  } catch (error) {
+
+    console.error(
+      "❌ ERROR AL CARGAR EL EQUIPO DE RECUPERACIÓN:",
+      error
+    );
+
+
+    setRegistros([]);
+
+  }
+
+}
+
+
+// ==================================================
 // 🔐 CARGAR DATOS DESPUÉS DEL LOGIN
 // ==================================================
 
 useEffect(() => {
 
- if (
-  !logueado ||
-  rolUsuario === "RECUPERACION" ||
-  rolUsuario === "PROMOTOR"
-) {
+  if (
+    !logueado ||
+    rolUsuario === "PROMOTOR"
+  ) {
 
-  return;
+    return;
 
-}
+  }
+
+
+  if (
+    rolUsuario === "RECUPERACION"
+  ) {
+
+    cargarRegistrosRecuperacion();
+
+    return;
+
+  }
 
 
   console.log(
@@ -889,16 +959,15 @@ useEffect(() => {
   );
 
 
-  console.log(
-  "🚀 DIRECCIÓN: voy a cargar datos"
-);
-
   cargarDatos();
 
 }, [
   logueado,
   rolUsuario,
 ]);
+
+
+  
 // ==================================================
 // LOGIN
 // ==================================================
