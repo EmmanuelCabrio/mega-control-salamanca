@@ -2996,7 +2996,8 @@ app.get(
   autenticarToken,
   autorizarRoles(
     "DIRECCIÓN",
-    "SUPERVISOR"
+    "SUPERVISOR",
+    "RECUPERACION"
   ),
   async (req, res) => {
 
@@ -3040,8 +3041,27 @@ app.get(
       }
 
 
+      // Supervisor y Recuperación únicamente
+      // consultan el equipo asociado a su token.
+
       const supervisor =
         req.supervisor;
+
+
+      if (
+        !supervisor
+      ) {
+
+        return res.status(403).json({
+
+          correcto: false,
+
+          mensaje:
+            "No tienes un equipo asociado para consultar",
+
+        });
+
+      }
 
 
       const registros =
@@ -3053,6 +3073,11 @@ app.get(
               ) === supervisor
           );
 
+
+      console.log(
+        "👤 USUARIO:",
+        rol
+      );
 
       console.log(
         "👨‍💼 SUPERVISOR:",
