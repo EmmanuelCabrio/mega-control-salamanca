@@ -72,8 +72,7 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:3001";
 
-const SUPERVISOR_RECUPERACION =
-  "MORALES PEREZ BENJAMIN";
+
 
 
 // ==================================================
@@ -867,105 +866,23 @@ console.log(
 }
 }
 
-// ==================================================
-// 🔄 CARGAR ÚNICAMENTE EL EQUIPO DE RECUPERACIÓN
-// ==================================================
-
-async function cargarRegistrosRecuperacion() {
-
-  try {
-
-    const respuesta =
-      await fetchProtegido(
-        `${API_URL}/api/registros`
-      );
-
-
-    if (
-      !respuesta.ok
-    ) {
-
-      throw new Error(
-        `Error HTTP ${respuesta.status} al cargar el equipo de recuperación`
-      );
-
-    }
-
-
-    const datos =
-      await respuesta.json();
-
-
-    if (
-      !datos.correcto
-    ) {
-
-      throw new Error(
-        datos.mensaje ||
-        "No se pudo cargar el equipo de recuperación"
-      );
-
-    }
-
-
-    setRegistros(
-      datos.registros || []
-    );
-
-  } catch (error) {
-
-    console.error(
-      "❌ ERROR AL CARGAR EL EQUIPO DE RECUPERACIÓN:",
-      error
-    );
-
-
-    setRegistros([]);
-
-  }
-
-}
-
 
 // ==================================================
 // 🔐 CARGAR DATOS DESPUÉS DEL LOGIN
 // ==================================================
 
 useEffect(() => {
-
   if (
     !logueado ||
-    rolUsuario === "PROMOTOR"
-  ) {
-
-    return;
-
-  }
-
-
-  if (
+    rolUsuario === "PROMOTOR" ||
     rolUsuario === "RECUPERACION"
   ) {
-
-    cargarRegistrosRecuperacion();
-
     return;
-
   }
 
-
-  console.log(
-    "🚀🚀 INICIANDO CARGA DESPUÉS DEL LOGIN"
-  );
-
-
+  console.log("🚀🚀 INICIANDO CARGA DESPUÉS DEL LOGIN");
   cargarDatos();
-
-}, [
-  logueado,
-  rolUsuario,
-]);
-
+}, [logueado, rolUsuario]);
 
   
 // ==================================================
@@ -2474,31 +2391,14 @@ if (
 
   return (
 
-    <PanelRecuperacion
-
-  registros={
-    registros
-  }
-
-  supervisor={
-        rolUsuario === "DIRECCIÓN"
-          ? SUPERVISOR_RECUPERACION
-          : supervisorSeleccionado
-      }
-
+       <PanelRecuperacion
+      desdeDireccion={rolUsuario === "DIRECCIÓN"}
       onRegresarDireccion={
         rolUsuario === "DIRECCIÓN"
-          ? () =>
-              setVista(
-                "direccion"
-              )
+          ? () => setVista("direccion")
           : null
       }
-
-      onCerrarSesion={
-        cerrarSesion
-      }
-
+      onCerrarSesion={cerrarSesion}
     />
 
   );
