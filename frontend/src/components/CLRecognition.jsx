@@ -10,19 +10,13 @@ function CLRecognition({
   // TOP 10 CL SALAMANCA
   // ==================================================
 
-  const top10 =
-    [...ranking]
-      .filter(
-        (promotor) =>
-          promotor.nombre !==
-          "MORALES PEREZ BENJAMIN"
-      )
-      .sort(
-        (a, b) =>
-          Number(b.productividad ?? 0) -
-          Number(a.productividad ?? 0)
-      )
-      .slice(0, 10);
+  const top10 = [...ranking]
+    .sort(
+      (a, b) =>
+        Number(b.productividad ?? 0) -
+        Number(a.productividad ?? 0)
+    )
+    .slice(0, 10);
 
 
   // ==================================================
