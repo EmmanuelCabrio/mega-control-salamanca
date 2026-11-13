@@ -91,13 +91,8 @@ function ResumenVsMesAnteriorSupervisores({
           }
 
 
-          if (
-            supervisorNormalizado ===
-            "MORALES PEREZ BENJAMIN"
-          ) {
-
+                    if (registro.equipoRecuperacion) {
             continue;
-
           }
 
 
