@@ -7,6 +7,9 @@ dotenv.config();
 
 const {
   obtenerUsuarios,
+  obtenerEquiposRecuperacion,
+  esEquipoRecuperacion,
+  normalizarNombre,
   validarUsuario,
   leerExcel,
   leerVentaVsMesAnterior,
@@ -263,6 +266,21 @@ function puedeAccederRecuperacion(
 }
 
 
+function resolverSupervisorRecuperacion(req, res) {
+  if (req.rol === "RECUPERACION") return req.supervisor;
+
+  const { activos } = obtenerEquiposRecuperacion();
+  if (activos.size === 1) return activos.values().next().value;
+
+  res.status(409).json({
+    correcto: false,
+    mensaje: "Configura un solo supervisor activo con el rol RECUPERACION en USERS.",
+  });
+
+  return null;
+}
+
+
 // ==================================================
 // AUTENTICACIÓN
 // ==================================================
@@ -355,6 +373,24 @@ if (!tokenValido) {
   });
 
 }
+
+
+        if (rol === "RECUPERACION") {
+      const usuarioActivo = obtenerUsuarios().some((usuario) =>
+        usuario.usuario.toLowerCase() === String(datos.usuario ?? "").trim().toLowerCase() &&
+        normalizarNombre(usuario.estado) === "ACTIVO" &&
+        normalizarRol(usuario.rol) === "RECUPERACION" &&
+        normalizarNombre(usuario.supervisor) === normalizarNombre(datos.supervisor) &&
+        tieneSupervisor
+      );
+
+      if (!usuarioActivo) {
+        return res.status(401).json({
+          correcto: false,
+          mensaje: "Tu acceso de Recuperación cambió. Vuelve a iniciar sesión.",
+        });
+      }
+    }
 
 
     // ================================================
@@ -2907,13 +2943,7 @@ app.get(
       const ranking =
         (datos.rankingSupervisores || [])
 
-          .filter(
-            (item) =>
-              normalizarSupervisor(
-                item.supervisor
-              ) !==
-              "MORALES PEREZ BENJAMIN"
-          )
+        
 
           .map(
             (item) => ({
@@ -3011,6 +3041,26 @@ app.get(
         normalizarRol(
           req.rol
         );
+
+
+            if (
+        rol === "RECUPERACION" ||
+        (rol === "DIRECCIÓN" && req.query.equipo === "recuperacion")
+      ) {
+        const supervisor = resolverSupervisorRecuperacion(req, res);
+        if (!supervisor) return;
+
+        const claveSupervisor = normalizarNombre(supervisor);
+
+        return res.json({
+          correcto: true,
+          rol,
+          supervisor,
+          registros: datos.registros.filter((registro) =>
+            normalizarNombre(registro.supervisor) === claveSupervisor
+          ),
+        });
+      }
 
 
       // Dirección recibe todos los registros.
@@ -4865,12 +4915,8 @@ app.get(
 
     try {
 
-      const supervisorRecuperacion =
-        normalizarRol(
-          req.rol
-        ) === "DIRECCIÓN"
-          ? "MORALES PEREZ BENJAMIN"
-          : req.supervisor;
+      const supervisorRecuperacion = resolverSupervisorRecuperacion(req, res);
+      if (!supervisorRecuperacion) return;
 
 
       const comparativa =
@@ -4934,14 +4980,8 @@ app.get(
 
       const ranking =
         (datos.registros || [])
-
-          .filter(
-            (registro) =>
-              normalizarSupervisor(
-                registro.supervisor
-              ) !==
-              "MORALES PEREZ BENJAMIN"
-          )
+                  .filter((registro) => !registro.equipoRecuperacion)
+                  
 
           .sort(
             (a, b) =>
@@ -5448,13 +5488,11 @@ app.get(
           clave === "0" ||
           clave === "SUPERVISOR" ||
           clave === "TOTAL" ||
-          clave ===
-            "MORALES PEREZ BENJAMIN"
+          registro.equipoRecuperacion
         ) {
-
           continue;
-
         }
+
 
 
         mapaSupervisores.set(
@@ -5630,15 +5668,9 @@ app.get(
         await leerExcel();
 
 
-      const registros =
+            const registros =
         (datos.registros || [])
-          .filter(
-            (registro) =>
-              normalizarSupervisor(
-                registro.supervisor
-              ) !==
-              "MORALES PEREZ BENJAMIN"
-          );
+          .filter((registro) => !registro.equipoRecuperacion);
 
 
       const ranking =
@@ -5725,15 +5757,9 @@ app.get(
         await leerExcel();
 
 
-      const registros =
+            const registros =
         (datos.registros || [])
-          .filter(
-            (registro) =>
-              normalizarSupervisor(
-                registro.supervisor
-              ) !==
-              "MORALES PEREZ BENJAMIN"
-          );
+          .filter((registro) => !registro.equipoRecuperacion);
 
 
       const ranking =
@@ -5960,12 +5986,7 @@ console.log(
                   registro.nombre ?? ""
                 ).trim();
 
-              const supervisor =
-                String(
-                  registro.supervisor ?? ""
-                )
-                  .trim()
-                  .toUpperCase();
+            
 
 
               if (
@@ -5978,13 +5999,8 @@ console.log(
               }
 
 
-              if (
-                supervisor ===
-                "MORALES PEREZ BENJAMIN"
-              ) {
-
+                           if (registro.equipoRecuperacion) {
                 return false;
-
               }
 
 
@@ -6869,8 +6885,11 @@ app.get(
       }
 
 
-      const registros =
-        leerDetalleVentaMensual();
+            const { supervisores } = obtenerEquiposRecuperacion();
+
+      const registros = leerDetalleVentaMensual().filter((registro) =>
+        !esEquipoRecuperacion(registro.supervisor, supervisores)
+      );
 
 
       return res.json({
