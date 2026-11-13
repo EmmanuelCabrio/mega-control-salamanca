@@ -1870,7 +1870,8 @@ const diferenciaVsMesAnterior =
 // ==================================================
 
 function leerRankingSupervisores(
-  hoja
+  hoja,
+  supervisoresRecuperacion
 ) {
 
   const datos =
