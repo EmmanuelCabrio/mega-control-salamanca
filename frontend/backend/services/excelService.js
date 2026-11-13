@@ -431,6 +431,31 @@ const COLUMNA_ROL = 7;
   return usuariosCacheados;
 }
 
+
+function obtenerEquiposRecuperacion() {
+  const supervisores = new Set();
+  const activos = new Map();
+
+  for (const usuario of obtenerUsuarios()) {
+    if (normalizarNombre(usuario.rol) !== "RECUPERACION") continue;
+
+    const clave = normalizarNombre(usuario.supervisor);
+    if (!clave || clave === "0") continue;
+
+    supervisores.add(clave);
+
+    if (limpiarTexto(usuario.estado) === "ACTIVO") {
+      activos.set(clave, limpiarTexto(usuario.supervisor));
+    }
+  }
+
+  return { supervisores, activos };
+}
+
+function esEquipoRecuperacion(supervisor, supervisores) {
+  return supervisores.has(normalizarNombre(supervisor));
+}
+
 // ==================================================
 // VALIDAR USUARIO
 // ==================================================
@@ -2099,13 +2124,8 @@ const COLUMNA_PRODUCTIVIDAD = 50;
     }
 
 
-    if (
-      supervisor ===
-      "MORALES PEREZ BENJAMIN"
-    ) {
-
+       if (esEquipoRecuperacion(supervisor, supervisoresRecuperacion)) {
       continue;
-
     }
 
 
@@ -8342,15 +8362,22 @@ const hojaMesAnterior =
   );
 
 
-    const registros =
-  leerRegistros(
-    hojaProduccion,
-    hojaSinVenta,
-    hojaVentaVsPpto,
-    diasHabiles,
-    comparativaMesAnterior.mapa
-  );
+        const { supervisores: supervisoresRecuperacion } =
+      obtenerEquiposRecuperacion();
 
+    const registros = leerRegistros(
+      hojaProduccion,
+      hojaSinVenta,
+      hojaVentaVsPpto,
+      diasHabiles,
+      comparativaMesAnterior.mapa
+    ).map((registro) => ({
+      ...registro,
+      equipoRecuperacion: esEquipoRecuperacion(
+        registro.supervisor,
+        supervisoresRecuperacion
+      ),
+    }));
 
     // ==================================================
 // RESULTADO DEL MISMO DÍA DE LA SEMANA ANTERIOR
@@ -8837,10 +8864,10 @@ const resumenPlanTrabajo =
     }
 
 
-    const rankingSupervisores =
-      leerRankingSupervisores(
-        hojaRankingSupervisores
-      );
+       const rankingSupervisores = leerRankingSupervisores(
+      hojaRankingSupervisores,
+      supervisoresRecuperacion
+    );
 
 
     // ==================================================
@@ -10921,6 +10948,12 @@ module.exports = {
   actualizarDatosDesdeSupabase,
 
   descargarExcelDesdeSupabase,
+  
+  obtenerEquiposRecuperacion,
+  
+  esEquipoRecuperacion,
+  
+  normalizarNombre,
 
   
 
