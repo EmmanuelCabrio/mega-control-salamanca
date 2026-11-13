@@ -16,18 +16,17 @@ function TeamTable({
   // EQUIPO DEL SUPERVISOR
   // ==================================================
 
-  const equipo =
-    registros.filter(
-      (promotor) =>
-        promotor.supervisor ===
-          supervisorSeleccionado &&
+    const registrosEquipo = modoRecuperacion
+    ? registros
+    : registros.filter(
+        (promotor) => promotor.supervisor === supervisorSeleccionado
+      );
 
-        promotor.nombre &&
-
-        String(
-          promotor.nombre
-        ).trim() !== "0"
-    );
+  const equipo = registrosEquipo.filter(
+    (promotor) =>
+      promotor.nombre &&
+      String(promotor.nombre).trim() !== "0"
+  );
 
 
   // ==================================================
