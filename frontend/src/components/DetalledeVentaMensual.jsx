@@ -150,12 +150,8 @@ function DetalledeVentaMensual({
                 .trim()
                 .toUpperCase();
 
-            return (
-              supervisor !== "" &&
-              supervisor !== "0" &&
-              supervisor !==
-                "MORALES PEREZ BENJAMIN"
-            );
+                        return supervisor !== "" && supervisor !== "0";
+            
 
           }
         )
